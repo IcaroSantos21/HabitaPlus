@@ -1,0 +1,39 @@
+# compilado
+/dist
+/build
+
+# dependências
+/node_modules
+
+# variáveis de ambiente (só o .env.example vai pro repositório)
+.env
+.env.*
+!.env.example
+
+# logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# testes
+/coverage
+/.nyc_output
+
+# sistema operacional
+.DS_Store
+Thumbs.db
+
+# editores
+/.idea
+/.vscode/*
+!/.vscode/extensions.json
+*.swp
+*.swo
+
+# temporários
+*.tmp
+.cache
