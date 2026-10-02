@@ -1,9 +1,9 @@
-import { ApiProperty} from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class HealthResponseDto {
-    @ApiProperty({  enum: ['ok', 'degraded'] })
-    status!: 'ok' | 'degraded';
+  @ApiProperty({ enum: ['ok', 'degraded'] })
+  status!: 'ok' | 'degraded';
 
-    @ApiProperty({  enum: ['up', 'down'] })
-    database!: 'up' | 'down';
+  @ApiProperty({ enum: ['up', 'down'] })
+  database!: 'up' | 'down';
 }
