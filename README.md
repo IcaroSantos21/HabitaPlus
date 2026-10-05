@@ -62,3 +62,7 @@ O schema vem de migrations (o `synchronize` fica desligado), e elas **não rodam
 ### Frontend
 
 Ainda não está no Compose. Entra quando o frontend tiver Dockerfile.
+
+## Contribuindo
+
+Branches, commits e regras de PR estão em [CONTRIBUTING.md](CONTRIBUTING.md).
