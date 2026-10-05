@@ -1,7 +1,50 @@
+name: habitaplus
+
 services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:?Defina DB_USER no .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env}
+      POSTGRES_DB: ${DB_NAME:?Defina DB_NAME no .env}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      DB_HOST: postgres
+      DB_PORT: 5432          # porta interna; a do host é só o mapeamento do postgres
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      ML_SERVICE_URL: http://ml-service:8000
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+
   ml-service:
     build: ./ml-service
-    container_name: habitaplus-ml-service
-    ports:
-      - "8000:8000"
     restart: unless-stopped
+    ports:
+      - "${ML_PORT:-8000}:8000"
+
+  # frontend: descomentar quando existir Dockerfile
+
+volumes:
+  pgdata:
