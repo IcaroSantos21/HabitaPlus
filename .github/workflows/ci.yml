@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+# Novo push no mesmo PR cancela a execução anterior
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24 # mesma versão do backend/Dockerfile
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      # lint:check não usa --fix: o "npm run lint" corrigiria o arquivo no runner e passaria
+      - run: npm run lint:check
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:e2e
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      # O frontend ainda não tem package.json. Enquanto isso, o job passa sem fazer nada,
+      # para o check "Frontend" poder ser obrigatório desde já. Remova os "if" quando o projeto existir.
+      - name: Frontend ainda não inicializado
+        if: ${{ hashFiles('frontend/package.json') == '' }}
+        run: echo "frontend/package.json não existe, nada a validar."
+      - uses: actions/setup-node@v7
+        if: ${{ hashFiles('frontend/package.json') != '' }}
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        if: ${{ hashFiles('frontend/package.json') != '' }}
+      - run: npm run lint
+        if: ${{ hashFiles('frontend/package.json') != '' }}
+      - run: npm run build
+        if: ${{ hashFiles('frontend/package.json') != '' }}
+
+  ml-service:
+    name: ML Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ml-service
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11" # mesma versão do ml-service/Dockerfile
+          cache: pip
+          cache-dependency-path: ml-service/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: pytest
