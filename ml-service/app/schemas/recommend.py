@@ -4,6 +4,7 @@ from app.core.constants import Category
 from app.schemas.base import CamelModel
 
 
+# Agrupa dados do morador usados para calcular recomendações.
 class Profile(CamelModel):
     """Interesse do morador por categoria. Vazio = cold start."""
 
@@ -12,6 +13,7 @@ class Profile(CamelModel):
     conversas: dict[Category, int] = Field(default_factory=dict)
 
 
+# Descreve um anúncio que pode ser recomendado.
 class Candidate(CamelModel):
     """Anúncio candidato enviado pelo back."""
 
@@ -21,6 +23,7 @@ class Candidate(CamelModel):
     popularidade: int = Field(ge=0)
 
 
+# Reúne o perfil e os anúncios que serão avaliados.
 class RecommendRequest(CamelModel):
     """Perfil do morador e anúncios candidatos."""
 
@@ -30,6 +33,7 @@ class RecommendRequest(CamelModel):
     top_n: int = Field(default=5, ge=1, le=50)
 
 
+# Representa um anúncio selecionado e sua pontuação.
 class Recommendation(CamelModel):
     """Anúncio recomendado com score."""
 
@@ -37,6 +41,7 @@ class Recommendation(CamelModel):
     score: float
 
 
+# Define o grupo identificado e a lista de recomendações da resposta.
 class RecommendResponse(CamelModel):
     """Cluster do morador e anúncios recomendados."""
 

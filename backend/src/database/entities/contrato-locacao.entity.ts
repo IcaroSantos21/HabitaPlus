@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { Unidade } from './unidade.entity';
 
 @Entity('contratos_locacao')
+// Representa o contrato de aluguel de uma unidade por um morador.
 export class ContratoLocacao {
   @PrimaryGeneratedColumn()
   id!: number;

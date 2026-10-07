@@ -10,6 +10,7 @@ import { Unidade } from './unidade.entity';
 import { StatusCobranca } from './enums';
 
 @Entity('cobrancas')
+// Representa uma cobrança vinculada a uma unidade do condomínio.
 export class Cobranca {
   @PrimaryGeneratedColumn()
   id!: number;

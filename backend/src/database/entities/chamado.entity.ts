@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { Unidade } from './unidade.entity';
 
 @Entity('chamados')
+// Representa um chamado de manutenção ou atendimento aberto por um usuário.
 export class Chamado {
   @PrimaryGeneratedColumn()
   id!: number;

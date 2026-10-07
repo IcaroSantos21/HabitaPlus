@@ -5,6 +5,7 @@ import {
 } from 'typeorm';
 
 @Entity('unidades')
+// Representa uma unidade habitacional do condomínio e seus dados básicos.
 export class Unidade {
   @PrimaryGeneratedColumn()
   id!: number;

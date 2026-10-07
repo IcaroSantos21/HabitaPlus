@@ -1,3 +1,4 @@
+// Descreve as configurações tipadas usadas pelo backend.
 export interface AppConfig {
   nodeEnv: string;
   port: number;
@@ -11,6 +12,7 @@ export interface AppConfig {
   };
 }
 
+// Lê as variáveis de ambiente e fornece valores padrão para configurações opcionais.
 export default (): AppConfig => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parseInt(process.env.PORT ?? '3000', 10),

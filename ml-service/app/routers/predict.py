@@ -9,6 +9,7 @@ from app.services.protocols import ExpensePredictor
 router = APIRouter(prefix="/predict", tags=["predict"])
 
 
+# Recebe o histórico de despesas e devolve uma previsão.
 @router.post(
     "/expenses",
     response_model=ExpensesResponse,

@@ -11,6 +11,7 @@ import { Unidade } from './unidade.entity';
 import { TipoVinculo } from './enums';
 
 @Entity('vinculos')
+// Relaciona um usuário a uma unidade como proprietário ou inquilino.
 export class Vinculo {
   @PrimaryGeneratedColumn()
   id!: number;

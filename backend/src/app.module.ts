@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    // Carrega configurações do ambiente e disponibiliza o acesso ao banco.
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: path.resolve(__dirname, '../../.env'),
@@ -16,6 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       validate: validateEnv,
     }),
     TypeOrmModule.forRootAsync({
+      // Monta a conexão com o PostgreSQL usando as configurações validadas.
       inject: [ConfigService],
       useFactory: (config: ConfigService<AppConfig, true>) => {
         const db = config.get('database', { infer: true });

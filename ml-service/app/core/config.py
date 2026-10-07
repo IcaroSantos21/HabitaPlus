@@ -9,6 +9,7 @@ APP_DESCRIPTION = (
     "previsão de despesas e recomendação de produtos."
 )
 
+# Define pastas usadas para localizar dados e modelos do serviço.
 BASE_DIR = Path(__file__).resolve().parents[2]
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 DATA_DIR = BASE_DIR / "data"

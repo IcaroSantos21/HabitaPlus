@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { StatusAnuncio } from './enums';
 
 @Entity('anuncios')
+// Representa um anúncio de produto publicado por um usuário.
 export class Anuncio {
   @PrimaryGeneratedColumn()
   id!: number;

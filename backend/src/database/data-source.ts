@@ -6,6 +6,7 @@ dotenv.config({
   path: path.resolve(__dirname, '../../../.env'),
 });
 
+// Configura a fonte de dados usada pelas ferramentas de migração do TypeORM.
 export default new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST ?? 'localhost',

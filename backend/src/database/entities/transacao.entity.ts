@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { TipoTransacao } from './enums';
 
 @Entity('transacoes')
+// Representa uma receita ou despesa registrada por um usuário.
 export class Transacao {
   @PrimaryGeneratedColumn()
   id!: number;

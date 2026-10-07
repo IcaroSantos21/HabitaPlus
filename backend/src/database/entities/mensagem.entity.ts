@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { Anuncio } from './anuncio.entity';
 
 @Entity('mensagens')
+// Representa uma mensagem trocada entre usuários sobre um anúncio.
 export class Mensagem {
   @PrimaryGeneratedColumn()
   id!: number;

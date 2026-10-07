@@ -1,6 +1,7 @@
 name: habitaplus
 
 services:
+  # Banco de dados compartilhado pelos serviços da aplicação.
   postgres:
     image: postgres:16
     restart: unless-stopped
@@ -19,6 +20,7 @@ services:
       retries: 10
       start_period: 10s
 
+  # API principal que acessa o banco e conversa com o serviço de ML.
   backend:
     build: ./backend
     restart: unless-stopped
@@ -38,6 +40,7 @@ services:
     ports:
       - "${BACKEND_PORT:-3000}:3000"
 
+  # Serviço que disponibiliza as funcionalidades de inteligência.
   ml-service:
     build: ./ml-service
     restart: unless-stopped
@@ -47,4 +50,5 @@ services:
   # frontend: descomentar quando existir Dockerfile
 
 volumes:
+  # Mantém os dados do PostgreSQL entre reinicializações dos containers.
   pgdata:

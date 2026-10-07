@@ -1,5 +1,7 @@
+// Define as variáveis que precisam existir para conectar ao banco de dados.
 const REQUIRED = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 
+// Interrompe a inicialização se alguma configuração obrigatória estiver ausente.
 export function validateEnv(
   env: Record<string, unknown>,
 ): Record<string, unknown> {

@@ -10,6 +10,7 @@ import { Usuario } from './usuario.entity';
 import { Anuncio } from './anuncio.entity';
 
 @Entity('visualizacoes')
+// Registra quando um usuário visualizou um anúncio.
 export class Visualizacao {
   @PrimaryGeneratedColumn()
   id!: number;

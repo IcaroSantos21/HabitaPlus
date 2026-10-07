@@ -6,6 +6,7 @@ from app.schemas.health import HealthResponse
 router = APIRouter(tags=["health"])
 
 
+# Retorna os dados básicos que indicam que a API está ativa.
 @router.get("/health", response_model=HealthResponse, summary="Healthcheck")
 def health() -> HealthResponse:
     """Indica que o serviço está no ar."""

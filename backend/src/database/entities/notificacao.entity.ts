@@ -9,6 +9,7 @@ import {
 import { Usuario } from './usuario.entity';
 
 @Entity('notificacoes')
+// Representa uma notificação enviada a um usuário.
 export class Notificacao {
   @PrimaryGeneratedColumn()
   id!: number;

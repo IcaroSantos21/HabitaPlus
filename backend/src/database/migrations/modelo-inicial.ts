@@ -1,10 +1,12 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CriarModeloInicial1791246819778 implements MigrationInterface {
+  // Cria os tipos, tabelas e relacionamentos iniciais do banco de dados.
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ==========================================
     // ENUMS
     // ==========================================
+    // Cria valores fixos usados para perfis, vínculos, transações e status.
 
     await queryRunner.query(`
       CREATE TYPE "perfil_usuario_enum"
@@ -32,6 +34,10 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     `);
 
     // ==========================================
+    // TABELAS
+    // ==========================================
+    // Cria as tabelas usadas por usuários, condomínio, finanças e marketplace.
+    // ==========================================
     // USUARIOS
     // ==========================================
 
@@ -50,7 +56,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // UNIDADES
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "unidades" (
         "id" SERIAL NOT NULL,
@@ -67,7 +72,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // VINCULOS
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "vinculos" (
         "id" SERIAL NOT NULL,
@@ -81,7 +85,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // CONTRATOS DE LOCACAO
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "contratos_locacao" (
         "id" SERIAL NOT NULL,
@@ -98,7 +101,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // CHAMADOS
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "chamados" (
         "id" SERIAL NOT NULL,
@@ -118,7 +120,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // TRANSACOES
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "transacoes" (
         "id" SERIAL NOT NULL,
@@ -136,7 +137,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // COBRANCAS
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "cobrancas" (
         "id" SERIAL NOT NULL,
@@ -153,7 +153,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // ANUNCIOS
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "anuncios" (
         "id" SERIAL NOT NULL,
@@ -171,7 +170,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // VISUALIZACOES
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "visualizacoes" (
         "id" SERIAL NOT NULL,
@@ -185,7 +183,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // MENSAGENS
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "mensagens" (
         "id" SERIAL NOT NULL,
@@ -202,7 +199,6 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     // ==========================================
     // NOTIFICACOES
     // ==========================================
-
     await queryRunner.query(`
       CREATE TABLE "notificacoes" (
         "id" SERIAL NOT NULL,
@@ -216,8 +212,9 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
     `);
 
     // ==========================================
-    // FOREIGN KEYS
+    // CHAVES ESTRANGEIRAS
     // ==========================================
+    // Liga os registros às tabelas relacionadas e define suas regras de exclusão.
 
     await queryRunner.query(`
       ALTER TABLE "vinculos"
@@ -328,6 +325,7 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Desfaz a criação na ordem inversa, removendo primeiro as tabelas dependentes.
     // Primeiro removemos as tabelas.
     await queryRunner.query(`DROP TABLE "notificacoes"`);
     await queryRunner.query(`DROP TABLE "mensagens"`);

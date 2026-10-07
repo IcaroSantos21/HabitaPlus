@@ -8,6 +8,7 @@ from app.schemas.recommend import (
 )
 
 
+# Implementação temporária que devolve sempre um exemplo de interpretação.
 class StubNluService:
     """Devolve sempre o exemplo do contrato."""
 
@@ -19,6 +20,7 @@ class StubNluService:
         )
 
 
+# Implementação temporária que devolve sempre uma previsão de exemplo.
 class StubExpensePredictor:
     """Devolve sempre o exemplo do contrato."""
 
@@ -31,6 +33,7 @@ class StubExpensePredictor:
         )
 
 
+# Implementação temporária que devolve sempre uma recomendação de exemplo.
 class StubRecommender:
     """Devolve sempre o exemplo do contrato."""
 

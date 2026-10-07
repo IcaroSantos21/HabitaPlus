@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 
+# Confere a resposta do endpoint de saúde.
 def test_health_returns_ok(client: TestClient) -> None:
     response = client.get("/health")
 
@@ -11,6 +12,7 @@ def test_health_returns_ok(client: TestClient) -> None:
     assert "version" in body
 
 
+# Confere que a página de documentação interativa está disponível.
 def test_swagger_docs_available(client: TestClient) -> None:
     response = client.get("/docs")
 
@@ -18,6 +20,7 @@ def test_swagger_docs_available(client: TestClient) -> None:
     assert "text/html" in response.headers["content-type"]
 
 
+# Confere que todos os endpoints esperados aparecem no OpenAPI.
 def test_openapi_exposes_all_endpoints(client: TestClient) -> None:
     paths = client.get("/openapi.json").json()["paths"]
 

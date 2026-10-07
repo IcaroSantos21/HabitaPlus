@@ -7,6 +7,7 @@ import {
 import { PerfilUsuario } from './enums';
 
 @Entity('usuarios')
+// Representa uma pessoa cadastrada no sistema e seu perfil de acesso.
 export class Usuario {
   @PrimaryGeneratedColumn()
   id!: number;
