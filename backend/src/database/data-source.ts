@@ -1,9 +1,14 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
+import path from 'path';
+
+dotenv.config({
+  path: path.resolve(__dirname, '../../../.env'),
+});
 
 export default new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST,
+  host: process.env.DB_HOST ?? 'localhost',
   port: parseInt(process.env.DB_PORT ?? '5432', 10),
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,

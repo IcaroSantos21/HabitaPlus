@@ -1,4 +1,4 @@
-const REQUIRED = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+const REQUIRED = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 
 export function validateEnv(
   env: Record<string, unknown>,

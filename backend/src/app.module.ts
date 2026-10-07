@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import path from 'path';
 import configuration, { AppConfig } from './config/configuration';
 import { validateEnv } from './config/env.validation';
 import { ConfigModule } from 'node_modules/@nestjs/config/dist/config.module';
@@ -10,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: path.resolve(__dirname, '../../.env'),
       load: [configuration],
       validate: validateEnv,
     }),
