@@ -40,8 +40,9 @@ export class Anuncio {
   })
   status!: StatusAnuncio;
 
-  @Column({ 
+  @Column({
     type: 'varchar',
-    nullable: true })
+    nullable: true,
+  })
   imagemUrl!: string | null;
 }
