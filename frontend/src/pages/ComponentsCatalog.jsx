@@ -23,26 +23,25 @@ const residentOptions = [
   { value: "administrador", label: "Administrador" },
 ];
 
+// Exemplos no mesmo formato da entidade Unidade do backend.
 const apartments = [
   {
-    id: "A-204",
-    title: "Apartamento 204",
-    address: "Bloco A · 2º andar",
-    price: "R$ 1.850/mês",
-    bedrooms: 2,
-    bathrooms: 1,
-    area: 68,
-    status: "Disponível",
+    id: 204,
+    numero: "204",
+    bloco: "A",
+    quartos: 2,
+    areaM2: 68,
+    valorAluguelSugerido: "1850.00",
+    disponivelLocacao: true,
   },
   {
-    id: "B-103",
-    title: "Apartamento 103",
-    address: "Bloco B · 1º andar",
-    price: "R$ 2.100/mês",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 82,
-    status: "Pendente",
+    id: 103,
+    numero: "103",
+    bloco: "B",
+    quartos: 3,
+    areaM2: 82,
+    valorAluguelSugerido: "2100.00",
+    disponivelLocacao: false,
   },
 ];
 
@@ -227,15 +226,26 @@ function ComponentsCatalog() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={selectedApartment?.title || "Detalhes do apartamento"}
+        title={selectedApartment?.numero ? `Apartamento ${selectedApartment.numero}` : "Detalhes da unidade"}
         footer={<Button onClick={() => setModalOpen(false)}>Fechar</Button>}
       >
         {selectedApartment && (
           <div className="space-y-3 text-sm">
-            <p className="text-muted">{selectedApartment.address}</p>
-            <p className="text-xl font-bold text-brand-teal">{selectedApartment.price}</p>
-            <p>{selectedApartment.bedrooms} quarto(s) · {selectedApartment.bathrooms} banheiro(s) · {selectedApartment.area} m²</p>
-            <Badge status={selectedApartment.status}>{selectedApartment.status}</Badge>
+            {selectedApartment.bloco && (
+              <p className="text-muted">Bloco {selectedApartment.bloco}</p>
+            )}
+            <p className="text-xl font-bold text-brand-teal">
+              {selectedApartment.valorAluguelSugerido !== undefined && selectedApartment.valorAluguelSugerido !== null
+                ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(selectedApartment.valorAluguelSugerido))
+                : "Valor não informado"}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {selectedApartment.quartos !== undefined && <span>{selectedApartment.quartos} quarto(s)</span>}
+              {selectedApartment.areaM2 !== undefined && <span>{selectedApartment.areaM2} m²</span>}
+            </div>
+            {typeof selectedApartment.disponivelLocacao === "boolean" && (
+              <Badge status={selectedApartment.disponivelLocacao ? "DISPONIVEL" : "INDISPONIVEL"} />
+            )}
           </div>
         )}
       </Modal>

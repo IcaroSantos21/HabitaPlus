@@ -10,31 +10,59 @@ const variantStyles = {
   default: "bg-gray-100 text-gray-700",
 };
 
-const statusVariants = {
-  disponivel: "available",
-  disponível: "available",
-  ativo: "available",
-  sucesso: "success",
-  pendente: "pending",
-  aguardando: "pending",
-  erro: "error",
-  atrasado: "error",
-  encerrado: "closed",
-  fechado: "closed",
-  concluido: "closed",
-  concluído: "closed",
-  informacao: "info",
-  informação: "info",
+const statusConfig = {
+  DISPONIVEL: { variant: "available", label: "Disponível" },
+  INDISPONIVEL: { variant: "closed", label: "Indisponível" },
+  AVAILABLE: { variant: "available", label: "Disponível" },
+  SUCCESS: { variant: "success", label: "Sucesso" },
+  PENDING: { variant: "pending", label: "Pendente" },
+  WARNING: { variant: "warning", label: "Aviso" },
+  ERROR: { variant: "error", label: "Erro" },
+  DANGER: { variant: "danger", label: "Erro" },
+  CLOSED: { variant: "closed", label: "Encerrado" },
+  INFO: { variant: "info", label: "Informação" },
+  PENDENTE: { variant: "pending", label: "Pendente" },
+  PAGA: { variant: "success", label: "Paga" },
+  ATRASADA: { variant: "error", label: "Atrasada" },
+  VENDIDO: { variant: "closed", label: "Vendido" },
+  ATIVO: { variant: "available", label: "Ativo" },
+  SUCESSO: { variant: "success", label: "Sucesso" },
+  AGUARDANDO: { variant: "pending", label: "Aguardando" },
+  ERRO: { variant: "error", label: "Erro" },
+  ATRASADO: { variant: "error", label: "Atrasado" },
+  ENCERRADO: { variant: "closed", label: "Encerrado" },
+  FECHADO: { variant: "closed", label: "Fechado" },
+  CONCLUIDO: { variant: "closed", label: "Concluído" },
+  INFORMACAO: { variant: "info", label: "Informação" },
 };
 
+function normalize(value) {
+  return String(value ?? "")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
+
 function Badge({ children, status, variant, className = "" }) {
-  const text = children ?? status ?? "Status";
-  const normalized = String(variant || status || "default").toLowerCase();
-  const resolvedVariant = variant || statusVariants[normalized] || normalized;
+  const normalizedStatus = normalize(status);
+  const normalizedVariant = normalize(variant).toLowerCase();
+  const config = statusConfig[normalizedStatus];
+  const variantConfig = statusConfig[normalize(variant)];
+
+  const resolvedVariant = variantStyles[variant]
+    ? variant
+    : variantStyles[normalizedVariant]
+      ? normalizedVariant
+      : config?.variant || variantConfig?.variant || "default";
+
+  const text = children ?? config?.label ?? variantConfig?.label ?? status ?? "Status";
   const styles = variantStyles[resolvedVariant] || variantStyles.default;
 
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles} ${className}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles} ${className}`}
+    >
       {text}
     </span>
   );

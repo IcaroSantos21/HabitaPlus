@@ -1,5 +1,5 @@
 const baseStyles =
-  "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2";
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2";
 
 const variantStyles = {
   primary: "bg-brand-teal text-white hover:bg-brand-navy",
@@ -8,9 +8,9 @@ const variantStyles = {
 };
 
 const sizeStyles = {
-  sm: "min-h-8 px-3 text-xs",
-  md: "min-h-9 px-4 text-sm",
-  lg: "min-h-11 px-6 text-base",
+  sm: "min-h-8 px-3 py-1.5 text-xs",
+  md: "min-h-9 px-4 py-2 text-sm",
+  lg: "min-h-11 px-6 py-3 text-base",
 };
 
 function Button({

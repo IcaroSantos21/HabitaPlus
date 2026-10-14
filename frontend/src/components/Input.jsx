@@ -12,12 +12,12 @@ function Input({
   ...props
 }) {
   const generatedId = useId();
-  const inputId = id || name || generatedId;
+  const inputId = id || generatedId;
   const message = typeof error === "string" ? error : helperText;
   const describedBy = message ? `${inputId}-message` : undefined;
 
   const inputStyles = disabled
-    ? "cursor-not-allowed border-gray-500 bg-gray-100 text-gray-500 placeholder:text-gray-400"
+    ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-500 placeholder:text-gray-400"
     : error
       ? "border-danger bg-white text-ink placeholder:text-muted focus:border-danger focus:ring-danger"
       : "border-muted bg-white text-ink placeholder:text-muted focus:border-brand-teal focus:ring-brand-teal";

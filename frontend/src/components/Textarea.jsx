@@ -13,7 +13,7 @@ function Textarea({
   ...props
 }) {
   const generatedId = useId();
-  const textareaId = id || name || generatedId;
+  const textareaId = id || generatedId;
   const message = typeof error === "string" ? error : helperText;
   const describedBy = message ? `${textareaId}-message` : undefined;
 

@@ -14,7 +14,7 @@ function Select({
   ...props
 }) {
   const generatedId = useId();
-  const selectId = id || name || generatedId;
+  const selectId = id || generatedId;
   const message = typeof error === "string" ? error : helperText;
   const describedBy = message ? `${selectId}-message` : undefined;
 
