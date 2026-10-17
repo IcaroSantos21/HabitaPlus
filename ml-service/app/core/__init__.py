@@ -1,0 +1,1 @@
+# Marca esta pasta como pacote de configuração e recursos centrais.

@@ -5,12 +5,15 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  // Ignora a própria configuração para evitar que ela seja analisada como código da aplicação.
   {
     ignores: ['eslint.config.mjs'],
   },
+  // Combina as regras recomendadas de JavaScript, TypeScript e Prettier.
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
+  // Define os globais e as opções do TypeScript para o projeto.
   {
     languageOptions: {
       globals: {
@@ -24,6 +27,7 @@ export default tseslint.config(
       },
     },
   },
+  // Ajusta regras específicas usadas pelo backend.
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

@@ -8,11 +8,13 @@ import { HealthController } from '../src/modules/health/health.controller';
 import { HealthService } from '../src/modules/health/health.service';
 
 describe('GET /api/health (e2e)', () => {
+  // Mantém a aplicação de teste e uma consulta ao banco simulada.
   let app: INestApplication;
   let server: Server;
   const query = jest.fn();
 
   beforeAll(async () => {
+    // Monta somente o controlador e serviço necessários para testar o endpoint.
     const moduleRef = await Test.createTestingModule({
       controllers: [HealthController],
       providers: [HealthService, { provide: DataSource, useValue: { query } }],
@@ -30,6 +32,7 @@ describe('GET /api/health (e2e)', () => {
 
   afterAll(() => app.close());
 
+  // Verifica a resposta do endpoint quando o banco está ativo.
   it('deve responder 200 com banco ativo', async () => {
     query.mockResolvedValue([]);
 
@@ -38,6 +41,7 @@ describe('GET /api/health (e2e)', () => {
     expect(res.body).toEqual({ status: 'ok', database: 'up' });
   });
 
+  // Verifica que rotas inexistentes usam o mesmo formato de erro da API.
   it('deve responder 404 no formato único para rota inexistente', async () => {
     const res = await request(server).get('/api/nao-existe').expect(404);
 

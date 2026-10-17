@@ -4,6 +4,7 @@ from app.core.constants import Intent
 from app.schemas.base import CamelModel
 
 
+# Define e valida o texto recebido para interpretação.
 class NluRequest(CamelModel):
     """Texto do morador a ser interpretado."""
 
@@ -18,6 +19,7 @@ class NluRequest(CamelModel):
         return value
 
 
+# Guarda os dados que o serviço consegue extrair do texto.
 class Entities(CamelModel):
     """Entidades extraídas. Só as encontradas aparecem na resposta."""
 
@@ -29,6 +31,7 @@ class Entities(CamelModel):
     data: str | None = None
 
 
+# Define a intenção, o nível de confiança e as entidades retornadas.
 class NluResponse(CamelModel):
     """Intenção, confiança e entidades."""
 

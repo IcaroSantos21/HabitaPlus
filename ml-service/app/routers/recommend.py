@@ -9,6 +9,7 @@ from app.services.protocols import Recommender
 router = APIRouter(prefix="/recommend", tags=["recommend"])
 
 
+# Recebe o perfil do morador e os anúncios para recomendar.
 @router.post(
     "",
     response_model=RecommendResponse,

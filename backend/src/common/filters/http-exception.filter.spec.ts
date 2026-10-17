@@ -7,6 +7,7 @@ import {
 import { AllExceptionsFilter } from './http-exception.filter';
 
 describe('AllExceptionsFilter', () => {
+  // Simula a resposta HTTP para verificar status e corpo sem iniciar um servidor.
   const filter = new AllExceptionsFilter();
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });
@@ -16,6 +17,7 @@ describe('AllExceptionsFilter', () => {
 
   beforeEach(() => jest.clearAllMocks());
 
+  // Verifica o formato de uma rota que não foi encontrada.
   it('deve devolver o formato único para exceções do Nest', () => {
     filter.catch(new NotFoundException('Chamado não encontrado'), host);
 
@@ -27,6 +29,7 @@ describe('AllExceptionsFilter', () => {
     });
   });
 
+  // Verifica que mensagens múltiplas de validação são reunidas em uma string.
   it('deve juntar as mensagens quando a validação devolve uma lista', () => {
     filter.catch(
       new BadRequestException(['nome é obrigatório', 'email inválido']),
@@ -41,6 +44,7 @@ describe('AllExceptionsFilter', () => {
     });
   });
 
+  // Verifica que erros inesperados não revelam detalhes internos ao cliente.
   it('deve responder 500 genérico sem vazar detalhes de erros inesperados', () => {
     jest.spyOn(Logger.prototype, 'error').mockImplementation();
     filter.catch(new Error('senha do banco: 123'), host);
