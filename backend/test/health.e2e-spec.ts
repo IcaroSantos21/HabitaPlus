@@ -47,8 +47,8 @@ describe('GET /api/health (e2e)', () => {
 
     expect(res.body).toEqual({
       statusCode: 404,
-      message: 'Cannot GET /api/nao-existe',
-      error: 'Not Found',
+      message: 'A rota solicitada não foi encontrada.',
+      error: 'Não encontrado',
     });
   });
 });

@@ -69,6 +69,18 @@ Não versione o arquivo `.env` nem coloque senhas, tokens ou outras informaçõe
 
 A variável `VITE_USE_MOCKS` é uma configuração; sua presença, por si só, não ativa a integração com MSW.
 
+## Autenticação com o backend
+
+Inicie o backend e o PostgreSQL antes do frontend. O valor padrão de
+`VITE_API_URL` é `http://localhost:3000`; o cliente acrescenta `/api` se o valor
+não tiver esse sufixo. Ajuste o `.env` do frontend caso use outro endereço e
+reinicie o Vite para carregar a configuração.
+
+Na rota `/login`, é possível entrar com uma conta existente ou selecionar
+**Cadastre-se** para criar um `MORADOR`. Depois do login ou registro, o frontend
+usa o token para carregar `/auth/me`, mantém o usuário ao atualizar a página e
+exibe seu perfil na página inicial. O botão **Sair** remove a sessão local.
+
 ## Estrutura do projeto
 
 ```text

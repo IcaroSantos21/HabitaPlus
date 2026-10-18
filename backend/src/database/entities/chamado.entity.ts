@@ -19,9 +19,9 @@ export class Chamado {
   @JoinColumn({ name: 'usuarioId' })
   usuario!: Usuario;
 
-  @ManyToOne(() => Unidade)
+  @ManyToOne(() => Unidade, { nullable: true })
   @JoinColumn({ name: 'unidadeId' })
-  unidade!: Unidade;
+  unidade!: Unidade | null;
 
   @Column({ type: 'varchar', nullable: true })
   areaComum!: string | null;

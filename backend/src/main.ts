@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ConfigService } from 'node_modules/@nestjs/config/dist/config.service';
+import { ConfigService } from '@nestjs/config';
 import { AppConfig } from './config/configuration';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { createPortugueseValidationException } from './common/validation/validation-exception.factory';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap(): Promise<void> {
@@ -19,6 +20,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: createPortugueseValidationException,
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter());

@@ -36,6 +36,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no .env}
+      JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
       ML_SERVICE_URL: http://ml-service:8000
     ports:
       - "${BACKEND_PORT:-3000}:3000"

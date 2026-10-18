@@ -58,7 +58,7 @@ Principais campos:
 
 - id
 - usuario
-- unidade
+- unidade (opcional para chamados de área comum)
 - tipo
 
 Tipos:
@@ -92,7 +92,7 @@ Principais campos:
 
 - id
 - usuario
-- unidade
+- unidade (opcional para chamados de área comum)
 - areaComum
 - categoria
 - equipamento
@@ -115,8 +115,11 @@ Principais campos:
 - categoria
 - valor
 - competencia
-- dados
+- data
 - descricao
+
+`competencia` representa o período financeiro; `data` registra quando a
+transação ocorreu.
 
 Tipos:
 
@@ -173,10 +176,12 @@ Status:
 
 Registra uma visualização de anúncio.
 
-Relaciona:
+Principais campos:
 
+- id
 - usuario
 - anuncio
+- data (data e hora da visualização)
 
 ---
 
@@ -255,7 +260,7 @@ erDiagram
     CHAMADO {
         int id PK
         int usuarioId FK
-        int unidadeId FK
+        int unidadeId FK "opcional"
         string areaComum
         string categoria
         string equipamento
@@ -272,7 +277,7 @@ erDiagram
         string categoria
         decimal valor
         date competencia
-        json dados
+        date data
         string descricao
     }
 
@@ -301,7 +306,7 @@ erDiagram
         int id PK
         int usuarioId FK
         int anuncioId FK
-        datetime dados
+        datetime data
     }
 
     MENSAGEM {
@@ -346,3 +351,14 @@ erDiagram
     USUARIO ||--o{ MENSAGEM : recebe
 
     USUARIO ||--o{ NOTIFICACAO : recebe
+```
+
+As colunas `usuarioId` e `unidadeId` das relações são geradas pelo TypeORM a
+partir de `@ManyToOne` e `@JoinColumn`; não é necessário declarar uma segunda
+propriedade de ID na entidade. A migration inicial cria o schema para bancos
+novos. Para bancos que já aplicaram a versão anterior, a migration
+`AjustarDatasEUnidadeChamado1792290000000` adiciona o campo de data da
+transação com base em `competencia` (não havia uma data específica confiável),
+renomeia a data da visualização e torna `unidadeId` opcional. Ela preserva a
+coluna JSONB histórica `transacoes.dados` para não descartar dados existentes;
+essa coluna não é mais usada pela entidade.

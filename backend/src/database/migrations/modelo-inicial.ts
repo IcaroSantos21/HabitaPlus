@@ -105,7 +105,7 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
       CREATE TABLE "chamados" (
         "id" SERIAL NOT NULL,
         "usuarioId" integer NOT NULL,
-        "unidadeId" integer NOT NULL,
+        "unidadeId" integer,
         "areaComum" character varying,
         "categoria" character varying NOT NULL,
         "equipamento" character varying,
@@ -128,7 +128,7 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
         "categoria" character varying NOT NULL,
         "valor" numeric(10,2) NOT NULL,
         "competencia" date NOT NULL,
-        "dados" jsonb,
+        "data" date NOT NULL,
         "descricao" text,
         CONSTRAINT "PK_transacoes" PRIMARY KEY ("id")
       )
@@ -175,7 +175,7 @@ export class CriarModeloInicial1791246819778 implements MigrationInterface {
         "id" SERIAL NOT NULL,
         "usuarioId" integer NOT NULL,
         "anuncioId" integer NOT NULL,
-        "dados" timestamp NOT NULL,
+        "data" timestamp NOT NULL,
         CONSTRAINT "PK_visualizacoes" PRIMARY KEY ("id")
       )
     `);

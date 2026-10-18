@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   BadRequestException,
   NotFoundException,
+  UnauthorizedException,
   Logger,
 } from '@nestjs/common';
 import { AllExceptionsFilter } from './http-exception.filter';
@@ -25,7 +26,7 @@ describe('AllExceptionsFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: 404,
       message: 'Chamado não encontrado',
-      error: 'Not Found',
+      error: 'Não encontrado',
     });
   });
 
@@ -40,7 +41,18 @@ describe('AllExceptionsFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: 400,
       message: 'nome é obrigatório; email inválido',
-      error: 'Bad Request',
+      error: 'Requisição inválida',
+    });
+  });
+
+  it('deve traduzir mensagens padrão de autenticação', () => {
+    filter.catch(new UnauthorizedException(), host);
+
+    expect(status).toHaveBeenCalledWith(401);
+    expect(json).toHaveBeenCalledWith({
+      statusCode: 401,
+      message: 'Autenticação necessária ou token inválido.',
+      error: 'Não autorizado',
     });
   });
 
@@ -53,7 +65,7 @@ describe('AllExceptionsFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: 500,
       message: 'Erro interno do servidor',
-      error: 'Internal Server Error',
+      error: 'Erro interno do servidor',
     });
   });
 });

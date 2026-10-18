@@ -37,8 +37,8 @@ export class Transacao {
   @Column({ type: 'date' })
   competencia!: Date;
 
-  @Column({ type: 'jsonb', nullable: true })
-  dados!: object | null;
+  @Column({ type: 'date' })
+  data!: Date;
 
   @Column('text', { nullable: true })
   descricao!: string | null;

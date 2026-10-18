@@ -4,9 +4,11 @@
 !.env.example
 
 #dependências
-node_module/
+node_modules/
 
 #Build
+dist/
+build/
 *.log
 
 #arquivos do sistema

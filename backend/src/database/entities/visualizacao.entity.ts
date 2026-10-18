@@ -24,5 +24,5 @@ export class Visualizacao {
   anuncio!: Anuncio;
 
   @Column({ type: 'timestamp' })
-  dados!: Date;
+  data!: Date;
 }
