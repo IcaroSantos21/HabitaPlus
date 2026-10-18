@@ -9,6 +9,7 @@ from app.services.protocols import NluService
 router = APIRouter(prefix="/nlu", tags=["nlu"])
 
 
+# Recebe um texto e devolve a intenção e as entidades identificadas.
 @router.post(
     "/parse",
     response_model=NluResponse,

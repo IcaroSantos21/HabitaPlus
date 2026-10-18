@@ -33,6 +33,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     """Cria e configura a aplicação FastAPI."""
+    # Registra os dados de identificação, o ciclo de vida e as rotas da API.
     app = FastAPI(
         title="Habita+ ML Service",
         description=APP_DESCRIPTION,
@@ -46,4 +47,5 @@ def create_app() -> FastAPI:
     return app
 
 
+# Cria a aplicação que será iniciada pelo servidor ASGI.
 app = create_app()

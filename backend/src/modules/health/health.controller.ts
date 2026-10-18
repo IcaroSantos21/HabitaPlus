@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from '../../common/decorators/public.decorator';
 import { HealthResponseDto } from './dto/health-response.dto';
 import { HealthService } from './health.service';
 
@@ -8,7 +9,9 @@ import { HealthService } from './health.service';
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
+  // Encaminha a consulta ao serviço e retorna o status da API e do banco.
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Verifica se a API e o banco estão no ar' })
   @ApiResponse({ status: 200, type: HealthResponseDto })
   check(): Promise<HealthResponseDto> {

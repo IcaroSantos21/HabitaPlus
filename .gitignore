@@ -1,1 +1,16 @@
+#variáveis de ambiente
 .env
+.env.*
+!.env.example
+
+#dependências
+node_modules/
+
+#Build
+dist/
+build/
+*.log
+
+#arquivos do sistema
+.DS_Store
+Thumbs.db

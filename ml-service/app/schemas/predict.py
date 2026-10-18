@@ -8,6 +8,7 @@ from app.schemas.base import CamelModel
 _MONTH_PATTERN = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 
+# Representa um mês do histórico e valida seu formato.
 class HistoryItem(CamelModel):
     """Total de despesas de um mês."""
 
@@ -23,6 +24,7 @@ class HistoryItem(CamelModel):
         return value
 
 
+# Valida o histórico enviado e define o formato da previsão de resposta.
 class ExpensesRequest(CamelModel):
     """Histórico financeiro enviado pelo back."""
 
