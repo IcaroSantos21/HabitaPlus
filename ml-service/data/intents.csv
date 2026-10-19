@@ -1,0 +1,908 @@
+text,intent,base_id,variant
+qual a distância entre São Paulo e Rio?,fora_de_escopo,fora_de_escopo-38,original
+"segunda via do boleto de marco, por favor",segunda_via_boleto,segunda_via_boleto-17,sem_acento
+quando vão resover o problema do elevador?,status_chamado,status_chamado-12,erro_digitacao
+visitante pode usar a academia?,regras_condominio,regras_condominio-10,original
+qual a capital da Farnça?,fora_de_escopo,fora_de_escopo-04,erro_digitacao
+esscreve um poema pra mim,fora_de_escopo,fora_de_escopo-25,erro_digitacao
+qual minha situação com a administradora?,status_financeiro,status_financeiro-21,original
+"vazamento de água na garagem, abre chamado por favor",abrir_chamado,abrir_chamado-19,original
+como canelo minha assinatura da netflix?,fora_de_escopo,fora_de_escopo-50,erro_digitacao
+me mosta o que eu já paguei este ano,status_financeiro,status_financeiro-26,erro_digitacao
+tenho pracelas atrasadas?,status_financeiro,status_financeiro-25,erro_digitacao
+qual a cotacao do bitcoin?,fora_de_escopo,fora_de_escopo-51,sem_acento
+tem apto pra alugar no bloco b,consultar_apartamentos,consultar_apartamentos-01,informal
+tem apartamento mobiliado disponível?,consultar_apartamentos,consultar_apartamentos-20,original
+já resolveram o chamado 2201,status_chamado,status_chamado-02,informal
+quanto o prédio vai gastar no próximo mês,previsao_despesas,previsao_despesas-16,informal
+boa tarde td bem com vc,saudacao,saudacao-17,informal
+tem como gerar o boleto atualizado com jros?,segunda_via_boleto,segunda_via_boleto-14,erro_digitacao
+qual o hoorário de silêncio?,regras_condominio,regras_condominio-00,erro_digitacao
+tem alguma cobranca extra no meu nome?,status_financeiro,status_financeiro-27,sem_acento
+como está o chamado da boba?,status_chamado,status_chamado-01,erro_digitacao
+queria reportar um defeito do portao do bloco D,abrir_chamado,abrir_chamado-07,sem_acento
+quero registrar uma reclamacao sobre a bomba,abrir_chamado,abrir_chamado-14,sem_acento
+tenho alguma pendência financeira?,status_financeiro,status_financeiro-00,original
+ja consta o pagamento de setembro?,status_financeiro,status_financeiro-08,sem_acento
+estou com o cond quitado,status_financeiro,status_financeiro-28,informal
+o tecnico ja foi atender o chamado do apto 405?,status_chamado,status_chamado-14,sem_acento
+tem artigos esportivos sendo vendido no condominio?,recomendar_produtos,recomendar_produtos-12,sem_acento
+"quero comprar algo dos vizinhos, o que você sugere?",recomendar_produtos,recomendar_produtos-10,original
+ja resolveram o chamado 337?,status_chamado,status_chamado-02,sem_acento
+bom dia pesosal,saudacao,saudacao-20,erro_digitacao
+previsão da conta de água do próximo mês,previsao_despesas,previsao_despesas-05,original
+o portão parou de funcionar,abrir_chamado,abrir_chamado-08,original
+qual o orcamento previsto para o proximo mes?,previsao_despesas,previsao_despesas-21,sem_acento
+ver o status da minha solicitação,status_chamado,status_chamado-13,original
+recomenda um item de esoprte,recomendar_produtos,recomendar_produtos-05,erro_digitacao
+qual o horário de silêncio?,regras_condominio,regras_condominio-00,original
+oii,saudacao,saudacao-13,original
+meu chamado ainda tá aberto,status_chamado,status_chamado-11,informal
+o pagamento da taxa de outubro foi compensado,status_financeiro,status_financeiro-19,informal
+queria reportar um defeito do portão do bloco d,abrir_chamado,abrir_chamado-07,informal
+como anda a manutenção do inerfone?,status_chamado,status_chamado-18,erro_digitacao
+tem apartamento para alugar no boco a?,consultar_apartamentos,consultar_apartamentos-01,erro_digitacao
+existe algum apartamento livvre no bloco C?,consultar_apartamentos,consultar_apartamentos-06,erro_digitacao
+posso alugar meu apto por temporada,regras_condominio,regras_condominio-15,informal
+"a lâmpada do corredor queimou, quero abrir chamado",abrir_chamado,abrir_chamado-12,original
+meu chamado foi atendido,status_chamado,status_chamado-04,informal
+quero ver apartamentos de 2 quartos disponíeis,consultar_apartamentos,consultar_apartamentos-02,erro_digitacao
+atualização do chamado 2201 pfv,status_chamado,status_chamado-16,informal
+me manda o boleto desse mes,segunda_via_boleto,segunda_via_boleto-02,sem_acento
+algum débito em aberto no apto 58?,status_financeiro,status_financeiro-30,original
+qual o valor da minha taxa condominial?,status_financeiro,status_financeiro-02,original
+estuo inadimplente?,status_financeiro,status_financeiro-09,erro_digitacao
+estimativa de gastos para o proximo mes,previsao_despesas,previsao_despesas-06,sem_acento
+vazamento de água na garagem abre chamado pfv,abrir_chamado,abrir_chamado-19,informal
+procuro apartamento com um quarto até R$ 2.500,consultar_apartamentos,consultar_apartamentos-03,original
+queria ver os apartamentos que estao livres,consultar_apartamentos,consultar_apartamentos-18,sem_acento
+há unidades disponíveis pra locação,consultar_apartamentos,consultar_apartamentos-19,informal
+tem multa ou juros no meu condomínio?,status_financeiro,status_financeiro-20,original
+quais valores estão em aberto no meu nome?,status_financeiro,status_financeiro-13,original
+qual a letra dessa musica?,fora_de_escopo,fora_de_escopo-16,sem_acento
+olá boa noite,saudacao,saudacao-22,informal
+pode ter animal de estimação no prédio?,regras_condominio,regras_condominio-03,original
+qual o valor do cond deste mês,status_financeiro,status_financeiro-24,informal
+qro registrar uma reclamação sobre o portão,abrir_chamado,abrir_chamado-14,informal
+quero ver fotos dos apartamentos livres,consultar_apartamentos,consultar_apartamentos-26,original
+como faco para aprender ingles rapido?,fora_de_escopo,fora_de_escopo-42,sem_acento
+qual o horário de mudaança no bloco c?,regras_condominio,regras_condominio-20,erro_digitacao
+preciso de um advogado para o meu divórcoi,fora_de_escopo,fora_de_escopo-43,erro_digitacao
+alguém já viu meu chamado,status_chamado,status_chamado-09,informal
+tem como gerar o boleto atualizado com juros,segunda_via_boleto,segunda_via_boleto-14,informal
+previsão de gasttos com manutenção,previsao_despesas,previsao_despesas-14,erro_digitacao
+"tô procurando algo de eletrônicos, me recomenda",recomendar_produtos,recomendar_produtos-16,original
+posso fazer festa no salão?,regras_condominio,regras_condominio-01,original
+tem previsão para consertar a bomba?,status_chamado,status_chamado-07,original
+"apaguei o boleto sem querer, manda de novo",segunda_via_boleto,segunda_via_boleto-20,original
+onde fica o hospital mais próximo?,fora_de_escopo,fora_de_escopo-31,original
+pode abrir uma ordem de serviço para a bomba?,abrir_chamado,abrir_chamado-23,original
+quis são as regras do condomínio?,regras_condominio,regras_condominio-02,erro_digitacao
+quais apartamentos estão disponívesi?,consultar_apartamentos,consultar_apartamentos-00,erro_digitacao
+preciso impriir o boleto,segunda_via_boleto,segunda_via_boleto-10,erro_digitacao
+"abre um chamado pra mim, portão com defeito",abrir_chamado,abrir_chamado-04,original
+"tá sem luz no coredor do bloco c, abre um chamado",abrir_chamado,abrir_chamado-24,erro_digitacao
+queria ver os apartamentos que estão lvres,consultar_apartamentos,consultar_apartamentos-18,erro_digitacao
+tem apartamento para alugar no blooc b?,consultar_apartamentos,consultar_apartamentos-01,erro_digitacao
+qual a situação do protocolo 337,status_chamado,status_chamado-08,informal
+"o portão do bloco C está fazendo barulho estranho, quero abrir chamado",abrir_chamado,abrir_chamado-18,original
+pode estacionar na vaga de visitante,regras_condominio,regras_condominio-18,informal
+tem apto de três quartos no bloco a,consultar_apartamentos,consultar_apartamentos-12,informal
+tem eletrônicos sendo vendido no cond,recomendar_produtos,recomendar_produtos-12,informal
+preciso de manutencao do elevador,abrir_chamado,abrir_chamado-11,sem_acento
+o que voce me recomenda comprar?,recomendar_produtos,recomendar_produtos-23,sem_acento
+"o portão do bloco C está fazendo barluho estranho, quero abrir chamado",abrir_chamado,abrir_chamado-18,erro_digitacao
+como tá o chamado da bomba,status_chamado,status_chamado-01,informal
+tem como gerar o boleto atualizado com juros?,segunda_via_boleto,segunda_via_boleto-14,original
+prever as despesas do cond,previsao_despesas,previsao_despesas-10,informal
+me explica como funciona a bolsa de valores,fora_de_escopo,fora_de_escopo-21,original
+procuro apartamento com tres quartos ate R$ 2.500,consultar_apartamentos,consultar_apartamentos-03,sem_acento
+"o interfone do apto 710 não toca, preciso de reparo",abrir_chamado,abrir_chamado-21,original
+qureo acompanhar meu chamado,status_chamado,status_chamado-05,erro_digitacao
+tem apto de cobertura disponível,consultar_apartamentos,consultar_apartamentos-27,informal
+"abrir chamado, bomab do bloco A quebrou",abrir_chamado,abrir_chamado-10,erro_digitacao
+preciso da segunda via do boleto,segunda_via_boleto,segunda_via_boleto-00,original
+asdfgh,fora_de_escopo,fora_de_escopo-15,original
+quando vão resolver o problema do interfone,status_chamado,status_chamado-12,informal
+qual a previsao do tempo para o fim de semana?,fora_de_escopo,fora_de_escopo-24,sem_acento
+tem alguma promoção de móveis entre os moradores,recomendar_produtos,recomendar_produtos-21,informal
+quanto o cnodomínio deve gastar em fevereiro?,previsao_despesas,previsao_despesas-03,erro_digitacao
+quanto vamos gastar com energia no próximo mês?,previsao_despesas,previsao_despesas-09,original
+como declarar impostto de renda?,fora_de_escopo,fora_de_escopo-35,erro_digitacao
+registrar probelma do portão,abrir_chamado,abrir_chamado-06,erro_digitacao
+como está o chamado do elevador?,status_chamado,status_chamado-01,original
+registrar problema do portao,abrir_chamado,abrir_chamado-06,sem_acento
+oq os moradores tão vendendo,recomendar_produtos,recomendar_produtos-15,informal
+"ta sem luz no corredor do bloco A, abre um chamado",abrir_chamado,abrir_chamado-24,sem_acento
+consultar minha situação financeira,status_financeiro,status_financeiro-11,original
+quanto o condomínio deve gastar em fevereiro?,previsao_despesas,previsao_despesas-03,original
+quanto o cond deve gastar em janeiro,previsao_despesas,previsao_despesas-03,informal
+qual o endereço da farmácia mais próxima,fora_de_escopo,fora_de_escopo-46,informal
+quais unidades estao vagas?,consultar_apartamentos,consultar_apartamentos-09,sem_acento
+tem regra pra lixo e coleta seletiva?,regras_condominio,regras_condominio-16,original
+quanto custa alugar um apartamento de três quartos?,consultar_apartamentos,consultar_apartamentos-14,original
+alguém já viu meu chamado?,status_chamado,status_chamado-09,original
+quanto será o gasto total do condomínio em dezembro?,previsao_despesas,previsao_despesas-19,original
+posso ver meus débitos?,status_financeiro,status_financeiro-23,original
+abrir ocorrência de problema no bloco a,abrir_chamado,abrir_chamado-16,informal
+consultar chamado 337,status_chamado,status_chamado-10,original
+tem apto vago?,consultar_apartamentos,consultar_apartamentos-04,original
+a bomba não está funcionando,abrir_chamado,abrir_chamado-03,original
+registrar problema da iluminacao,abrir_chamado,abrir_chamado-06,sem_acento
+precios de um apto com vaga de garagem,consultar_apartamentos,consultar_apartamentos-29,erro_digitacao
+status do chamado número 88,status_chamado,status_chamado-03,original
+qual a previsão de despesas para dzeembro?,previsao_despesas,previsao_despesas-08,erro_digitacao
+o apto 101 tá com alguma dívida,status_financeiro,status_financeiro-15,informal
+recomenda um filme para hoje a noite,fora_de_escopo,fora_de_escopo-08,sem_acento
+tem apartamento para alugar no bloco b?,consultar_apartamentos,consultar_apartamentos-01,original
+qro saber se meu chamado foi fechado,status_chamado,status_chamado-20,informal
+tem algma coisa de artigos esportivos anunciada?,recomendar_produtos,recomendar_produtos-07,erro_digitacao
+qual a tendência de despesas do prédio?,previsao_despesas,previsao_despesas-15,original
+tem previsão para conserttar o portão?,status_chamado,status_chamado-07,erro_digitacao
+quero abrir uma conta no banco,fora_de_escopo,fora_de_escopo-22,original
+o chamado do interfone do bloco d já foi concluído,status_chamado,status_chamado-17,informal
+meu chamado foi atendido?,status_chamado,status_chamado-04,original
+Olá! Tudo bem?,saudacao,saudacao-25,original
+me recomenda um bom livro,fora_de_escopo,fora_de_escopo-44,original
+quais anúncios você acha que eu vou gostar?,recomendar_produtos,recomendar_produtos-09,original
+qual o melhor celular para comprar?,fora_de_escopo,fora_de_escopo-09,original
+solicito reparo do elevador no bloco c,abrir_chamado,abrir_chamado-22,informal
+como cancelo minha assinatura da netflix?,fora_de_escopo,fora_de_escopo-50,original
+já resolveram o chamado 337?,status_chamado,status_chamado-02,original
+tenho parcelas atrasadas?,status_financeiro,status_financeiro-25,original
+"oi, tem alguem ai?",saudacao,saudacao-18,sem_acento
+"boa tarrde, tudo bem com você?",saudacao,saudacao-17,erro_digitacao
+o que os moradores estão vendendo?,recomendar_produtos,recomendar_produtos-15,original
+cadê meu boleto?,segunda_via_boleto,segunda_via_boleto-07,original
+tem multa ou juros no meu cond,status_financeiro,status_financeiro-20,informal
+me indica uma serie para maratonar,fora_de_escopo,fora_de_escopo-33,sem_acento
+tem apartamento de tres quartos no bloco A?,consultar_apartamentos,consultar_apartamentos-12,sem_acento
+procuro apto com três quartos até r$ 2500,consultar_apartamentos,consultar_apartamentos-03,informal
+o técnico já foi atender o chamado do apto 302?,status_chamado,status_chamado-14,original
+registrar problema do portão,abrir_chamado,abrir_chamado-06,original
+apartamentos a venda no condominio,consultar_apartamentos,consultar_apartamentos-05,sem_acento
+qual a situacao do protocolo 337?,status_chamado,status_chamado-08,sem_acento
+quero reemitir o boleto vencido,segunda_via_boleto,segunda_via_boleto-13,original
+tem infiltraço no teto do apto 101,abrir_chamado,abrir_chamado-13,erro_digitacao
+como faço para aprender inglês rápido?,fora_de_escopo,fora_de_escopo-42,original
+quanto é 15 vezes 23?,fora_de_escopo,fora_de_escopo-29,original
+qauntas vagas de garagem cada apartamento tem?,regras_condominio,regras_condominio-09,erro_digitacao
+boa tadre,saudacao,saudacao-03,erro_digitacao
+"boa noitte, tudo bem?",saudacao,saudacao-26,erro_digitacao
+quanto custa um iphone novo,fora_de_escopo,fora_de_escopo-32,informal
+indica algum anúncio bom pra mim,recomendar_produtos,recomendar_produtos-19,original
+qual a situação do protocolo 2201?,status_chamado,status_chamado-08,original
+quero dicas de coisas para comprar no marketplace,recomendar_produtos,recomendar_produtos-20,original
+quais unidades esttão vagas?,consultar_apartamentos,consultar_apartamentos-09,erro_digitacao
+quanto sera o gasto total do condominio em dezembro?,previsao_despesas,previsao_despesas-19,sem_acento
+como trocar o pneu do carro,fora_de_escopo,fora_de_escopo-45,informal
+me mostra a previsão financeira do condomínio,previsao_despesas,previsao_despesas-12,original
+me ensina a fazer um curriculo,fora_de_escopo,fora_de_escopo-37,sem_acento
+baixar boleto do condomínio,segunda_via_boleto,segunda_via_boleto-19,original
+qual a capital da frança,fora_de_escopo,fora_de_escopo-04,informal
+heello,saudacao,saudacao-14,erro_digitacao
+existe algum apartamento livrre no bloco b?,consultar_apartamentos,consultar_apartamentos-06,erro_digitacao
+"opa, tudo bem?",saudacao,saudacao-06,original
+vai ter rateio extra no mes que vem?,previsao_despesas,previsao_despesas-18,sem_acento
+"o portao da garagem esta travado, abre um chamado",abrir_chamado,abrir_chamado-15,sem_acento
+qual meu sado devedor?,status_financeiro,status_financeiro-07,erro_digitacao
+o que diz o regimento interno sobre pets?,regras_condominio,regras_condominio-13,original
+as despesas vão subbir no próximo mês?,previsao_despesas,previsao_despesas-11,erro_digitacao
+quanto custa alugar um apartamento de 2 quarots?,consultar_apartamentos,consultar_apartamentos-14,erro_digitacao
+quem e o presidente do Brasil?,fora_de_escopo,fora_de_escopo-12,sem_acento
+tem previsão pra consertar a bomba,status_chamado,status_chamado-07,informal
+"boa tarde, tudo bem com você?",saudacao,saudacao-17,original
+"olá, assistente do condomínio",saudacao,saudacao-27,original
+o boleo não chegou no meu e-mail,segunda_via_boleto,segunda_via_boleto-12,erro_digitacao
+como está o chamado do ellevador?,status_chamado,status_chamado-01,erro_digitacao
+quanto deve ficar a taxa condominial no mês que vem,previsao_despesas,previsao_despesas-13,informal
+nao recebi o boleto deste mes,segunda_via_boleto,segunda_via_boleto-08,sem_acento
+o interofne não está funcionando,abrir_chamado,abrir_chamado-03,erro_digitacao
+qual a previsão de despeesas para novembro?,previsao_despesas,previsao_despesas-08,erro_digitacao
+aptos à venda no cond,consultar_apartamentos,consultar_apartamentos-05,informal
+o tecnico ja foi atender o chamado do apto 302?,status_chamado,status_chamado-14,sem_acento
+"abri um chamado semaan passada e ninguém respondeu, como está?",status_chamado,status_chamado-21,erro_digitacao
+qual a cotação do bitcoin?,fora_de_escopo,fora_de_escopo-51,original
+até que horas pode usar o salão de jogos?,regras_condominio,regras_condominio-14,original
+quanto está o dólaar hoje?,fora_de_escopo,fora_de_escopo-07,erro_digitacao
+tem vaazmento no apto 1204,abrir_chamado,abrir_chamado-05,erro_digitacao
+algum débito em aberto no apto 101?,status_financeiro,status_financeiro-30,original
+o que tem de ineressante no marketplace?,recomendar_produtos,recomendar_produtos-06,erro_digitacao
+qual o andamento do meu chamado?,status_chamado,status_chamado-00,original
+qual a letra dessa música?,fora_de_escopo,fora_de_escopo-16,original
+tem alguma cobrança extra no meu nome,status_financeiro,status_financeiro-27,informal
+o chamado do elevador do bloco c já foi concluído,status_chamado,status_chamado-17,informal
+qual a previsão do tempo para amanhã?,fora_de_escopo,fora_de_escopo-00,original
+onde fica o hospital mais próxximo?,fora_de_escopo,fora_de_escopo-31,erro_digitacao
+como resservo o salão de festas?,regras_condominio,regras_condominio-05,erro_digitacao
+quanto vamoos gastar com energia no próximo mês?,previsao_despesas,previsao_despesas-09,erro_digitacao
+quero ver ofertas do marketplace,recomendar_produtos,recomendar_produtos-04,original
+estou inadimplente?,status_financeiro,status_financeiro-09,original
+qual o adnamento do meu chamado?,status_chamado,status_chamado-00,erro_digitacao
+meus chamados em abeerto,status_chamado,status_chamado-19,erro_digitacao
+qual o vencimento da miha próxima taxa?,status_financeiro,status_financeiro-29,erro_digitacao
+ja consta o pagamento de janeiro?,status_financeiro,status_financeiro-08,sem_acento
+me recomenda algo do marketplace,recomendar_produtos,recomendar_produtos-00,original
+boa nooite,saudacao,saudacao-04,erro_digitacao
+receita de lasaanha,fora_de_escopo,fora_de_escopo-17,erro_digitacao
+tem algum apartamento com um quarto abaixo de 1500 raeis?,consultar_apartamentos,consultar_apartamentos-23,erro_digitacao
+"atualização do chamado 2201, por favor",status_chamado,status_chamado-16,original
+o condominio vai gastar mais no mes que vem?,previsao_despesas,previsao_despesas-07,sem_acento
+tem apartameto disponível para dia 15/11?,consultar_apartamentos,consultar_apartamentos-10,erro_digitacao
+"abre um chamdo pra mim, portão com defeito",abrir_chamado,abrir_chamado-04,erro_digitacao
+como instalo o windows,fora_de_escopo,fora_de_escopo-18,informal
+qual a capital da França?,fora_de_escopo,fora_de_escopo-04,original
+status do chamado número 2201,status_chamado,status_chamado-03,original
+"tô procurando algo de eletôrnicos, me recomenda",recomendar_produtos,recomendar_produtos-16,erro_digitacao
+oq vc me recomenda comprar,recomendar_produtos,recomendar_produtos-23,informal
+como funciona a regra de uso da churrasqueira,regras_condominio,regras_condominio-19,informal
+o apto 1204 está com alguma dívida?,status_financeiro,status_financeiro-15,original
+cade meu boleto?,segunda_via_boleto,segunda_via_boleto-07,sem_acento
+ola,saudacao,saudacao-01,sem_acento
+quem é o presidente do brasil,fora_de_escopo,fora_de_escopo-12,informal
+minha taxa extra ja foi cobrada?,status_financeiro,status_financeiro-18,sem_acento
+"pgauei ontem, já caiu?",status_financeiro,status_financeiro-12,erro_digitacao
+tenho alguma pendência financeira,status_financeiro,status_financeiro-00,informal
+tem algmu apartamento com dois quartos abaixo de 2 mil?,consultar_apartamentos,consultar_apartamentos-23,erro_digitacao
+qual o valor do condomnio deste mês?,status_financeiro,status_financeiro-24,erro_digitacao
+qual o melhor restaurrante da cidade?,fora_de_escopo,fora_de_escopo-28,erro_digitacao
+quanto o condomínio deve gastar em janeiro?,previsao_despesas,previsao_despesas-03,original
+quanto deve ficar a taxa condominial no mês que vem?,previsao_despesas,previsao_despesas-13,original
+"segunda via do boleto de outubro, por favor",segunda_via_boleto,segunda_via_boleto-17,original
+quais valores tão em aberto no meu nome,status_financeiro,status_financeiro-13,informal
+qro pagar o cond me envia o boleto,segunda_via_boleto,segunda_via_boleto-18,informal
+posso ver meus débiots?,status_financeiro,status_financeiro-23,erro_digitacao
+mostra os anuncios mais populares,recomendar_produtos,recomendar_produtos-11,sem_acento
+o chamado do elevador do bloco C já foi concluído?,status_chamado,status_chamado-17,original
+o chamado do interfone do bloco D já foi concluído?,status_chamado,status_chamado-17,original
+qual o limite de convidados na festa?,regras_condominio,regras_condominio-17,original
+estou com o condomínio quitado?,status_financeiro,status_financeiro-28,original
+qro dicas de coisas pra comprar no marketplace,recomendar_produtos,recomendar_produtos-20,informal
+queria reportar um defeito do portão do bloco D,abrir_chamado,abrir_chamado-07,original
+tem apto vago,consultar_apartamentos,consultar_apartamentos-04,informal
+quais apartamentos do bloco b estão vazios?,consultar_apartamentos,consultar_apartamentos-22,original
+gerar novo boleto do condomínio,segunda_via_boleto,segunda_via_boleto-06,original
+quero o boleto de jluho,segunda_via_boleto,segunda_via_boleto-05,erro_digitacao
+quanto paguei de cond esse ano,status_financeiro,status_financeiro-14,informal
+já consertaram o elevador do bloco d,status_chamado,status_chamado-23,informal
+como faço para emagrecer?,fora_de_escopo,fora_de_escopo-30,original
+lista de aartamentos para alugar até 3 mil,consultar_apartamentos,consultar_apartamentos-17,erro_digitacao
+qual meu saldo devedor,status_financeiro,status_financeiro-07,informal
+algum debito em aberto no apto 101?,status_financeiro,status_financeiro-30,sem_acento
+cadê o técnico do meu chamado,status_chamado,status_chamado-15,informal
+meu pagamento foi confirmado?,status_financeiro,status_financeiro-04,original
+pode estacionar na vaga de visitannte?,regras_condominio,regras_condominio-18,erro_digitacao
+estou devendo alguma coisa pro condomínio?,status_financeiro,status_financeiro-22,original
+gerar novo boleto do condominio,segunda_via_boleto,segunda_via_boleto-06,sem_acento
+"quero pagar o condomínio, me envia o boleto",segunda_via_boleto,segunda_via_boleto-18,original
+qual o prazo para resolverem meu chamado?,status_chamado,status_chamado-22,original
+qual o endereço da farmácia mais próxmia?,fora_de_escopo,fora_de_escopo-46,erro_digitacao
+algum apto térreo vago,consultar_apartamentos,consultar_apartamentos-28,informal
+qual o valor da minha taxa condominial,status_financeiro,status_financeiro-02,informal
+segunda via da taxa condominial do apto 710,segunda_via_boleto,segunda_via_boleto-09,original
+emiitir boleto do apto 1204,segunda_via_boleto,segunda_via_boleto-15,erro_digitacao
+qual a letra desssa música?,fora_de_escopo,fora_de_escopo-16,erro_digitacao
+quero alugar um apartamento de tres quartos,consultar_apartamentos,consultar_apartamentos-07,sem_acento
+como faço para emmagrecer?,fora_de_escopo,fora_de_escopo-30,erro_digitacao
+quero abrir chamado do portão do bloco B,abrir_chamado,abrir_chamado-00,original
+qual a regra pra barulho depois das 22h,regras_condominio,regras_condominio-11,informal
+abre o spotify,fora_de_escopo,fora_de_escopo-13,original
+qro ver aptos de 2 quartos disponíveis,consultar_apartamentos,consultar_apartamentos-02,informal
+lista de apartamentos para alugar até 3 mil,consultar_apartamentos,consultar_apartamentos-17,original
+me ajuda com meu dever de matemática,fora_de_escopo,fora_de_escopo-06,original
+estou inadimplente,status_financeiro,status_financeiro-09,informal
+queria ver os apartamentos que estão livres,consultar_apartamentos,consultar_apartamentos-18,original
+quantos aptos tão pra alugar agora,consultar_apartamentos,consultar_apartamentos-25,informal
+olá td bom,saudacao,saudacao-16,informal
+qual o total das minhas pendências?,status_financeiro,status_financeiro-16,original
+a bomba n tá funcionando,abrir_chamado,abrir_chamado-03,informal
+o chamado que abri ontem já foi resolvido?,status_chamado,status_chamado-06,original
+o condomínio vai gastar mais no mês que vem?,previsao_despesas,previsao_despesas-07,original
+tem apto de cobertura disponivel?,consultar_apartamentos,consultar_apartamentos-27,sem_acento
+prever as despesas do condominio,previsao_despesas,previsao_despesas-10,sem_acento
+ha unidades disponiveis para locacao?,consultar_apartamentos,consultar_apartamentos-19,sem_acento
+preciso de um apto com vaga de garagem,consultar_apartamentos,consultar_apartamentos-29,original
+boa noite,saudacao,saudacao-04,original
+qual a previsão de despesas pra dezembro,previsao_despesas,previsao_despesas-08,informal
+quero o boleto de janeiro,segunda_via_boleto,segunda_via_boleto-05,original
+procuro aparamento com um quarto até R$ 2.500,consultar_apartamentos,consultar_apartamentos-03,erro_digitacao
+quanto será o gaso total do condomínio em novembro?,previsao_despesas,previsao_despesas-19,erro_digitacao
+como emitir segunda via do boleto?,segunda_via_boleto,segunda_via_boleto-03,original
+quanto devo de condominio?,status_financeiro,status_financeiro-03,sem_acento
+estou procurando um apto de três quartos aqui no condmínio,consultar_apartamentos,consultar_apartamentos-21,erro_digitacao
+preciso de manutencao do portao,abrir_chamado,abrir_chamado-11,sem_acento
+quero abrir uma solicitação de reparo no apto 101,abrir_chamado,abrir_chamado-09,original
+"abri um chamado semana passada e ninguem respondeu, como esta?",status_chamado,status_chamado-21,sem_acento
+o link do boleto expirou preciso de outro,segunda_via_boleto,segunda_via_boleto-16,informal
+lista de aptos pra alugar até 3 mil,consultar_apartamentos,consultar_apartamentos-17,informal
+qual a previsao de despesas para novembro?,previsao_despesas,previsao_despesas-08,sem_acento
+alguem ja viu meu chamado?,status_chamado,status_chamado-09,sem_acento
+a bomba do boco c está quebrado,abrir_chamado,abrir_chamado-01,erro_digitacao
+oi pode me ajudar,saudacao,saudacao-21,informal
+algum débito em abetro no apto 58?,status_financeiro,status_financeiro-30,erro_digitacao
+tem apartamento de três quartos no bloco A?,consultar_apartamentos,consultar_apartamentos-12,original
+emmitir boleto do apto 1204,segunda_via_boleto,segunda_via_boleto-15,erro_digitacao
+olá assistente do cond,saudacao,saudacao-27,informal
+qual o horário de funcionamento da piscina?,regras_condominio,regras_condominio-04,original
+as despesas vão subir no próximo mês?,previsao_despesas,previsao_despesas-11,original
+estou devendo alguma coisa pro cond,status_financeiro,status_financeiro-22,informal
+hello,saudacao,saudacao-14,original
+"atualização do chamado 2201, por fvor",status_chamado,status_chamado-16,erro_digitacao
+quais são as melhores ofertas do marketplace hoje,recomendar_produtos,recomendar_produtos-17,informal
+baixar bolto do condomínio,segunda_via_boleto,segunda_via_boleto-19,erro_digitacao
+Ola! Tudo bem?,saudacao,saudacao-25,sem_acento
+me conta uma piada,fora_de_escopo,fora_de_escopo-02,original
+como faço para tirrar o passaporte?,fora_de_escopo,fora_de_escopo-23,erro_digitacao
+pervisão da conta de água do próximo mês,previsao_despesas,previsao_despesas-05,erro_digitacao
+o interfone do bloco a tá fazendo barulho estranho qro abrir chamado,abrir_chamado,abrir_chamado-18,informal
+apaguei o boleto sem querer manda de novo,segunda_via_boleto,segunda_via_boleto-20,informal
+quanto será o gasto total do condomínio em novembro?,previsao_despesas,previsao_despesas-19,original
+como vão ficar as contas do condomíniio mês que vem?,previsao_despesas,previsao_despesas-23,erro_digitacao
+"atualizacao do chamado 2201, por favor",status_chamado,status_chamado-16,sem_acento
+"bom dia, tudo certo?",saudacao,saudacao-10,original
+o que tem de interessante no marketplace?,recomendar_produtos,recomendar_produtos-06,original
+o pagamento da taxa de outubro foi compensado?,status_financeiro,status_financeiro-19,original
+me envia nvamente o boleto,segunda_via_boleto,segunda_via_boleto-21,erro_digitacao
+existe algum apartamento livre no bloco b?,consultar_apartamentos,consultar_apartamentos-06,original
+quais apartamentos estao disponiveis?,consultar_apartamentos,consultar_apartamentos-00,sem_acento
+"o interfone do apto 1204 não toca, preciso de reparo",abrir_chamado,abrir_chamado-21,original
+"tá sem luz no corredor do bloco A, abre um chamado",abrir_chamado,abrir_chamado-24,original
+como anda a manutenção do interfone?,status_chamado,status_chamado-18,original
+qro contratar um plano de celular,fora_de_escopo,fora_de_escopo-36,informal
+"oi, tudo bem?",saudacao,saudacao-07,original
+qro abrir chamado do portão do bloco b,abrir_chamado,abrir_chamado-00,informal
+perdi o boleto do cond,segunda_via_boleto,segunda_via_boleto-01,informal
+quanto vai ser a despesa do próximo mês,previsao_despesas,previsao_despesas-00,informal
+quero abrir uma solicitação de reparo no apto 1204,abrir_chamado,abrir_chamado-09,original
+me ajdua com meu dever de matemática,fora_de_escopo,fora_de_escopo-06,erro_digitacao
+que produtos você indica pra mim?,recomendar_produtos,recomendar_produtos-01,original
+onde fica o hospital mais proximo?,fora_de_escopo,fora_de_escopo-31,sem_acento
+me recomenda algo do marektplace,recomendar_produtos,recomendar_produtos-00,erro_digitacao
+posso ver meus debitos?,status_financeiro,status_financeiro-23,sem_acento
+trauz essa frase para inglês,fora_de_escopo,fora_de_escopo-11,erro_digitacao
+quais aptos aceitam pets e estão diponíveis?,consultar_apartamentos,consultar_apartamentos-30,erro_digitacao
+inidca algum anúncio bom pra mim,recomendar_produtos,recomendar_produtos-19,erro_digitacao
+o que você me recomenda comprar?,recomendar_produtos,recomendar_produtos-23,original
+qual a previsão do tempo pra o fim de semana,fora_de_escopo,fora_de_escopo-24,informal
+quantos apartamentos estoã para alugar agora?,consultar_apartamentos,consultar_apartamentos-25,erro_digitacao
+"o portão da garagem está travado, abre um chamado",abrir_chamado,abrir_chamado-15,original
+qual o horário de mudança no blloco C?,regras_condominio,regras_condominio-20,erro_digitacao
+como está o trânsito agora?,fora_de_escopo,fora_de_escopo-10,original
+procuro apartamento com um quarto ate R$ 2.500,consultar_apartamentos,consultar_apartamentos-03,sem_acento
+tem apartamento de 2 quartos no blooco C?,consultar_apartamentos,consultar_apartamentos-12,erro_digitacao
+qro abrir uma conta no banco,fora_de_escopo,fora_de_escopo-22,informal
+qual o valor do condomínio deste mês?,status_financeiro,status_financeiro-24,original
+preciso de um apartamento ate 1500 reais por mes,consultar_apartamentos,consultar_apartamentos-11,sem_acento
+quero consultar imóveis para locação,consultar_apartamentos,consultar_apartamentos-13,original
+quem ganhou o jogo ontem,fora_de_escopo,fora_de_escopo-01,informal
+qro alugar um apto de um quarto,consultar_apartamentos,consultar_apartamentos-07,informal
+quero ver o histórico de pagameentos,status_financeiro,status_financeiro-17,erro_digitacao
+quero alugar um aparttamento de três quartos,consultar_apartamentos,consultar_apartamentos-07,erro_digitacao
+consulltar chamado 1042,status_chamado,status_chamado-10,erro_digitacao
+me explica oq é inteligência artificial,fora_de_escopo,fora_de_escopo-47,informal
+qual a distancia entre Sao Paulo e Rio?,fora_de_escopo,fora_de_escopo-38,sem_acento
+qual o melhor restaurante da cidade?,fora_de_escopo,fora_de_escopo-28,original
+tem móveis à venda no marketplace,recomendar_produtos,recomendar_produtos-02,informal
+qual o horário de funcionamento da piscina,regras_condominio,regras_condominio-04,informal
+motra os aptos disponíveis,consultar_apartamentos,consultar_apartamentos-08,erro_digitacao
+opa td bem,saudacao,saudacao-06,informal
+minha taxa extra já foi cobrada?,status_financeiro,status_financeiro-18,original
+"olá, boa noite",saudacao,saudacao-22,original
+"oi, pode me ajuddar?",saudacao,saudacao-21,erro_digitacao
+qual a situacao do protocolo 2201?,status_chamado,status_chamado-08,sem_acento
+tem apto de cobertura disponível?,consultar_apartamentos,consultar_apartamentos-27,original
+como esta o transito agora?,fora_de_escopo,fora_de_escopo-10,sem_acento
+estou com o condominio quitado?,status_financeiro,status_financeiro-28,sem_acento
+"tô procurando algo de esporte, me recoemnda",recomendar_produtos,recomendar_produtos-16,erro_digitacao
+tem apto disponível pra dia 15/11,consultar_apartamentos,consultar_apartamentos-10,informal
+quero abrir chamado da iluminação do bloco B,abrir_chamado,abrir_chamado-00,original
+quanto vamos gastar com energia no próximo mês,previsao_despesas,previsao_despesas-09,informal
+reocmenda um filme para hoje à noite,fora_de_escopo,fora_de_escopo-08,erro_digitacao
+quanto é 15 vezes 23,fora_de_escopo,fora_de_escopo-29,informal
+quais aptos aceitam pets e estao disponiveis?,consultar_apartamentos,consultar_apartamentos-30,sem_acento
+previsão de gastos com manutenção,previsao_despesas,previsao_despesas-14,original
+vai ter rateio extra no mês que vem,previsao_despesas,previsao_despesas-18,informal
+traduz essa frase pra inglês,fora_de_escopo,fora_de_escopo-11,informal
+quanto será o gasto total do cond em novembro,previsao_despesas,previsao_despesas-19,informal
+qual o prazo pra resolverem meu chamado,status_chamado,status_chamado-22,informal
+preciso solicitar conserto da bomba,abrir_chamado,abrir_chamado-17,original
+me envia novamente o boleto,segunda_via_boleto,segunda_via_boleto-21,original
+consultar chamado 1042,status_chamado,status_chamado-10,original
+quanto vai ser a despesa do próximo mês?,previsao_despesas,previsao_despesas-00,original
+"ola, preciso de ajuda",saudacao,saudacao-08,sem_acento
+bom dia,saudacao,saudacao-02,original
+manda o codigo de barras do boleto,segunda_via_boleto,segunda_via_boleto-11,sem_acento
+preciso solicitar conserto do interfone,abrir_chamado,abrir_chamado-17,original
+quanto devo de condomínio?,status_financeiro,status_financeiro-03,original
+"sugestao de compra no marketplace, por favor",recomendar_produtos,recomendar_produtos-13,sem_acento
+o boleto n chegou no meu e-mail,segunda_via_boleto,segunda_via_boleto-12,informal
+perdi o boleot do condomínio,segunda_via_boleto,segunda_via_boleto-01,erro_digitacao
+qro abrir uma solicitação de reparo no apto 101,abrir_chamado,abrir_chamado-09,informal
+quero abrir chamado da iluminacao do bloco B,abrir_chamado,abrir_chamado-00,sem_acento
+me explica o que e inteligencia artificial,fora_de_escopo,fora_de_escopo-47,sem_acento
+escreve um poema pra mim,fora_de_escopo,fora_de_escopo-25,original
+tem previsão pra consertar o portão,status_chamado,status_chamado-07,informal
+me mostra o que eu já paguei este ano,status_financeiro,status_financeiro-26,original
+e ai,saudacao,saudacao-05,sem_acento
+o portão da garagem tá travado abre um chamado,abrir_chamado,abrir_chamado-15,informal
+slve,saudacao,saudacao-12,erro_digitacao
+cadê o técnico do meu cahmado?,status_chamado,status_chamado-15,erro_digitacao
+quero abrir uma solicitacao de reparo no apto 101,abrir_chamado,abrir_chamado-09,sem_acento
+tem alguma coisa de esporte anunciada?,recomendar_produtos,recomendar_produtos-07,original
+quem gahnou o jogo ontem?,fora_de_escopo,fora_de_escopo-01,erro_digitacao
+como trocar o pneu do carrro?,fora_de_escopo,fora_de_escopo-45,erro_digitacao
+tenho parcelas atrasadas,status_financeiro,status_financeiro-25,informal
+quando vão resolver o problema do elevador?,status_chamado,status_chamado-12,original
+emitir boleto do apto 1204,segunda_via_boleto,segunda_via_boleto-15,original
+qual o limite de convidados na festa,regras_condominio,regras_condominio-17,informal
+estou devendo alguma coisa pro condominio?,status_financeiro,status_financeiro-22,sem_acento
+tem vazamento no apto 1204,abrir_chamado,abrir_chamado-05,original
+"a lampada do corredor queimou, quero abrir chamado",abrir_chamado,abrir_chamado-12,sem_acento
+mostra os aptos disponíveis,consultar_apartamentos,consultar_apartamentos-08,original
+quanto paguei de condominio esse ano?,status_financeiro,status_financeiro-14,sem_acento
+preciso do boletto pra pagar hoje,segunda_via_boleto,segunda_via_boleto-22,erro_digitacao
+me india uma série para maratonar,fora_de_escopo,fora_de_escopo-33,erro_digitacao
+pode abrir uma ordem de serviço pra a bomba,abrir_chamado,abrir_chamado-23,informal
+a bomba do bloco c está quebrado,abrir_chamado,abrir_chamado-01,original
+o regimento permite churrasqueira na varanda,regras_condominio,regras_condominio-07,informal
+"o link do boleto expirou, preciso de outro",segunda_via_boleto,segunda_via_boleto-16,original
+paguei ontem já caiu,status_financeiro,status_financeiro-12,informal
+quais apartamentos do bloco c estao vazios?,consultar_apartamentos,consultar_apartamentos-22,sem_acento
+procuro apartamento com três quartos até R$ 2.500,consultar_apartamentos,consultar_apartamentos-03,original
+mostra os anúncios mais populares,recomendar_produtos,recomendar_produtos-11,original
+minhas contas com o condominio estao certas?,status_financeiro,status_financeiro-31,sem_acento
+o interfone do apto 710 n toca preciso de reparo,abrir_chamado,abrir_chamado-21,informal
+quero ver apartamentos de 2 quartos disponíveis,consultar_apartamentos,consultar_apartamentos-02,original
+baixar boleto do cond,segunda_via_boleto,segunda_via_boleto-19,informal
+projetar os custos do condomínio,previsao_despesas,previsao_despesas-22,original
+a iluminação do bloco c está quebrdo,abrir_chamado,abrir_chamado-01,erro_digitacao
+qro fazer um chamado de manutenção no apto 101,abrir_chamado,abrir_chamado-20,informal
+indica algum anuncio bom pra mim,recomendar_produtos,recomendar_produtos-19,sem_acento
+o condomínio vai gatsar mais no mês que vem?,previsao_despesas,previsao_despesas-07,erro_digitacao
+"a lâmpada do correddor queimou, quero abrir chamado",abrir_chamado,abrir_chamado-12,erro_digitacao
+quero alugar um apartamento de três quartos,consultar_apartamentos,consultar_apartamentos-07,original
+posso instalar ar-condicionado na fachada?,regras_condominio,regras_condominio-22,original
+quanto custa alugar um apartamento de 2 quartos?,consultar_apartamentos,consultar_apartamentos-14,original
+voces tem apartamento pra alugar?,consultar_apartamentos,consultar_apartamentos-15,sem_acento
+posso colocar rede de proteção na janela,regras_condominio,regras_condominio-12,informal
+tá sem luz no corredor do bloco c abre um chamado,abrir_chamado,abrir_chamado-24,informal
+tem infiltração no teto do apto 101,abrir_chamado,abrir_chamado-13,original
+oi,saudacao,saudacao-00,original
+quanto tempo leva para cozinhar arroz?,fora_de_escopo,fora_de_escopo-48,original
+já consta o pagamento de janeiro?,status_financeiro,status_financeiro-08,original
+quero comprar uma passagem de aviao,fora_de_escopo,fora_de_escopo-05,sem_acento
+me manda o boleto desse mês,segunda_via_boleto,segunda_via_boleto-02,original
+me mostra o que eu ja paguei este ano,status_financeiro,status_financeiro-26,sem_acento
+algum apto desocupando em julho?,consultar_apartamentos,consultar_apartamentos-16,original
+solicito reparo da bomba no bloco c,abrir_chamado,abrir_chamado-22,original
+quero ajjuda para montar meu computador gamer,fora_de_escopo,fora_de_escopo-49,erro_digitacao
+quero consultar imoveis para locacao,consultar_apartamentos,consultar_apartamentos-13,sem_acento
+tem algmua taxa em aberto no apto 405?,status_financeiro,status_financeiro-06,erro_digitacao
+"abrir chamado, elevador do bloco C quebrou",abrir_chamado,abrir_chamado-10,original
+projetar os cutsos do condomínio,previsao_despesas,previsao_despesas-22,erro_digitacao
+"querro comprar algo dos vizinhos, o que você sugere?",recomendar_produtos,recomendar_produtos-10,erro_digitacao
+"ola, assistente do condominio",saudacao,saudacao-27,sem_acento
+qual minha situacao com a administradora?,status_financeiro,status_financeiro-21,sem_acento
+o interfone do apto 1204 n toca preciso de reparo,abrir_chamado,abrir_chamado-21,informal
+o chamado que abri ontem ja foi resolvido?,status_chamado,status_chamado-06,sem_acento
+gstaria de uma estimativa das despesas futuras,previsao_despesas,previsao_despesas-17,erro_digitacao
+estou procurando um apto de três quartos aqui no condomínio,consultar_apartamentos,consultar_apartamentos-21,original
+sugeere algum produto pra mim,recomendar_produtos,recomendar_produtos-03,erro_digitacao
+"sugestão de compra no marketplace, por favor",recomendar_produtos,recomendar_produtos-13,original
+qual o horário do jogo do Corinthans?,fora_de_escopo,fora_de_escopo-20,erro_digitacao
+oq tem de interessante no marketplace,recomendar_produtos,recomendar_produtos-06,informal
+como anda a manutenção do interfone,status_chamado,status_chamado-18,informal
+quero fazer um chamado de manutenção no apto 101,abrir_chamado,abrir_chamado-20,original
+como vão ficar as contas do condomínio mês que vem?,previsao_despesas,previsao_despesas-23,original
+statsu do chamado número 2201,status_chamado,status_chamado-03,erro_digitacao
+o boleto não chegou no meu e-mail,segunda_via_boleto,segunda_via_boleto-12,original
+status do chamado numero 88,status_chamado,status_chamado-03,sem_acento
+cadê o técnico do meu chamado?,status_chamado,status_chamado-15,original
+tudo bem?,saudacao,saudacao-23,original
+o técnico já foi atender o chamaddo do apto 405?,status_chamado,status_chamado-14,erro_digitacao
+como anda a manutenção do elevador?,status_chamado,status_chamado-18,original
+já consta o pagamento de setembro?,status_financeiro,status_financeiro-08,original
+qual a previsão de despesas para dezembro?,previsao_despesas,previsao_despesas-08,original
+"o portao do bloco C esta fazendo barulho estranho, quero abrir chamado",abrir_chamado,abrir_chamado-18,sem_acento
+o interfone não está funcionando,abrir_chamado,abrir_chamado-03,original
+qual a cotação do bitcoin,fora_de_escopo,fora_de_escopo-51,informal
+pode estacionar na vaga de visitante?,regras_condominio,regras_condominio-18,original
+preciso de um apartamento ate 2 mil por mes,consultar_apartamentos,consultar_apartamentos-11,sem_acento
+como faço pra aprender inglês rápido,fora_de_escopo,fora_de_escopo-42,informal
+quais apartamentos estão disponíveis?,consultar_apartamentos,consultar_apartamentos-00,original
+tem artigos esportivos sendo vendido no condomínio?,recomendar_produtos,recomendar_produtos-12,original
+"o interfone do bloco a esta fazendo barulho estranho, quero abrir chamado",abrir_chamado,abrir_chamado-18,sem_acento
+"quero pagar o condominio, me envia o boleto",segunda_via_boleto,segunda_via_boleto-18,sem_acento
+qunato tempo leva para cozinhar arroz?,fora_de_escopo,fora_de_escopo-48,erro_digitacao
+ja resolveram o chamado 2201?,status_chamado,status_chamado-02,sem_acento
+quando vao resolver o problema do elevador?,status_chamado,status_chamado-12,sem_acento
+que dia é hoje?,fora_de_escopo,fora_de_escopo-40,original
+quais apartamentos do bloco b estao vazios?,consultar_apartamentos,consultar_apartamentos-22,sem_acento
+voês têm apartamento pra alugar?,consultar_apartamentos,consultar_apartamentos-15,erro_digitacao
+quais são as regras do condomínio?,regras_condominio,regras_condominio-02,original
+olá td bem,saudacao,saudacao-25,informal
+o técnico já foi atender o chamado do apto 302,status_chamado,status_chamado-14,informal
+preciso de um encanador para minha casa de praia,fora_de_escopo,fora_de_escopo-26,original
+tem apartamento mobiliado disponivel?,consultar_apartamentos,consultar_apartamentos-20,sem_acento
+ver meu extrato financeiro,status_financeiro,status_financeiro-05,original
+como emitir segunda via do bleto?,segunda_via_boleto,segunda_via_boleto-03,erro_digitacao
+quanto o condominio deve gastar em fevereiro?,previsao_despesas,previsao_despesas-03,sem_acento
+tem previsao para consertar a bomba?,status_chamado,status_chamado-07,sem_acento
+bom dia td certo,saudacao,saudacao-10,informal
+posso colocar rede de proteção na janela?,regras_condominio,regras_condominio-12,original
+pode ter animal de estmiação no prédio?,regras_condominio,regras_condominio-03,erro_digitacao
+quantas vagas de garagem cada apartamento tem?,regras_condominio,regras_condominio-09,original
+qro o boleto de janeiro,segunda_via_boleto,segunda_via_boleto-05,informal
+quero pedir uma pizza,fora_de_escopo,fora_de_escopo-27,original
+bom dia pessoal,saudacao,saudacao-20,original
+quais aptos aceitam pets e estão disponíveis?,consultar_apartamentos,consultar_apartamentos-30,original
+quero registrar uma reclamação sobre o portão,abrir_chamado,abrir_chamado-14,original
+tem regra pra lixo e coleeta seletiva?,regras_condominio,regras_condominio-16,erro_digitacao
+me indica produtos que combinam com meu perfil,recomendar_produtos,recomendar_produtos-08,original
+tem alguma promoção de móveis entre os moradores?,recomendar_produtos,recomendar_produtos-21,original
+qual a previsão do tempo para o fim de semana?,fora_de_escopo,fora_de_escopo-24,original
+tem algum apartamento com um quarto abaixo de 1500 reais?,consultar_apartamentos,consultar_apartamentos-23,original
+tá sem luz no corredor do bloco a abre um chamado,abrir_chamado,abrir_chamado-24,informal
+qual o vencimento da minha próxima taxa,status_financeiro,status_financeiro-29,informal
+oi assistetne,saudacao,saudacao-09,erro_digitacao
+aglum apto desocupando em julho?,consultar_apartamentos,consultar_apartamentos-16,erro_digitacao
+tem previsão para consertar o portão?,status_chamado,status_chamado-07,original
+abrir ocorrencia de problema no bloco A,abrir_chamado,abrir_chamado-16,sem_acento
+me mostra a previsão financeria do condomínio,previsao_despesas,previsao_despesas-12,erro_digitacao
+como funicona o pix?,fora_de_escopo,fora_de_escopo-39,erro_digitacao
+preciso abrir um chamado de manutenção,abrir_chamado,abrir_chamado-02,original
+qro consultar imóveis pra locação,consultar_apartamentos,consultar_apartamentos-13,informal
+qual a distância entre são paulo e rio,fora_de_escopo,fora_de_escopo-38,informal
+qro abrir chamado da iluminação do bloco b,abrir_chamado,abrir_chamado-00,informal
+já reslveram o chamado 337?,status_chamado,status_chamado-02,erro_digitacao
+quais são as melhores oefrtas do marketplace hoje?,recomendar_produtos,recomendar_produtos-17,erro_digitacao
+qro comprar uma passagem de avião,fora_de_escopo,fora_de_escopo-05,informal
+me indica produtso que combinam com meu perfil,recomendar_produtos,recomendar_produtos-08,erro_digitacao
+projetar os custos do condominio,previsao_despesas,previsao_despesas-22,sem_acento
+quanto deve ficcar a taxa condominial no mês que vem?,previsao_despesas,previsao_despesas-13,erro_digitacao
+o pagameento da taxa de outubro foi compensado?,status_financeiro,status_financeiro-19,erro_digitacao
+qual o endereço da farmácia mais próxima?,fora_de_escopo,fora_de_escopo-46,original
+"ola, boa noite",saudacao,saudacao-22,sem_acento
+quanto custa um carro novo?,fora_de_escopo,fora_de_escopo-19,original
+tem algum apartamento com dois quartos abaixo de 2 mil?,consultar_apartamentos,consultar_apartamentos-23,original
+como faço um bolo de cenoura?,fora_de_escopo,fora_de_escopo-03,original
+algum apartaemnto térreo vago?,consultar_apartamentos,consultar_apartamentos-28,erro_digitacao
+oi assistente,saudacao,saudacao-09,original
+quero ver o historico de pagamentos,status_financeiro,status_financeiro-17,sem_acento
+eae,saudacao,saudacao-24,original
+tem promoção de passagem pra o nordeste,fora_de_escopo,fora_de_escopo-41,informal
+qual o horário de mudança no bloco c?,regras_condominio,regras_condominio-20,original
+minha taxa extra já foi cobrada,status_financeiro,status_financeiro-18,informal
+o que os mooradores estão vendendo?,recomendar_produtos,recomendar_produtos-15,erro_digitacao
+já consta o pagameto de setembro?,status_financeiro,status_financeiro-08,erro_digitacao
+pode abrir uma ordem de servico para a bomba?,abrir_chamado,abrir_chamado-23,sem_acento
+as despesas vão subir no próximo mês,previsao_despesas,previsao_despesas-11,informal
+qro abrir uma solicitação de reparo no apto 1204,abrir_chamado,abrir_chamado-09,informal
+hey,saudacao,saudacao-15,original
+qual o horario de silencio?,regras_condominio,regras_condominio-00,sem_acento
+"segunda via do boleto de março, por favor",segunda_via_boleto,segunda_via_boleto-17,original
+qual o placar do jogo do Palmeiras?,fora_de_escopo,fora_de_escopo-34,original
+o chamado do elevador do bloco C ja foi concluido?,status_chamado,status_chamado-17,sem_acento
+"abrr chamado, elevador do bloco C quebrou",abrir_chamado,abrir_chamado-10,erro_digitacao
+e aí beleza,saudacao,saudacao-19,informal
+como funciona o pix,fora_de_escopo,fora_de_escopo-39,informal
+meus chamados em aberto,status_chamado,status_chamado-19,original
+meu pagamento foi confirmado,status_financeiro,status_financeiro-04,informal
+que dia é hoje,fora_de_escopo,fora_de_escopo-40,informal
+preciso de um advogado pra o meu divórcio,fora_de_escopo,fora_de_escopo-43,informal
+quais anuncios voce acha que eu vou gostar?,recomendar_produtos,recomendar_produtos-09,sem_acento
+a bomba nao esta funcionando,abrir_chamado,abrir_chamado-03,sem_acento
+qual o horário do jogo do Corinthians?,fora_de_escopo,fora_de_escopo-20,original
+como faço um bolo de ceenoura?,fora_de_escopo,fora_de_escopo-03,erro_digitacao
+o apto 1204 está com alugma dívida?,status_financeiro,status_financeiro-15,erro_digitacao
+tem promoção de passagem para o nordeste?,fora_de_escopo,fora_de_escopo-41,original
+tem regra pra lixo e coleta seletiva,regras_condominio,regras_condominio-16,informal
+estimativa de gastos para o próxiom mês,previsao_despesas,previsao_despesas-06,erro_digitacao
+que dia e hoje?,fora_de_escopo,fora_de_escopo-40,sem_acento
+quantos apartamentos estão para alugar agora?,consultar_apartamentos,consultar_apartamentos-25,original
+que produtos vc indica pra mim,recomendar_produtos,recomendar_produtos-01,informal
+quais aptos do bloco c tão vazios,consultar_apartamentos,consultar_apartamentos-22,informal
+como reservo o salão de festas?,regras_condominio,regras_condominio-05,original
+tem artigos esportivos sendo vendido no cond,recomendar_produtos,recomendar_produtos-12,informal
+tô procurando algo de esporte me recomenda,recomendar_produtos,recomendar_produtos-16,informal
+tem apartamento de 2 quartos no bloco C?,consultar_apartamentos,consultar_apartamentos-12,original
+"abrir chamado, bomba do bloco A quebrou",abrir_chamado,abrir_chamado-10,original
+qual o orçamento previsto para o próximo mês?,previsao_despesas,previsao_despesas-21,original
+preciso de um apto até 1500 reais por mês,consultar_apartamentos,consultar_apartamentos-11,informal
+manda o código de barras do boleto,segunda_via_boleto,segunda_via_boleto-11,original
+preciso imprimir o boleto,segunda_via_boleto,segunda_via_boleto-10,original
+qual a previsão de despesas para novembro?,previsao_despesas,previsao_despesas-08,original
+quanto custa alugar um apto de 2 quartos,consultar_apartamentos,consultar_apartamentos-14,informal
+boa noite td bem,saudacao,saudacao-26,informal
+quais apartamentos do bloco c estão vazios?,consultar_apartamentos,consultar_apartamentos-22,original
+qro o boleto de julho,segunda_via_boleto,segunda_via_boleto-05,informal
+qanto custa um iphone novo?,fora_de_escopo,fora_de_escopo-32,erro_digitacao
+registrar problema da iluminação,abrir_chamado,abrir_chamado-06,original
+qual o melhor celular para comprrar?,fora_de_escopo,fora_de_escopo-09,erro_digitacao
+até que horas pode usar o salão de jogos,regras_condominio,regras_condominio-14,informal
+e aí,saudacao,saudacao-05,original
+qual o horário permitido para oras?,regras_condominio,regras_condominio-08,erro_digitacao
+"e ai, beleza?",saudacao,saudacao-19,sem_acento
+preciso do boleto pra pagar hoje,segunda_via_boleto,segunda_via_boleto-22,original
+abrir ocorrência de problema no bloco A,abrir_chamado,abrir_chamado-16,original
+já resolveram o chamado 2201?,status_chamado,status_chamado-02,original
+quero contratar um plano de celular,fora_de_escopo,fora_de_escopo-36,original
+quanto o condominio deve gastar em janeiro?,previsao_despesas,previsao_despesas-03,sem_acento
+previsão de despesa com salários e limpeza,previsao_despesas,previsao_despesas-20,original
+como reservo o salão de festas,regras_condominio,regras_condominio-05,informal
+visitante pode usar a academia,regras_condominio,regras_condominio-10,informal
+"o interfone do bloco a está fazendo barulho estranho, quero abrir chamado",abrir_chamado,abrir_chamado-18,original
+quanto o prédio vai gastar no próimo mês?,previsao_despesas,previsao_despesas-16,erro_digitacao
+como está o chamado da bomba?,status_chamado,status_chamado-01,original
+não recebi o boleto deste mês,segunda_via_boleto,segunda_via_boleto-08,original
+quais aparamentos do bloco b estão vazios?,consultar_apartamentos,consultar_apartamentos-22,erro_digitacao
+quais são as regras do cond,regras_condominio,regras_condominio-02,informal
+traduz essa frase para inglês,fora_de_escopo,fora_de_escopo-11,original
+algum débito em aberto no apto 101,status_financeiro,status_financeiro-30,informal
+pode ter animal de estimação no prédio,regras_condominio,regras_condominio-03,informal
+quanto falta pagar?,status_financeiro,status_financeiro-10,original
+estou procurando um apto de três quartos aqui no cond,consultar_apartamentos,consultar_apartamentos-21,informal
+estou procurando um apto de tres quartos aqui no condominio,consultar_apartamentos,consultar_apartamentos-21,sem_acento
+tem alguma coisa de artigos esportivos anunciada?,recomendar_produtos,recomendar_produtos-07,original
+como faco para emagrecer?,fora_de_escopo,fora_de_escopo-30,sem_acento
+tem eletrônicos sendo vendido no condomínio?,recomendar_produtos,recomendar_produtos-12,original
+o técnico já foi atender o chamado do apto 405?,status_chamado,status_chamado-14,original
+qual o vlaor da minha taxa condominial?,status_financeiro,status_financeiro-02,erro_digitacao
+qual a situação do protocolo 337?,status_chamado,status_chamado-08,original
+a bomba do bloco c tá quebrado,abrir_chamado,abrir_chamado-01,informal
+vocês têm apartamento pra alugar?,consultar_apartamentos,consultar_apartamentos-15,original
+existe taxa para usar o salão de festas?,regras_condominio,regras_condominio-23,original
+qual a tendencia de despesas do predio?,previsao_despesas,previsao_despesas-15,sem_acento
+tem apartameento mobiliado disponível?,consultar_apartamentos,consultar_apartamentos-20,erro_digitacao
+me ensina a fazer um currículo,fora_de_escopo,fora_de_escopo-37,original
+o interfone nao esta funcionando,abrir_chamado,abrir_chamado-03,sem_acento
+quanto o prédio vai gastar no próximo mês?,previsao_despesas,previsao_despesas-16,original
+solicito reparo do elevador no bloco C,abrir_chamado,abrir_chamado-22,original
+qual o andamento do meu chamado,status_chamado,status_chamado-00,informal
+"o boleto venceu, pode gerar outro?",segunda_via_boleto,segunda_via_boleto-04,original
+quanto custa alugar um apartamento de tres quartos?,consultar_apartamentos,consultar_apartamentos-14,sem_acento
+quero abrir chamado do portao do bloco B,abrir_chamado,abrir_chamado-00,sem_acento
+abre um chamado pra mim interfone com defeito,abrir_chamado,abrir_chamado-04,informal
+segunda via do boleto de março pfv,segunda_via_boleto,segunda_via_boleto-17,informal
+quero registrar uma reclamação sobbre o portão,abrir_chamado,abrir_chamado-14,erro_digitacao
+não recebi o boleo deste mês,segunda_via_boleto,segunda_via_boleto-08,erro_digitacao
+como está o trânstio agora?,fora_de_escopo,fora_de_escopo-10,erro_digitacao
+algum apto desocupando em janeiro,consultar_apartamentos,consultar_apartamentos-16,informal
+que produtos voce indica pra mim?,recomendar_produtos,recomendar_produtos-01,sem_acento
+quero o boleto de julho,segunda_via_boleto,segunda_via_boleto-05,original
+posso fazer festa no salão,regras_condominio,regras_condominio-01,informal
+qual o horário permitido pra obras,regras_condominio,regras_condominio-08,informal
+qual o horario do jogo do Corinthians?,fora_de_escopo,fora_de_escopo-20,sem_acento
+o porto parou de funcionar,abrir_chamado,abrir_chamado-08,erro_digitacao
+tem móveis à venda no markketplace?,recomendar_produtos,recomendar_produtos-02,erro_digitacao
+me explica como funcionna a bolsa de valores,fora_de_escopo,fora_de_escopo-21,erro_digitacao
+abre o sptoify,fora_de_escopo,fora_de_escopo-13,erro_digitacao
+como faço para tirar o passaporte?,fora_de_escopo,fora_de_escopo-23,original
+previsao de despesa com salarios e limpeza,previsao_despesas,previsao_despesas-20,sem_acento
+como funciona a regra de uso da churrasqueira?,regras_condominio,regras_condominio-19,original
+me mostra produtos novos no marketplace,recomendar_produtos,recomendar_produtos-18,original
+já consertaram o portão do bloco d,status_chamado,status_chamado-23,informal
+tem promocao de passagem para o nordeste?,fora_de_escopo,fora_de_escopo-41,sem_acento
+qual o total das minhas pendências,status_financeiro,status_financeiro-16,informal
+"vazamento de agua na garagem, abre chamado por favor",abrir_chamado,abrir_chamado-19,sem_acento
+oq diz o regimento interno sobre pets,regras_condominio,regras_condominio-13,informal
+segunda via do boleto de outubro pfv,segunda_via_boleto,segunda_via_boleto-17,informal
+quais valores estão em abreto no meu nome?,status_financeiro,status_financeiro-13,erro_digitacao
+tem apto de 2 quartos no bloco c,consultar_apartamentos,consultar_apartamentos-12,informal
+preciso de manutenção do portão,abrir_chamado,abrir_chamado-11,original
+quero comprar uma passagem de avião,fora_de_escopo,fora_de_escopo-05,original
+qual a tendência de despesas do prédio,previsao_despesas,previsao_despesas-15,informal
+tem eletronicos sendo vendido no condominio?,recomendar_produtos,recomendar_produtos-12,sem_acento
+como anda a manutenção do elevadoor?,status_chamado,status_chamado-18,erro_digitacao
+como trocar o pneu do carro?,fora_de_escopo,fora_de_escopo-45,original
+qual o horário de mudança no bloco c,regras_condominio,regras_condominio-20,informal
+precciso de manutenção do portão,abrir_chamado,abrir_chamado-11,erro_digitacao
+posso fazer festa no salao?,regras_condominio,regras_condominio-01,sem_acento
+recomende produtos baseados no que eu costumo ver,recomendar_produtos,recomendar_produtos-14,original
+o chamado que abri ontem já foi resolvido,status_chamado,status_chamado-06,informal
+recomenda um item de esporte,recomendar_produtos,recomendar_produtos-05,original
+gerar novo boleto do cond,segunda_via_boleto,segunda_via_boleto-06,informal
+quero agendar uma consulta no dentiista,fora_de_escopo,fora_de_escopo-14,erro_digitacao
+"atualização do camado 2201, por favor",status_chamado,status_chamado-16,erro_digitacao
+preciso solicitar conserto da bomab,abrir_chamado,abrir_chamado-17,erro_digitacao
+qual o orçamento previsto pra o próximo mês,previsao_despesas,previsao_despesas-21,informal
+como vao ficar as contas do condominio mes que vem?,previsao_despesas,previsao_despesas-23,sem_acento
+pode abrir uma odrem de serviço para a bomba?,abrir_chamado,abrir_chamado-23,erro_digitacao
+quero saber se meu chamado foi fechado,status_chamado,status_chamado-20,original
+já consertaram o portão do bloco D?,status_chamado,status_chamado-23,original
+quero abrir uma solicitacao de reparo no apto 1204,abrir_chamado,abrir_chamado-09,sem_acento
+como declarar imposto de renda?,fora_de_escopo,fora_de_escopo-35,original
+visitate pode usar a academia?,regras_condominio,regras_condominio-10,erro_digitacao
+tem alguma taxa em aberto no apto 405?,status_financeiro,status_financeiro-06,original
+ver o status da minha solicitacao,status_chamado,status_chamado-13,sem_acento
+o apto 101 está com alguma díviida?,status_financeiro,status_financeiro-15,erro_digitacao
+tem móveis à venda no marketplace?,recomendar_produtos,recomendar_produtos-02,original
+me explica o que é inteligência artificial,fora_de_escopo,fora_de_escopo-47,original
+preciso de um encanador pra minha casa de praia,fora_de_escopo,fora_de_escopo-26,informal
+receita de lasanha,fora_de_escopo,fora_de_escopo-17,original
+quanto será o gasto total do condomíínio em dezembro?,previsao_despesas,previsao_despesas-19,erro_digitacao
+quero pediir uma pizza,fora_de_escopo,fora_de_escopo-27,erro_digitacao
+queor ver ofertas do marketplace,recomendar_produtos,recomendar_produtos-04,erro_digitacao
+preciso saber a convenção do condomínio,regras_condominio,regras_condominio-21,original
+minhas contas com o cond tão certas,status_financeiro,status_financeiro-31,informal
+quero conttratar um plano de celular,fora_de_escopo,fora_de_escopo-36,erro_digitacao
+estimativa de gastos para o próximo mês,previsao_despesas,previsao_despesas-06,original
+existe algum apartamento livre no bloco C?,consultar_apartamentos,consultar_apartamentos-06,original
+quero registrar uma reclamação sobre a bomba,abrir_chamado,abrir_chamado-14,original
+tem alguma promoção de móevis entre os moradores?,recomendar_produtos,recomendar_produtos-21,erro_digitacao
+"quero morar no condomínio, o que tem disponível?",consultar_apartamentos,consultar_apartamentos-24,original
+qual minha sittuação com a administradora?,status_financeiro,status_financeiro-21,erro_digitacao
+"e aí, beleza?",saudacao,saudacao-19,original
+tem alguma cobrança extra no meu nome?,status_financeiro,status_financeiro-27,original
+algum apartamento térreo vago?,consultar_apartamentos,consultar_apartamentos-28,original
+tem alguma coisa de esporte anunciada,recomendar_produtos,recomendar_produtos-07,informal
+qual a previsao do tempo para amanha?,fora_de_escopo,fora_de_escopo-00,sem_acento
+preciso saaber a convenção do condomínio,regras_condominio,regras_condominio-21,erro_digitacao
+quanto custa um iphone novo?,fora_de_escopo,fora_de_escopo-32,original
+quantas vagas de garagem cada apto tem,regras_condominio,regras_condominio-09,informal
+quais unidades estão vagas?,consultar_apartamentos,consultar_apartamentos-09,original
+qual a previsao de gastos do condominio?,previsao_despesas,previsao_despesas-01,sem_acento
+tem infiltração no teto do apto 1204,abrir_chamado,abrir_chamado-13,original
+posso colcar rede de proteção na janela?,regras_condominio,regras_condominio-12,erro_digitacao
+projecao de despesas do mes que vem,previsao_despesas,previsao_despesas-04,sem_acento
+me mostra produtos noos no marketplace,recomendar_produtos,recomendar_produtos-18,erro_digitacao
+esotu em dia com o condomínio?,status_financeiro,status_financeiro-01,erro_digitacao
+algum débito em aberto no apto 58,status_financeiro,status_financeiro-30,informal
+quanto tá o dólar hoje,fora_de_escopo,fora_de_escopo-07,informal
+tem vazaento no apto 302,abrir_chamado,abrir_chamado-05,erro_digitacao
+perdi o boleto do condomínio,segunda_via_boleto,segunda_via_boleto-01,original
+me manda o bleto desse mês,segunda_via_boleto,segunda_via_boleto-02,erro_digitacao
+preciso saber a convenção do cond,regras_condominio,regras_condominio-21,informal
+a boba parou de funcionar,abrir_chamado,abrir_chamado-08,erro_digitacao
+boa tarde,saudacao,saudacao-03,original
+sugere algum produto pra mim,recomendar_produtos,recomendar_produtos-03,original
+quero agendar uma consulta no dentista,fora_de_escopo,fora_de_escopo-14,original
+gostaria de uma estimativa das despesas futuras,previsao_despesas,previsao_despesas-17,original
+qual a regra para barulho depois das 22h?,regras_condominio,regras_condominio-11,original
+qual o vencimento da minha próxima taxa?,status_financeiro,status_financeiro-29,original
+pode fazer mudnça no domingo?,regras_condominio,regras_condominio-06,erro_digitacao
+"tô procurando algo de esporte, me recomenda",recomendar_produtos,recomendar_produtos-16,original
+tem apartamento disponível para dia 15/11?,consultar_apartamentos,consultar_apartamentos-10,original
+o regimento permite churrasqueira na varanda?,regras_condominio,regras_condominio-07,original
+projeção de despesas do mês que vem,previsao_despesas,previsao_despesas-04,original
+quero o bolleto de janeiro,segunda_via_boleto,segunda_via_boleto-05,erro_digitacao
+o apto 1204 esta com alguma divida?,status_financeiro,status_financeiro-15,sem_acento
+td bem,saudacao,saudacao-23,informal
+"oi, tem alguém aí?",saudacao,saudacao-18,original
+"abre um chamado pra mim, portao com defeito",abrir_chamado,abrir_chamado-04,sem_acento
+lista de apartamentos para augar até 3 mil,consultar_apartamentos,consultar_apartamentos-17,erro_digitacao
+"olá, tudo bom?",saudacao,saudacao-16,original
+recomenda um filme para hoje à noite,fora_de_escopo,fora_de_escopo-08,original
+preciso de manutenção do elevador,abrir_chamado,abrir_chamado-11,original
+quanto falta pagar,status_financeiro,status_financeiro-10,informal
+existe taxa pra usar o salão de festas,regras_condominio,regras_condominio-23,informal
+quero sabr se meu chamado foi fechado,status_chamado,status_chamado-20,erro_digitacao
+"tá sem luz no corredor do bloco c, abre um chamado",abrir_chamado,abrir_chamado-24,original
+seggunda via da taxa condominial do apto 710,segunda_via_boleto,segunda_via_boleto-09,erro_digitacao
+"sugestão de compra no marrketplace, por favor",recomendar_produtos,recomendar_produtos-13,erro_digitacao
+preciso da seugnda via do boleto,segunda_via_boleto,segunda_via_boleto-00,erro_digitacao
+prever as despesas do condomínio,previsao_despesas,previsao_despesas-10,original
+quanto paguei de condomínio esse ano?,status_financeiro,status_financeiro-14,original
+há unidades disponíveis para locação?,consultar_apartamentos,consultar_apartamentos-19,original
+tem apartamento para alugar no bloco a?,consultar_apartamentos,consultar_apartamentos-01,original
+ver meu exttrato financeiro,status_financeiro,status_financeiro-05,erro_digitacao
+recommenda um item de utensílios,recomendar_produtos,recomendar_produtos-05,erro_digitacao
+algum apto desocupando em janeiro?,consultar_apartamentos,consultar_apartamentos-16,original
+preciso de um advogado para o meu divórcio,fora_de_escopo,fora_de_escopo-43,original
+tem multa ou juros no meu condominio?,status_financeiro,status_financeiro-20,sem_acento
+tem apto pra alugar no bloco a,consultar_apartamentos,consultar_apartamentos-01,informal
+"olá, preciso de ajuad",saudacao,saudacao-08,erro_digitacao
+tem algum apto com um quarto abaixo de 1500 reais,consultar_apartamentos,consultar_apartamentos-23,informal
+"oi, pode me ajudar?",saudacao,saudacao-21,original
+"paguei ontem, já caiu?",status_financeiro,status_financeiro-12,original
+"abri um chamado semana passada e ninguém respondeu, como está?",status_chamado,status_chamado-21,original
+a iluminação do bloco c está quebrado,abrir_chamado,abrir_chamado-01,original
+qual o horário de mudança no bloco C?,regras_condominio,regras_condominio-20,original
+a bomba parou de funcionar,abrir_chamado,abrir_chamado-08,original
+quanto está o dólar hoje?,fora_de_escopo,fora_de_escopo-07,original
+"boa noite, tudo bem?",saudacao,saudacao-26,original
+meu chamado ainda está aberto?,status_chamado,status_chamado-11,original
+posso alugar meu apartamento por temporada?,regras_condominio,regras_condominio-15,original
+qual o horario de funcionamento da piscina?,regras_condominio,regras_condominio-04,sem_acento
+pode fazer mudança no domingo?,regras_condominio,regras_condominio-06,original
+como tá o chamado do elevador,status_chamado,status_chamado-01,informal
+recomendações personalizadas pfv,recomendar_produtos,recomendar_produtos-22,informal
+abrir ocorrência de problema no bloco b,abrir_chamado,abrir_chamado-16,original
+pode fazer mudanca no domingo?,regras_condominio,regras_condominio-06,sem_acento
+estou em dia com o cond,status_financeiro,status_financeiro-01,informal
+2ª via do bolleto,segunda_via_boleto,segunda_via_boleto-23,erro_digitacao
+como cancelo minha assinatura da netflix,fora_de_escopo,fora_de_escopo-50,informal
+queo fazer um chamado de manutenção no apto 101,abrir_chamado,abrir_chamado-20,erro_digitacao
+"abre um chamado pra mim, interfone com defeito",abrir_chamado,abrir_chamado-04,original
+"quero morar no conndomínio, o que tem disponível?",consultar_apartamentos,consultar_apartamentos-24,erro_digitacao
+minhas contas com o condomínio estão certas?,status_financeiro,status_financeiro-31,original
+qual o horário permitido para obras?,regras_condominio,regras_condominio-08,original
+"o boleto veenceu, pode gerar outro?",segunda_via_boleto,segunda_via_boleto-04,erro_digitacao
+"recomenddações personalizadas, por favor",recomendar_produtos,recomendar_produtos-22,erro_digitacao
+qual meu saldo devedor?,status_financeiro,status_financeiro-07,original
+quanto cutsa um carro novo?,fora_de_escopo,fora_de_escopo-19,erro_digitacao
+existe taxa para usar o salao de festas?,regras_condominio,regras_condominio-23,sem_acento
+preciso de um apartamento até 2 mil por mês,consultar_apartamentos,consultar_apartamentos-11,original
+vai aumentar a taxa mês que vem,previsao_despesas,previsao_despesas-02,informal
+já consrtaram o elevador do bloco d?,status_chamado,status_chamado-23,erro_digitacao
+olá,saudacao,saudacao-01,original
+quanto e 15 vezes 23?,fora_de_escopo,fora_de_escopo-29,sem_acento
+qual a previsão de gastos do condomínio?,previsao_despesas,previsao_despesas-01,original
+apartamentos à venda no condomínio,consultar_apartamentos,consultar_apartamentos-05,original
+tem vazamento no apto 302,abrir_chamado,abrir_chamado-05,original
+oi tem alguém aí,saudacao,saudacao-18,informal
+qual a previsão do tempo para amahnã?,fora_de_escopo,fora_de_escopo-00,erro_digitacao
+qual o total das minhas pendencias?,status_financeiro,status_financeiro-16,sem_acento
+qro reemitir o boleto vencido,segunda_via_boleto,segunda_via_boleto-13,informal
+2ª via do boleto,segunda_via_boleto,segunda_via_boleto-23,original
+o chamado do interfone do bloco D ja foi concluido?,status_chamado,status_chamado-17,sem_acento
+quero alugar um apartamento de um quarto,consultar_apartamentos,consultar_apartamentos-07,original
+meu chamado ainda está abeerto?,status_chamado,status_chamado-11,erro_digitacao
+vai aumentar a taxa mês que vem?,previsao_despesas,previsao_despesas-02,original
+quadno vão resolver o problema do interfone?,status_chamado,status_chamado-12,erro_digitacao
+quem ganhou o jogo ontem?,fora_de_escopo,fora_de_escopo-01,original
+tem infitração no teto do apto 1204,abrir_chamado,abrir_chamado-13,erro_digitacao
+"olá, preciso de ajuda",saudacao,saudacao-08,original
+qro acompanhar meu chamado,status_chamado,status_chamado-05,informal
+me mostra a previsão financeira do cond,previsao_despesas,previsao_despesas-12,informal
+já consertaram o elevador do bloco d?,status_chamado,status_chamado-23,original
+"o interfone do apto 1204 não toca, preciso de reprao",abrir_chamado,abrir_chamado-21,erro_digitacao
+quero ver footos dos apartamentos livres,consultar_apartamentos,consultar_apartamentos-26,erro_digitacao
+qro pedir uma pizza,fora_de_escopo,fora_de_escopo-27,informal
+quero ajuda para montar meu computador gamer,fora_de_escopo,fora_de_escopo-49,original
+recomenda um item de utensílios,recomendar_produtos,recomendar_produtos-05,original
+como instalo o windows?,fora_de_escopo,fora_de_escopo-18,original
+já consta o pgamento de janeiro?,status_financeiro,status_financeiro-08,erro_digitacao
+me recomenda um bom lvro,fora_de_escopo,fora_de_escopo-44,erro_digitacao
+o apto 101 está com alguma dívida?,status_financeiro,status_financeiro-15,original
+como faco para tirar o passaporte?,fora_de_escopo,fora_de_escopo-23,sem_acento
+queero registrar uma reclamação sobre a bomba,abrir_chamado,abrir_chamado-14,erro_digitacao
+vai aumentra a taxa mês que vem?,previsao_despesas,previsao_despesas-02,erro_digitacao
+qual a previsão de gasttos do condomínio?,previsao_despesas,previsao_despesas-01,erro_digitacao
+quais são as melhores ofertas do marketplace hoje?,recomendar_produtos,recomendar_produtos-17,original
+a iluminação do bloco c tá quebrado,abrir_chamado,abrir_chamado-01,informal
+como faço um bolo de cenoura,fora_de_escopo,fora_de_escopo-03,informal
+tem alguma promocao de moveis entre os moradores?,recomendar_produtos,recomendar_produtos-21,sem_acento
+tem alguma taxa em abrto no apto 405?,status_financeiro,status_financeiro-06,erro_digitacao
+tô procurando algo de eletrônicos me recomenda,recomendar_produtos,recomendar_produtos-16,informal
+quero ver o histórico de pagamentos,status_financeiro,status_financeiro-17,original
+opa,saudacao,saudacao-28,original
+tem alguma taxa em aberto no apto 405,status_financeiro,status_financeiro-06,informal
+quanto vai ser a despesa do próxmio mês?,previsao_despesas,previsao_despesas-00,erro_digitacao
+me indica uma série para maratonar,fora_de_escopo,fora_de_escopo-33,original
+ate que horas pode usar o salao de jogos?,regras_condominio,regras_condominio-14,sem_acento
+abrir ocorrencia de problema no bloco b,abrir_chamado,abrir_chamado-16,sem_acento
+salve,saudacao,saudacao-12,original
+quero acompanhar meu chamado,status_chamado,status_chamado-05,original
+estou em dia com o condomínio?,status_financeiro,status_financeiro-01,original
+"quero morar no condominio, o que tem disponivel?",consultar_apartamentos,consultar_apartamentos-24,sem_acento
+"o interfone do apto 710 nao toca, preciso de reparo",abrir_chamado,abrir_chamado-21,sem_acento
+preciso abrir um cahmado de manutenção,abrir_chamado,abrir_chamado-02,erro_digitacao
+ja consertaram o portao do bloco D?,status_chamado,status_chamado-23,sem_acento
+quem é o presidente do Brasil?,fora_de_escopo,fora_de_escopo-12,original
+cadê meu boleto,segunda_via_boleto,segunda_via_boleto-07,informal
+consultar minha situacao financeira,status_financeiro,status_financeiro-11,sem_acento
+quando vão resolver o problema do interfone?,status_chamado,status_chamado-12,original
+posso instalar ar-condicionado na fachdaa?,regras_condominio,regras_condominio-22,erro_digitacao
+status do chamado numero 2201,status_chamado,status_chamado-03,sem_acento
+quais anúncios você acha que eu vou goostar?,recomendar_produtos,recomendar_produtos-09,erro_digitacao
+algum apto desocupanddo em janeiro?,consultar_apartamentos,consultar_apartamentos-16,erro_digitacao
+"quero comprar algo dos vizinhos, o que voce sugere?",recomendar_produtos,recomendar_produtos-10,sem_acento
+como funciona o pix?,fora_de_escopo,fora_de_escopo-39,original
+tem apatamento disponível para dia 15/11?,consultar_apartamentos,consultar_apartamentos-10,erro_digitacao
+como anda a manutencao do elevador?,status_chamado,status_chamado-18,sem_acento
+existe algum apto livre no bloco c,consultar_apartamentos,consultar_apartamentos-06,informal
+tenho alguuma pendência financeira?,status_financeiro,status_financeiro-00,erro_digitacao
+qual a situação do prottocolo 2201?,status_chamado,status_chamado-08,erro_digitacao
+qureia reportar um defeito do portão do bloco D,abrir_chamado,abrir_chamado-07,erro_digitacao
+quanto devo de cond,status_financeiro,status_financeiro-03,informal
+quanto custa alugar um apto de três quartos,consultar_apartamentos,consultar_apartamentos-14,informal
+vai ter rateio extra no mês que vem?,previsao_despesas,previsao_despesas-18,original
+fala aí,saudacao,saudacao-11,original
+"recomendações personalizadas, por favor",recomendar_produtos,recomendar_produtos-22,original
+quero ver apartamentos de 2 quartos disponiveis,consultar_apartamentos,consultar_apartamentos-02,sem_acento
+perciso de um apartamento até 2 mil por mês,consultar_apartamentos,consultar_apartamentos-11,erro_digitacao
+quero fazer um chamado de manutencao no apto 101,abrir_chamado,abrir_chamado-20,sem_acento
+qual o plcaar do jogo do Palmeiras?,fora_de_escopo,fora_de_escopo-34,erro_digitacao
+"o link do boleto exprou, preciso de outro",segunda_via_boleto,segunda_via_boleto-16,erro_digitacao
+preciso de um apartamento até 1500 reais por mês,consultar_apartamentos,consultar_apartamentos-11,original
