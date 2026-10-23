@@ -1,166 +1,74 @@
 # Habita+ — Front-end
 
-Front-end da plataforma Habita+, desenvolvido com React, Vite e Tailwind CSS.
+Front-end React + Vite + Tailwind CSS.
 
-## Tecnologias
-
-- React
-- Vite
-- JavaScript (JSX)
-- React Router
-- Axios
-- Tailwind CSS
-- Nginx e Docker para execução em container
-
-## Pré-requisitos
+## Requisitos
 
 - Node.js 24
 - npm
-- Docker Desktop, para executar a versão em container
 
-## Instalação local
+## Instalação no Windows (PowerShell)
 
-Abra um terminal dentro da pasta `frontend`.
-
-### Windows PowerShell
-
-Copie o arquivo de exemplo das variáveis de ambiente:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Instale as dependências:
+Execute os comandos dentro desta pasta (`frontend`):
 
 ```powershell
 npm.cmd install
-```
-
-Inicie o ambiente de desenvolvimento:
-
-```powershell
+npx.cmd msw init public --save
+Copy-Item .env.example .env
 npm.cmd run dev
 ```
 
-### Linux, macOS ou Git Bash
+Se o arquivo `.env` já existir, não o sobrescreva sem conferir. Ele deve conter:
 
-```bash
-cp .env.example .env
-npm install
-npm run dev
+```env
+VITE_API_URL=http://localhost:3000
+VITE_USE_MOCKS=true
 ```
 
-O Vite exibirá o endereço local da aplicação no terminal, normalmente `http://localhost:5173/`.
+Abra o endereço que o Vite mostrar, normalmente `http://localhost:5173`.
 
-Se essa porta já estiver ocupada, utilize o endereço alternativo que o Vite informar.
+## Modo de mocks (MSW)
 
-## Variáveis de ambiente
+`VITE_USE_MOCKS=true` ativa o Mock Service Worker durante o desenvolvimento. O backend não precisa estar ligado para experimentar login, cadastro e os módulos demonstrativos.
 
-As variáveis de ambiente são configuradas por meio de `.env.example`.
+Contas de demonstração:
 
-| Variável | Descrição | Valor local padrão |
+| Perfil | E-mail | Senha |
 |---|---|---|
-| `VITE_API_URL` | Endereço base da API do backend | `http://localhost:3000` |
-| `VITE_USE_MOCKS` | Configuração prevista para o uso de mocks | `true` |
+| Morador | `morador@habitaplus.com` | `Habita123!` |
+| Síndico | `sindico@habitaplus.com` | `Habita123!` |
+| Administrador | `admin@habitaplus.com` | `Habita123!` |
 
-Para o desenvolvimento local, crie o arquivo `.env` a partir de `.env.example`.
+Também é possível cadastrar um novo morador no formulário. As contas cadastradas no modo mock ficam salvas apenas na sessão atual do navegador.
 
-Não versione o arquivo `.env` nem coloque senhas, tokens ou outras informações secretas nele.
+Para testar a API real, altere `VITE_USE_MOCKS=false` no `.env`, confira se o backend está em execução e reinicie o Vite. O cliente de autenticação usa os endpoints atualmente implementados pelo backend (`/api/auth/login`, `/api/auth/register` e `/api/auth/me`). Os demais serviços seguem os caminhos planejados em `docs/api-contracts.md`; parte dos endpoints de domínio ainda depende de implementação no backend.
 
-A variável `VITE_USE_MOCKS` é uma configuração; sua presença, por si só, não ativa a integração com MSW.
+## Serviços da API
 
-## Autenticação com o backend
+Cada módulo tem seu próprio serviço em `src/services/`, por exemplo `authService`, `unitsService`, `ticketsService`, `chargesService`, `announcementsService` e `notificationsService`. As telas chamam esses serviços; a camada Axios define URL base, token Bearer e tratamento de HTTP 401.
 
-Inicie o backend e o PostgreSQL antes do frontend. O valor padrão de
-`VITE_API_URL` é `http://localhost:3000`; o cliente acrescenta `/api` se o valor
-não tiver esse sufixo. Ajuste o `.env` do frontend caso use outro endereço e
-reinicie o Vite para carregar a configuração.
+## Rotas e perfis
 
-Na rota `/login`, é possível entrar com uma conta existente ou selecionar
-**Cadastre-se** para criar um `MORADOR`. Depois do login ou registro, o frontend
-usa o token para carregar `/auth/me`, mantém o usuário ao atualizar a página e
-exibe seu perfil na página inicial. O botão **Sair** remove a sessão local.
+- `/login`: autenticação.
+- `/dev/components`: catálogo de componentes.
+- `/morador`: área do perfil MORADOR.
+- `/sindico`: área do perfil SINDICO.
+- `/admin`: área do perfil ADMIN.
+- Demais módulos autenticados: unidades, locações, chamados, transações, cobranças, anúncios, mensagens, notificações, assistente, previsão e recomendações.
 
-## Estrutura do projeto
+Ao receber HTTP 401 de uma requisição autenticada, o cliente remove o token local e a sessão volta à tela de login. O menu lateral muda conforme o perfil.
 
-```text
-frontend/
-├── public/
-├── src/
-│   ├── components/
-│   ├── hooks/
-│   ├── mocks/
-│   ├── pages/
-│   │   ├── Home.jsx
-│   │   ├── Login.jsx
-│   │   └── NotFound.jsx
-│   ├── services/
-│   │   └── api.js
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── .dockerignore
-├── .env.example
-├── Dockerfile
-├── nginx.conf
-├── package.json
-├── postcss.config.js
-├── tailwind.config.js
-└── vite.config.js
+## Verificação
+
+```powershell
+npm.cmd run lint
+npm.cmd run build
 ```
 
-## Identidade visual
+## Build e Docker
 
-As cores do Habita+ estão configuradas como tokens no `tailwind.config.js`.
-
-| Token | Cor |
-|---|---|
-| `brand-mint` | `#AAFFC7` |
-| `brand-green` | `#67C090` |
-| `brand-teal` | `#215B63` |
-| `brand-navy` | `#124170` |
-| `danger` | `#D64545` |
-| `muted` | `#687280` |
-| `surface` | `#8FAFAC` |
-| `ink` | `#172024` |
-
-## Build de produção
-
-Para gerar a versão de produção:
-
-```bash
-npm run build
+```powershell
+npm.cmd run build
 ```
 
-Os arquivos compilados serão gerados no diretório `dist/`.
-
-Para visualizar a versão compilada localmente:
-
-```bash
-npm run preview
-```
-
-## Docker
-
-Execute os comandos abaixo dentro da pasta `frontend`.
-
-### Construir a imagem
-
-```bash
-docker build \
-  --build-arg VITE_API_URL=http://localhost:3000 \
-  --build-arg VITE_USE_MOCKS=true \
-  -t habitaplus-frontend .
-```
-
-### Executar o container
-
-```bash
-docker run --rm -p 8080:80 habitaplus-frontend
-```
-
-A aplicação ficará disponível em `http://localhost:8080/`.
-
-O Nginx está configurado para encaminhar as rotas da aplicação para `index.html`, permitindo atualizar diretamente endereços como `/login` sem receber erro 404 do servidor.
-
-As variáveis `VITE_API_URL` e `VITE_USE_MOCKS` são incorporadas durante o build. Para alterar seus valores na imagem de produção, construa uma nova imagem com os argumentos correspondentes.
+A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos arquivos `Dockerfile` e `nginx.conf`.
