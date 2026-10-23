@@ -1,40 +1,59 @@
+import Card from "../components/Card";
+import Badge from "../components/Badge";
 import { useAuth } from "../hooks/useAuth";
+import { roleLabel } from "../utils/roles";
 
 function Home() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-brand-teal">
-          Habita+
+    <div className="space-y-6">
+      <header>
+        <p className="text-sm font-semibold uppercase tracking-widest text-brand-teal">
+          Habita+ · Área autenticada
+        </p>
+        <h1 className="mt-2 text-3xl font-bold text-brand-navy">
+          Olá, {user?.nome || user?.name || "bem-vindo"}!
         </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+          Esta é a visão geral da sua área no Habita+. O menu lateral mostra os módulos disponíveis para o seu perfil.
+        </p>
+      </header>
 
-        <p className="mt-3 text-muted">Sessão autenticada via API</p>
-
-        <dl className="mt-6 space-y-3 rounded-lg bg-gray-50 p-4">
+      <Card title="Sua sessão" description="Dados do usuário autenticado">
+        <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm text-muted">Nome</dt>
-            <dd className="font-medium text-ink">{user.nome}</dd>
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+              Nome
+            </dt>
+            <dd className="mt-1 font-semibold text-ink">
+              {user?.nome || user?.name || "Não informado"}
+            </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted">E-mail</dt>
-            <dd className="font-medium text-ink">{user.email}</dd>
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+              E-mail
+            </dt>
+            <dd className="mt-1 font-semibold text-ink">
+              {user?.email || "Não informado"}
+            </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted">Perfil</dt>
-            <dd className="font-medium text-ink">{user.perfil}</dd>
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+              Perfil
+            </dt>
+            <dd className="mt-2">
+              <Badge variant="info">{roleLabel(user)}</Badge>
+            </dd>
           </div>
         </dl>
+      </Card>
 
-        <button
-          type="button"
-          onClick={logout}
-          className="mt-6 w-full rounded-lg border border-brand-teal px-4 py-3 font-semibold text-brand-teal hover:bg-gray-50"
-        >
-          Sair
-        </button>
-      </div>
+      <Card title="Próximos passos" description="A navegação já está preparada para os módulos do projeto.">
+        <p className="text-sm leading-6 text-muted">
+          Com <code>VITE_USE_MOCKS=true</code>, os módulos demonstrativos podem ser navegados sem iniciar o backend. Quando os endpoints reais estiverem disponíveis, altere a variável para <code>false</code> para chamar a API.
+        </p>
+      </Card>
     </div>
   );
 }
