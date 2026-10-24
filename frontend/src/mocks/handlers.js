@@ -256,4 +256,48 @@ export const handlers = [
 
   http.get("*/api/v1/forecasts/expenses", ({ request }) => protectedJson(request, mockForecast)),
   http.post("*/api/v1/recomendacoes", ({ request }) => protectedJson(request, mockRecommendations)),
+  http.post("*/api/v1/nlu/parse", async ({ request }) => {
+    if (!isAuthorized(request)) {
+      return unauthorized();
+    }
+
+    const payload = await request.json();
+    const texto = String(payload?.texto || "").trim();
+
+    if (!texto) {
+      return HttpResponse.json(
+        { message: "O campo texto é obrigatório." },
+        { status: 400 },
+      );
+    }
+
+    const normalizedText = texto.toLocaleLowerCase("pt-BR");
+    const isChargeQuestion = /taxa|cobrança|cobranca|boleto|pagamento/.test(normalizedText);
+    const isTicketQuestion = /chamado|manutenção|manutencao|reparo|problema/.test(normalizedText);
+    const intent = isChargeQuestion
+      ? "CONSULT_CHARGE"
+      : isTicketQuestion
+        ? "CONSULT_TICKET"
+        : "GENERAL_QUERY";
+    const operation = isChargeQuestion
+      ? "LIST_CHARGES"
+      : isTicketQuestion
+        ? "LIST_TICKETS"
+        : "GENERAL_ASSISTANCE";
+
+    return HttpResponse.json({
+      intencao: intent,
+      confianca: 0.9,
+      entities: {
+        unitId: payload?.contexto?.unitId || null,
+        period: null,
+      },
+      precisaAutenticacao: true,
+      acaoSugerida: {
+        type: "CALL_API",
+        operation,
+      },
+      versaoModelo: "nlu-mock-v1",
+    });
+  }),
 ];

@@ -72,3 +72,22 @@ npm.cmd run build
 ```
 
 A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos arquivos `Dockerfile` e `nginx.conf`.
+
+
+## Ajustes complementares da FE-03
+
+- O serviço `src/services/nluService.js` chama `POST /api/v1/nlu/parse`.
+- Com `VITE_USE_MOCKS=true`, o MSW oferece uma resposta demonstrativa para interpretação de texto.
+- A rota de locações é restrita a síndico e administrador, como no menu autenticado. O menu de síndico também apresenta o assistente virtual, cuja rota é acessível aos perfis autenticados.
+
+
+## Login e cadastro (FE-04)
+
+- `/login`: acesso por e-mail e senha.
+- `/cadastro`: cadastro público de morador com nome, e-mail, senha e confirmação da senha.
+- O formulário valida campos obrigatórios, formato de e-mail, tamanho mínimo da senha e igualdade das senhas. Erros retornados pela API são exibidos no formulário.
+- Depois do login ou cadastro, a navegação segue o perfil recebido (`MORADOR`, `SINDICO` ou `ADMIN`). O token é persistido pelo `AuthContext` em `localStorage`, e `/auth/me` restaura a sessão após recarregar a página.
+- O botão de sair permanece no layout autenticado e remove o token local.
+- O layout usa o painel de marca azul `#124170` e se reorganiza verticalmente em telas pequenas.
+
+Para testar com MSW, mantenha `VITE_USE_MOCKS=true` no `.env`. Para testar contra o backend real, configure `VITE_USE_MOCKS=false`, confirme que o backend está ativo e reinicie o Vite. Os endpoints de autenticação reais do backend são `/api/auth/login`, `/api/auth/register` e `/api/auth/me`.

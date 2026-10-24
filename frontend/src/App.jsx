@@ -51,6 +51,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeRedirect />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Login />} />
           <Route path="/dev/components" element={<ComponentsCatalog />} />
 
           <Route
@@ -96,6 +97,7 @@ function App() {
                 title="Locações"
                 description="Lista demonstrativa dos contratos de locação."
                 service={rentalsService}
+                roles={managementRoles}
               />
             }
           />
