@@ -37,6 +37,7 @@ const linksByRole = {
     commonLinks.announcements,
     commonLinks.messages,
     commonLinks.notifications,
+    commonLinks.chatbot,
     { label: "Previsão de despesas", to: "/forecasts" },
     commonLinks.recommendations,
   ],
