@@ -14,9 +14,12 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 DATA_DIR = BASE_DIR / "data"
 
+EXPENSE_MODEL_PATH = ARTIFACTS_DIR / "expense_model.joblib"
+
 def configure_logging() -> None:
     """Configura o logging do serviço."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+    
