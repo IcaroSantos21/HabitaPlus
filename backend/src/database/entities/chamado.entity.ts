@@ -1,4 +1,5 @@
 import {
+  Check,
   Column,
   Entity,
   JoinColumn,
@@ -6,10 +7,24 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { StatusChamado } from './enums';
+
 import { Usuario } from './usuario.entity';
 import { Unidade } from './unidade.entity';
 
 @Entity('chamados')
+@Check(
+  'CK_chamados_status',
+  `"status" IN ('ABERTO', 'EM_ANDAMENTO', 'ENCERRADO')`,
+)
+@Check(
+  'CK_chamados_unidade_ou_area',
+  `("unidadeId" IS NULL) <> ("areaComum" IS NULL)`,
+)
+@Check(
+  'CK_chamados_encerrados_em',
+  `("status" = 'ENCERRADO') = ("encerradoEm) IS NOT NULL`,
+)
 // Representa um chamado de manutenção ou atendimento aberto por um usuário.
 export class Chamado {
   @PrimaryGeneratedColumn()
@@ -35,8 +50,8 @@ export class Chamado {
   @Column('text')
   descricao!: string;
 
-  @Column()
-  status!: string;
+  @Column({ type: 'varchar' })
+  status!: StatusChamado;
 
   @Column({ type: 'timestamp' })
   abertoEm!: Date;

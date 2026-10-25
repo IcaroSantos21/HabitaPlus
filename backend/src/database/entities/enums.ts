@@ -29,3 +29,9 @@ export enum StatusAnuncio {
   DISPONIVEL = 'DISPONIVEL',
   VENDIDO = 'VENDIDO',
 }
+
+export enum StatusChamado {
+  ABERTO = 'ABERTO',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  ENCERRADO = 'ENCERRADO',
+}
