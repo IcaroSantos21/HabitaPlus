@@ -144,6 +144,66 @@ const mockRecommendations = {
   versaoModelo: "recommend-v1",
 };
 
+
+
+const mockFinanceDashboard = {
+  month: "2026-10",
+  metrics: {
+    revenue: 58900,
+    expenses: 43250,
+    balance: 15650,
+    delinquency: {
+      amount: 3250,
+      count: 5,
+      rate: 5.5,
+    },
+  },
+  monthlyHistory: [
+    { month: "2026-05", amount: 35200 },
+    { month: "2026-06", amount: 36750 },
+    { month: "2026-07", amount: 38900 },
+    { month: "2026-08", amount: 40180 },
+    { month: "2026-09", amount: 41750 },
+    { month: "2026-10", amount: 43250 },
+  ],
+  alerts: [
+    {
+      id: "alt_001",
+      title: "Cobranças próximas do vencimento",
+      description: "Existem 5 cobranças em aberto que precisam de acompanhamento.",
+      type: "warning",
+      label: "Atenção",
+      createdAt: "2026-10-30T09:00:00-03:00",
+    },
+    {
+      id: "alt_002",
+      title: "Manutenção preventiva concluída",
+      description: "A manutenção preventiva do elevador foi concluída.",
+      type: "success",
+      label: "Concluído",
+      createdAt: "2026-10-29T15:30:00-03:00",
+    },
+    {
+      id: "alt_003",
+      title: "Novo comunicado publicado",
+      description: "Há um novo comunicado disponível para os moradores.",
+      type: "info",
+      label: "Informação",
+      createdAt: "2026-10-28T11:15:00-03:00",
+    },
+  ],
+};
+
+const mockExpensePrediction = {
+  predictionId: "pred_dashboard_demo",
+  mesDesejado: "2026-11",
+  predicaoTotal: 45100,
+  moeda: "BRL",
+  predictions: [{ category: "TOTAL", predictedAmount: 45100 }],
+  versaoModelo: "expenses-v1",
+  geradoEm: "2026-10-30T10:00:00-03:00",
+};
+
 export const handlers = [
   http.post("*/api/auth/login", async ({ request }) => {
     const payload = await request.json();
@@ -300,4 +360,11 @@ export const handlers = [
       versaoModelo: "nlu-mock-v1",
     });
   }),
+
+  http.get("*/api/finance/dashboard", ({ request }) =>
+    protectedJson(request, mockFinanceDashboard),
+  ),
+  http.get("*/api/predictions/expenses", ({ request }) =>
+    protectedJson(request, mockExpensePrediction),
+  ),
 ];
