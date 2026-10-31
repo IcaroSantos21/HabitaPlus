@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { getHomePath } from "../utils/roles";
 
 function getErrorMessage(error) {
   if (!error.response) {
@@ -30,54 +31,16 @@ function Login() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const redirectTo = location.state?.from?.pathname || "/";
+  const redirectTo = location.state?.from?.pathname;
 
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-surface p-6">
         <p className="text-ink" role="status">
           Verificando sua sessão...
-        </p>
-      </main>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setErrorMessage("");
-    setIsSubmitting(true);
-
-    try {
-      if (isRegistering) {
-        await register({ nome, email, senha });
-      } else {
-        await login({ email, senha });
-      }
-      navigate(redirectTo, { replace: true });
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-        <h1 className="text-2xl font-bold text-brand-teal">
-          {isRegistering ? "Criar conta" : "Entrar"}
-        </h1>
-
-        <p className="mt-2 text-muted">
-          {isRegistering
-            ? "Cadastre-se no Habita+ como morador"
-            : "Acesse sua conta do Habita+"}
         </p>
       </main>
     );
@@ -97,6 +60,7 @@ function Login() {
     }
 
     setIsSubmitting(true);
+
     try {
       let authenticatedUser;
       if (isRegistering) {
@@ -108,19 +72,26 @@ function Login() {
       } else {
         authenticatedUser = await login({ email: email.trim(), senha });
       }
-
       navigate(redirectTo || getHomePath(authenticatedUser), { replace: true });
     } catch (requestError) {
-      setErrorMessage(getApiErrorMessage(requestError));
+      setErrorMessage(getErrorMessage(requestError));
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  const title = isRegistering ? "Crie sua conta" : "Boas-vindas!";
-  const subtitle = isRegistering
-    ? "Cadastre-se como morador para acessar a plataforma."
-    : "Entre para acessar os serviços do seu condomínio.";
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-surface p-6">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+        <h1 className="text-2xl font-bold text-brand-teal">
+          {isRegistering ? "Criar conta" : "Entrar"}
+        </h1>
+
+        <p className="mt-2 text-muted">
+          {isRegistering
+            ? "Cadastre-se no Habita+ como morador"
+            : "Acesse sua conta do Habita+"}
+        </p>
 
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           {isRegistering && (
@@ -190,6 +161,28 @@ function Login() {
             )}
           </div>
 
+          {isRegistering && (
+            <div>
+              <label
+                htmlFor="confirmarSenha"
+                className="block text-sm font-medium text-ink"
+              >
+                Confirme a senha
+              </label>
+              <input
+                id="confirmarSenha"
+                name="confirmarSenha"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                value={confirmarSenha}
+                onChange={(event) => setConfirmarSenha(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-brand-teal"
+              />
+            </div>
+          )}
+
           {errorMessage && (
             <p
               className="rounded-lg bg-red-50 p-3 text-sm text-danger"
@@ -226,7 +219,7 @@ function Login() {
           </button>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
 

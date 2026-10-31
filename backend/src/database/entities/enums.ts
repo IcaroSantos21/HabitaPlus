@@ -29,3 +29,10 @@ export enum StatusAnuncio {
   DISPONIVEL = 'DISPONIVEL',
   VENDIDO = 'VENDIDO',
 }
+
+// Lista os estados possíveis de um chamado.
+export enum StatusChamado {
+  ABERTO = 'ABERTO',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  ENCERRADO = 'ENCERRADO',
+}

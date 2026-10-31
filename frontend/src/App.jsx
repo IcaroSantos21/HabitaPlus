@@ -19,8 +19,6 @@ import HomeRedirect from "./pages/HomeRedirect";
 import Login from "./pages/Login";
 import ModulePage from "./pages/ModulePage";
 import NotFound from "./pages/NotFound";
-import { AuthProvider } from "./contexts/AuthContext";
-import RequireAuth from "./components/RequireAuth";
 
 function App() {
   return (

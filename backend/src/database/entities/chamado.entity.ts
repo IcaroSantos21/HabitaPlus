@@ -8,6 +8,7 @@ import {
 
 import { Usuario } from './usuario.entity';
 import { Unidade } from './unidade.entity';
+import { StatusChamado } from './enums';
 
 @Entity('chamados')
 // Representa um chamado de manutenção ou atendimento aberto por um usuário.
@@ -36,7 +37,7 @@ export class Chamado {
   descricao!: string;
 
   @Column()
-  status!: string;
+  status!: StatusChamado;
 
   @Column({ type: 'timestamp' })
   abertoEm!: Date;
