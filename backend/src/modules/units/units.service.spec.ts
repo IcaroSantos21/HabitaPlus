@@ -34,6 +34,12 @@ describe('UnitsService', () => {
     findOneBy: findUnit,
     create: jest.fn(),
     save: jest.fn(),
+    createQueryBuilder: jest.fn(() => ({
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    })),
   } as unknown as Repository<Unidade>;
   const usersRepository = {
     findOneBy: findUser,
@@ -45,10 +51,15 @@ describe('UnitsService', () => {
     remove: removeLink,
   } as unknown as Repository<Vinculo>;
 
+  const rentalsRepository = {
+    find: jest.fn(),
+  } as unknown as Repository<any>;
+
   const service = new UnitsService(
     unitsRepository,
     usersRepository,
     linksRepository,
+    rentalsRepository,
   );
   const linkDto: LinkResidentDto = {
     usuarioId: user.id,

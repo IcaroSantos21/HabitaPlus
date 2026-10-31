@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
+import { ContratoLocacao } from '../../database/entities/contrato-locacao.entity';
+import { StatusLocacao } from '../../database/entities/enums';
 import { Unidade } from '../../database/entities/unidade.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { Vinculo } from '../../database/entities/vinculo.entity';
@@ -25,6 +27,8 @@ export class UnitsService {
     private readonly usersRepository: Repository<Usuario>,
     @InjectRepository(Vinculo)
     private readonly linksRepository: Repository<Vinculo>,
+    @InjectRepository(ContratoLocacao)
+    private readonly rentalsRepository: Repository<ContratoLocacao>,
   ) {}
 
   async list(query: ListUnitsQueryDto) {
@@ -168,6 +172,79 @@ export class UnitsService {
     }
 
     await this.linksRepository.remove(link);
+  }
+
+  async listAvailableUnits(filters: {
+    bloco?: string;
+    quartos?: number;
+    valorMax?: number;
+  }) {
+    const query = this.unitsRepository
+      .createQueryBuilder('unidade')
+      .where('unidade.disponivelLocacao = :disponivel', { disponivel: true });
+
+    if (filters.bloco) {
+      query.andWhere('LOWER(unidade.bloco) = LOWER(:bloco)', {
+        bloco: filters.bloco,
+      });
+    }
+
+    if (filters.quartos) {
+      query.andWhere('unidade.quartos = :quartos', { quartos: filters.quartos });
+    }
+
+    if (filters.valorMax !== undefined) {
+      query.andWhere('unidade.valorAluguelSugerido <= :valorMax', {
+        valorMax: filters.valorMax,
+      });
+    }
+
+    return query.orderBy('unidade.id', 'ASC').getMany();
+  }
+
+  async listRentalsByUnit(unitId: number) {
+    const unit = await this.unitsRepository.findOneBy({ id: unitId });
+    if (!unit) {
+      throw new NotFoundException('Unidade não encontrada.');
+    }
+
+    const rentals = await this.rentalsRepository.find({
+      where: { unidade: { id: unitId } },
+      relations: { locatario: true, unidade: true },
+      order: { inicio: 'DESC' },
+    });
+
+    return rentals.map((contract) => ({
+      ...contract,
+      status: this.computeStatus(contract),
+    }));
+  }
+
+  private computeStatus(contract: Partial<ContratoLocacao>): StatusLocacao {
+    const today = this.toDateOnly(new Date());
+    const endDate = contract.fim ? this.toDateOnly(new Date(contract.fim)) : null;
+
+    if (endDate && endDate < today) {
+      return StatusLocacao.ENCERRADO;
+    }
+
+    if (endDate) {
+      const remainingDays = Math.ceil(
+        (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
+      if (remainingDays <= 30 && remainingDays >= 0) {
+        return StatusLocacao.A_VENCER;
+      }
+    }
+
+    return StatusLocacao.ATIVO;
+  }
+
+  private toDateOnly(value: Date): Date {
+    const normalized = new Date(value);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
   }
 
   private throwForUniqueConstraint(error: unknown, constraint: string): void {
