@@ -40,6 +40,18 @@ class ExpensesRequest(CamelModel):
             )
         return value
 
+    @field_validator("history")
+    @classmethod
+    def history_must_be_consecutive(cls, value: list[HistoryItem]) -> list[HistoryItem]:
+        """Ordena por mês e rejeita repetições e lacunas (os lags dependem de meses vizinhos)."""
+        ordered = sorted(value, key=lambda item: item.month)
+        positions = [int(item.month[:4]) * 12 + int(item.month[5:]) for item in ordered]
+        if any(b - a != 1 for a, b in zip(positions, positions[1:], strict=False)):
+            raise ValueError(
+                "O histórico deve ter meses consecutivos, sem lacunas nem meses repetidos."
+            )
+        return ordered
+
 
 class ExpensesResponse(CamelModel):
     """Previsão do próximo mês."""

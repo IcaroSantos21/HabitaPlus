@@ -19,4 +19,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const requestUrl = String(error?.config?.url || "");
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    if (error?.response?.status === 401 && !isLoginRequest) {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export default api;

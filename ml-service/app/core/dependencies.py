@@ -5,6 +5,7 @@ Para trocar um stub pelo modelo real, basta mudar o retorno aqui.
 from app.services.protocols import ExpensePredictor, NluService, Recommender
 from app.services.stubs import StubExpensePredictor, StubNluService, StubRecommender
 
+from fastapi import Request
 
 # Fornece a implementação de NLU usada pela rota.
 def get_nlu_service() -> NluService:
@@ -15,7 +16,7 @@ def get_nlu_service() -> NluService:
 # Fornece a implementação de previsão usada pela rota.
 def get_expense_predictor() -> ExpensePredictor:
     """Devolve o serviço de previsão de despesas."""
-    return StubExpensePredictor()
+    return request.app.state.expense_predictor
 
 
 # Fornece a implementação de recomendações usada pela rota.

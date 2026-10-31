@@ -1,3 +1,5 @@
+import numpy as np
+import pytest
 from fastapi.testclient import TestClient
 
 # Exemplo de histórico válido, com o mínimo de meses exigido.
@@ -17,9 +19,31 @@ def test_predict_returns_camel_case_contract(client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
     assert set(body) == {"month", "predictedTotal", "model", "mae"}
-    assert body["month"] == "2026-11"
-    assert body["predictedTotal"] == 18980.55
+    assert body["month"] == "2026-02"  # mês seguinte ao último do histórico
+    assert body["model"] in {"ridge", "random_forest"}
+    assert body["predictedTotal"] > 0
+    assert body["mae"] > 0
 
+
+# Confere que o mês previsto vira o ano quando o histórico termina em dezembro.
+def test_predict_month_rolls_over_the_year(client: TestClient) -> None:
+    history = [{"month": m, "total": 19000.0} for m in ("2025-10", "2025-11", "2025-12")]
+
+    body = client.post("/predict/expenses", json={"history": history}).json()
+
+    assert body["month"] == "2026-01"
+
+
+# Confere que a previsão fica na mesma ordem de grandeza do histórico recente.
+def test_predict_is_in_the_scale_of_recent_months(client: TestClient) -> None:
+    body = client.post("/predict/expenses", json=VALID_HISTORY).json()
+
+    assert 0.7 * 18700 < body["predictedTotal"] < 1.3 * 18700
+
+
+# Confere que a ordem dos meses no request não muda o resultado.
+def test_predict_ignores_the_order_of_the_history(client: TestClient) -> None:
+    shuffled = {"history": list(reversed(VALID_HISTORY["history"]))}
 
 # Confere que histórico curto é rejeitado com uma mensagem clara.
 def test_predict_short_history_returns_422_with_clear_message(client: TestClient) -> None:
@@ -51,3 +75,34 @@ def test_predict_rejects_negative_total(client: TestClient) -> None:
 # Confere que a requisição precisa informar o histórico.
 def test_predict_rejects_missing_history(client: TestClient) -> None:
     assert client.post("/predict/expenses", json={}).status_code == 422
+
+
+# Confere que o serviço pode ser trocado nos testes (injeção via Depends).
+def test_predictor_can_be_replaced_via_dependency_override(client: TestClient) -> None:
+    class FakePredictor:
+        def predict(self, request: ExpensesRequest) -> ExpensesResponse:
+            return ExpensesResponse(month="2030-01", predicted_total=1.0, model="fake", mae=0.0)
+
+    app.dependency_overrides[get_expense_predictor] = lambda: FakePredictor()
+    try:
+        body = client.post("/predict/expenses", json=VALID_HISTORY).json()
+    finally:
+        app.dependency_overrides.clear()
+
+    assert body["model"] == "fake"
+
+
+# Confere a mensagem clara quando o artefato não existe (a subida falha cedo).
+def test_loading_missing_artifact_fails_with_clear_message(tmp_path) -> None:
+    with pytest.raises(FileNotFoundError, match="train_expenses"):
+        SklearnExpensePredictor.from_artifact(tmp_path / "nao-existe.joblib")
+
+
+# Confere que o artefato versionado carrega e prevê sem erro.
+def test_committed_artifact_loads_and_predicts() -> None:
+    predictor = SklearnExpensePredictor.from_artifact(EXPENSE_MODEL_PATH)
+    request = ExpensesRequest.model_validate(VALID_HISTORY)
+
+    response = predictor.predict(request)
+
+    assert np.isfinite(response.predicted_total)

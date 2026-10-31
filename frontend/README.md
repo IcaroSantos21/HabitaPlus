@@ -1,62 +1,49 @@
 # Habita+ — Front-end
 
-Front-end da plataforma Habita+, desenvolvido com React, Vite e Tailwind CSS.
+Front-end React + Vite + Tailwind CSS.
 
-## Tecnologias
-
-- React
-- Vite
-- JavaScript (JSX)
-- React Router
-- Axios
-- Tailwind CSS
-- Nginx e Docker para execução em container
-
-## Pré-requisitos
+## Requisitos
 
 - Node.js 24
 - npm
-- Docker Desktop, para executar a versão em container
 
-## Instalação local
+## Instalação no Windows (PowerShell)
 
-Abra um terminal dentro da pasta `frontend`.
-
-### Windows PowerShell
-
-Copie o arquivo de exemplo das variáveis de ambiente:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Instale as dependências:
+Execute os comandos dentro desta pasta (`frontend`):
 
 ```powershell
 npm.cmd install
-```
-
-Inicie o ambiente de desenvolvimento:
-
-```powershell
+npx.cmd msw init public --save
+Copy-Item .env.example .env
 npm.cmd run dev
 ```
 
-### Linux, macOS ou Git Bash
+Se o arquivo `.env` já existir, não o sobrescreva sem conferir. Ele deve conter:
 
-```bash
-cp .env.example .env
-npm install
-npm run dev
+```env
+VITE_API_URL=http://localhost:3000
+VITE_USE_MOCKS=true
 ```
 
-O Vite exibirá o endereço local da aplicação no terminal, normalmente `http://localhost:5173/`.
+Abra o endereço que o Vite mostrar, normalmente `http://localhost:5173`.
 
-Se essa porta já estiver ocupada, utilize o endereço alternativo que o Vite informar.
+## Modo de mocks (MSW)
 
-## Variáveis de ambiente
+`VITE_USE_MOCKS=true` ativa o Mock Service Worker durante o desenvolvimento. O backend não precisa estar ligado para experimentar login, cadastro e os módulos demonstrativos.
 
-As variáveis de ambiente são configuradas por meio de `.env.example`.
+Contas de demonstração:
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Morador | `morador@habitaplus.com` | `Habita123!` |
+| Síndico | `sindico@habitaplus.com` | `Habita123!` |
+| Administrador | `admin@habitaplus.com` | `Habita123!` |
+
+Também é possível cadastrar um novo morador no formulário. As contas cadastradas no modo mock ficam salvas apenas na sessão atual do navegador.
+
+Para testar a API real, altere `VITE_USE_MOCKS=false` no `.env`, confira se o backend está em execução e reinicie o Vite. O cliente de autenticação usa os endpoints atualmente implementados pelo backend (`/api/auth/login`, `/api/auth/register` e `/api/auth/me`). Os demais serviços seguem os caminhos planejados em `docs/api-contracts.md`; parte dos endpoints de domínio ainda depende de implementação no backend.
+
+## Serviços da API
 
 | Variável | Descrição | Valor local padrão |
 |---|---|---|
@@ -109,58 +96,60 @@ frontend/
 └── vite.config.js
 ```
 
-## Identidade visual
+## Rotas e perfis
 
-As cores do Habita+ estão configuradas como tokens no `tailwind.config.js`.
+- `/login`: autenticação.
+- `/dev/components`: catálogo de componentes.
+- `/morador`: área do perfil MORADOR.
+- `/sindico`: área do perfil SINDICO.
+- `/admin`: área do perfil ADMIN.
+- Demais módulos autenticados: unidades, locações, chamados, transações, cobranças, anúncios, mensagens, notificações, assistente, previsão e recomendações.
 
-| Token | Cor |
-|---|---|
-| `brand-mint` | `#AAFFC7` |
-| `brand-green` | `#67C090` |
-| `brand-teal` | `#215B63` |
-| `brand-navy` | `#124170` |
-| `danger` | `#D64545` |
-| `muted` | `#687280` |
-| `surface` | `#8FAFAC` |
-| `ink` | `#172024` |
+Ao receber HTTP 401 de uma requisição autenticada, o cliente remove o token local e a sessão volta à tela de login. O menu lateral muda conforme o perfil.
 
-## Build de produção
+## Verificação
 
-Para gerar a versão de produção:
-
-```bash
-npm run build
+```powershell
+npm.cmd run lint
+npm.cmd run build
 ```
 
-Os arquivos compilados serão gerados no diretório `dist/`.
+## Build e Docker
 
-Para visualizar a versão compilada localmente:
-
-```bash
-npm run preview
+```powershell
+npm.cmd run build
 ```
 
-## Docker
+A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos arquivos `Dockerfile` e `nginx.conf`.
 
-Execute os comandos abaixo dentro da pasta `frontend`.
 
-### Construir a imagem
+## Ajustes complementares da FE-03
 
-```bash
-docker build \
-  --build-arg VITE_API_URL=http://localhost:3000 \
-  --build-arg VITE_USE_MOCKS=true \
-  -t habitaplus-frontend .
-```
+- O serviço `src/services/nluService.js` chama `POST /api/v1/nlu/parse`.
+- Com `VITE_USE_MOCKS=true`, o MSW oferece uma resposta demonstrativa para interpretação de texto.
+- A rota de locações é restrita a síndico e administrador, como no menu autenticado. O menu de síndico também apresenta o assistente virtual, cuja rota é acessível aos perfis autenticados.
 
-### Executar o container
 
-```bash
-docker run --rm -p 8080:80 habitaplus-frontend
-```
+## Login e cadastro (FE-04)
 
-A aplicação ficará disponível em `http://localhost:8080/`.
+- `/login`: acesso por e-mail e senha.
+- `/cadastro`: cadastro público de morador com nome, e-mail, senha e confirmação da senha.
+- O formulário valida campos obrigatórios, formato de e-mail, tamanho mínimo da senha e igualdade das senhas. Erros retornados pela API são exibidos no formulário.
+- Depois do login ou cadastro, a navegação segue o perfil recebido (`MORADOR`, `SINDICO` ou `ADMIN`). O token é persistido pelo `AuthContext` em `localStorage`, e `/auth/me` restaura a sessão após recarregar a página.
+- O botão de sair permanece no layout autenticado e remove o token local.
+- O layout usa o painel de marca azul `#124170` e se reorganiza verticalmente em telas pequenas.
 
-O Nginx está configurado para encaminhar as rotas da aplicação para `index.html`, permitindo atualizar diretamente endereços como `/login` sem receber erro 404 do servidor.
+Para testar com MSW, mantenha `VITE_USE_MOCKS=true` no `.env`. Para testar contra o backend real, configure `VITE_USE_MOCKS=false`, confirme que o backend está ativo e reinicie o Vite. Os endpoints de autenticação reais do backend são `/api/auth/login`, `/api/auth/register` e `/api/auth/me`.
 
-As variáveis `VITE_API_URL` e `VITE_USE_MOCKS` são incorporadas durante o build. Para alterar seus valores na imagem de produção, construa uma nova imagem com os argumentos correspondentes.
+
+## Painel (FE-05)
+
+As rotas `/morador`, `/sindico` e `/admin` exibem painéis diferentes de acordo
+com o perfil autenticado. O painel administrativo consulta `GET /api/finance/dashboard`
+e `GET /api/predictions/expenses`; o painel do morador reutiliza os serviços de
+cobranças, chamados e anúncios. Com `VITE_USE_MOCKS=true`, o MSW fornece dados
+demonstrativos para esses indicadores e gráficos.
+
+O gráfico de despesas usa Recharts. As dependências `recharts` e `react-is` são
+instaladas com `npm install`; a versão de `react-is` deve acompanhar a versão
+instalada de React.

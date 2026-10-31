@@ -79,6 +79,48 @@ function Login() {
             ? "Cadastre-se no Habita+ como morador"
             : "Acesse sua conta do Habita+"}
         </p>
+      </main>
+    );
+  }
+
+  if (user) {
+    return <Navigate to={getHomePath(user)} replace />;
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setErrorMessage("");
+
+    if (isRegistering && senha !== confirmarSenha) {
+      setErrorMessage("As senhas não coincidem. Confira os dois campos.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      let authenticatedUser;
+      if (isRegistering) {
+        authenticatedUser = await register({
+          nome: nome.trim(),
+          email: email.trim(),
+          senha,
+        });
+      } else {
+        authenticatedUser = await login({ email: email.trim(), senha });
+      }
+
+      navigate(redirectTo || getHomePath(authenticatedUser), { replace: true });
+    } catch (requestError) {
+      setErrorMessage(getApiErrorMessage(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const title = isRegistering ? "Crie sua conta" : "Boas-vindas!";
+  const subtitle = isRegistering
+    ? "Cadastre-se como morador para acessar a plataforma."
+    : "Entre para acessar os serviços do seu condomínio.";
 
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           {isRegistering && (
