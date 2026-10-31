@@ -45,7 +45,56 @@ Para testar a API real, altere `VITE_USE_MOCKS=false` no `.env`, confira se o ba
 
 ## Serviços da API
 
-Cada módulo tem seu próprio serviço em `src/services/`, por exemplo `authService`, `unitsService`, `ticketsService`, `chargesService`, `announcementsService` e `notificationsService`. As telas chamam esses serviços; a camada Axios define URL base, token Bearer e tratamento de HTTP 401.
+| Variável | Descrição | Valor local padrão |
+|---|---|---|
+| `VITE_API_URL` | Endereço base da API do backend | `http://localhost:3000` |
+| `VITE_USE_MOCKS` | Configuração prevista para o uso de mocks | `true` |
+
+Para o desenvolvimento local, crie o arquivo `.env` a partir de `.env.example`.
+
+Não versione o arquivo `.env` nem coloque senhas, tokens ou outras informações secretas nele.
+
+A variável `VITE_USE_MOCKS` é uma configuração; sua presença, por si só, não ativa a integração com MSW.
+
+## Autenticação com o backend
+
+Inicie o backend e o PostgreSQL antes do frontend. O valor padrão de
+`VITE_API_URL` é `http://localhost:3000`; o cliente acrescenta `/api` se o valor
+não tiver esse sufixo. Ajuste o `.env` do frontend caso use outro endereço e
+reinicie o Vite para carregar a configuração.
+
+Na rota `/login`, é possível entrar com uma conta existente ou selecionar
+**Cadastre-se** para criar um `MORADOR`. Depois do login ou registro, o frontend
+usa o token para carregar `/auth/me`, mantém o usuário ao atualizar a página e
+exibe seu perfil na página inicial. O botão **Sair** remove a sessão local.
+
+## Estrutura do projeto
+
+```text
+frontend/
+├── public/
+├── src/
+│   ├── components/
+│   ├── hooks/
+│   ├── mocks/
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Login.jsx
+│   │   └── NotFound.jsx
+│   ├── services/
+│   │   └── api.js
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── .dockerignore
+├── .env.example
+├── Dockerfile
+├── nginx.conf
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+└── vite.config.js
+```
 
 ## Rotas e perfis
 

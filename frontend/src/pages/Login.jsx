@@ -1,60 +1,45 @@
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import Button from "../components/Button";
-import Input from "../components/Input";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { getHomePath } from "../utils/roles";
 
-function getApiErrorMessage(error) {
-  const status = error?.response?.status;
-  const data = error?.response?.data;
-  const message = data?.message ?? data?.error?.message;
-  const details = data?.error?.details ?? data?.details;
+function getErrorMessage(error) {
+  if (!error.response) {
+    return "Não foi possível conectar à API. Verifique se o backend está em execução.";
+  }
 
-  if (!error?.response) {
-    return "Não foi possível conectar à API. Confira sua conexão e tente novamente.";
-  }
+  const { status, data } = error.response;
   if (status === 401) {
-    return "E-mail ou senha inválidos. Confira os dados e tente novamente.";
-  }
-  if (status === 403) {
-    return "Seu perfil não tem permissão para realizar esta ação.";
+    return "E-mail ou senha inválidos.";
   }
   if (status === 409) {
     return "Este e-mail já está cadastrado. Entre ou use outro e-mail.";
   }
-  if (Array.isArray(message)) {
-    return message.filter(Boolean).join(" ");
+  if (status === 400) {
+    return Array.isArray(data?.message)
+      ? data.message.join(" ")
+      : data?.message || "Confira os dados informados.";
   }
-  if (Array.isArray(details)) {
-    const detailMessages = details
-      .map((item) => (typeof item === "string" ? item : item?.message))
-      .filter(Boolean);
-    if (detailMessages.length) return detailMessages.join(" ");
-  }
-  if (typeof message === "string" && message.trim()) return message;
-  return "Não foi possível concluir a solicitação. Tente novamente.";
+  return data?.message || "Não foi possível concluir a solicitação.";
 }
 
 function Login() {
   const { user, isLoading, login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isRegistering = location.pathname === "/cadastro";
-
+  const [isRegistering, setIsRegistering] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const redirectTo = location.state?.from?.pathname;
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-white p-6">
-        <p role="status" className="text-sm font-medium text-brand-navy">
+      <main className="flex min-h-screen items-center justify-center bg-surface p-6">
+        <p className="text-ink" role="status">
           Verificando sua sessão...
         </p>
       </main>
@@ -75,6 +60,7 @@ function Login() {
     }
 
     setIsSubmitting(true);
+
     try {
       let authenticatedUser;
       if (isRegistering) {
@@ -86,174 +72,154 @@ function Login() {
       } else {
         authenticatedUser = await login({ email: email.trim(), senha });
       }
-
       navigate(redirectTo || getHomePath(authenticatedUser), { replace: true });
     } catch (requestError) {
-      setErrorMessage(getApiErrorMessage(requestError));
+      setErrorMessage(getErrorMessage(requestError));
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  const title = isRegistering ? "Crie sua conta" : "Boas-vindas!";
-  const subtitle = isRegistering
-    ? "Cadastre-se como morador para acessar a plataforma."
-    : "Entre para acessar os serviços do seu condomínio.";
-
-  function clearError(setter, value) {
-    setter(value);
-    if (errorMessage) setErrorMessage("");
-  }
-
   return (
-    <div className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-      <aside className="relative flex min-h-[250px] flex-col justify-between overflow-hidden bg-brand-navy px-6 py-7 text-white sm:min-h-[280px] sm:px-10 sm:py-9 lg:min-h-screen lg:px-12 lg:py-12 xl:px-16">
-        <Link to="/login" className="relative z-10 inline-flex items-center gap-3 self-start">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-green text-xl font-black text-brand-navy">
-            H+
-          </span>
-          <span className="text-2xl font-bold tracking-tight">Habita+</span>
-        </Link>
+    <main className="flex min-h-screen items-center justify-center bg-surface p-6">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+        <h1 className="text-2xl font-bold text-brand-teal">
+          {isRegistering ? "Criar conta" : "Entrar"}
+        </h1>
 
-        <div className="relative z-10 max-w-xl py-7 lg:py-0">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-mint">
-            Gestão condominial inteligente
-          </p>
-          <h2 className="mt-4 max-w-lg text-3xl font-bold leading-tight sm:text-4xl xl:text-5xl">
-            Seu condomínio, mais simples e conectado.
-          </h2>
-          <p className="mt-4 max-w-md text-sm leading-6 text-white/80 sm:text-base sm:leading-7">
-            Organize informações, acompanhe solicitações e mantenha a comunidade em sintonia em um só lugar.
-          </p>
-        </div>
-
-        <div className="pointer-events-none absolute bottom-0 right-0 h-36 w-64 overflow-hidden sm:h-44 sm:w-80 lg:h-72 lg:w-full" aria-hidden="true">
-          <div className="absolute -bottom-20 -left-5 h-40 w-40 rounded-full border-[18px] border-brand-green/90 sm:h-52 sm:w-52 sm:border-[22px] lg:-bottom-24 lg:-left-16 lg:h-64 lg:w-64" />
-          <div className="absolute bottom-0 left-[45%] h-14 w-5 bg-brand-teal sm:h-20 sm:w-7 lg:h-28 lg:w-10" />
-          <div className="absolute bottom-0 left-[57%] h-20 w-5 bg-brand-teal/90 sm:h-28 sm:w-7 lg:h-44 lg:w-10" />
-          <div className="absolute bottom-0 left-[69%] h-28 w-5 bg-brand-green/80 sm:h-36 sm:w-7 lg:h-60 lg:w-10" />
-        </div>
-
-        <p className="relative z-10 text-xs text-white/60">
-          Habita+ · Cuidado com o lugar onde vivemos.
+        <p className="mt-2 text-muted">
+          {isRegistering
+            ? "Cadastre-se no Habita+ como morador"
+            : "Acesse sua conta do Habita+"}
         </p>
-      </aside>
 
-      <main className="flex min-h-[60vh] items-center justify-center px-4 py-10 sm:px-8 lg:min-h-screen lg:px-12 xl:px-20">
-        <section className="w-full max-w-md">
-          <div className="mb-8">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-teal">
-              {isRegistering ? "Cadastro de morador" : "Acesso à plataforma"}
-            </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-brand-navy sm:text-4xl">
-              {title}
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-muted">{subtitle}</p>
-          </div>
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {isRegistering && (
-              <Input
-                id="auth-nome"
-                label="Nome completo"
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+          {isRegistering && (
+            <div>
+              <label
+                htmlFor="nome"
+                className="block text-sm font-medium text-ink"
+              >
+                Nome
+              </label>
+              <input
+                id="nome"
                 name="nome"
                 type="text"
-                placeholder="Ex.: Maria Silva"
                 autoComplete="name"
                 minLength={2}
-                maxLength={120}
                 required
-                disabled={isSubmitting}
                 value={nome}
-                onChange={(event) => clearError(setNome, event.target.value)}
+                onChange={(event) => setNome(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-brand-teal"
               />
-            )}
+            </div>
+          )}
 
-            <Input
-              id="auth-email"
-              label="E-mail"
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-ink"
+            >
+              E-mail
+            </label>
+            <input
+              id="email"
               name="email"
               type="email"
-              placeholder="seu@email.com"
               autoComplete="email"
+              placeholder="seu@email.com"
               required
-              disabled={isSubmitting}
               value={email}
-              onChange={(event) => clearError(setEmail, event.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-brand-teal"
             />
+          </div>
 
-            <Input
-              id="auth-senha"
-              label="Senha"
+          <div>
+            <label
+              htmlFor="senha"
+              className="block text-sm font-medium text-ink"
+            >
+              Senha
+            </label>
+            <input
+              id="senha"
               name="senha"
               type="password"
-              placeholder={isRegistering ? "Crie uma senha segura" : "Digite sua senha"}
               autoComplete={isRegistering ? "new-password" : "current-password"}
-              minLength={8}
+              minLength={isRegistering ? 8 : undefined}
               required
-              disabled={isSubmitting}
               value={senha}
-              onChange={(event) => clearError(setSenha, event.target.value)}
+              onChange={(event) => setSenha(event.target.value)}
+              className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-brand-teal"
             />
-
             {isRegistering && (
-              <>
-                <Input
-                  id="auth-confirmar-senha"
-                  label="Confirmar senha"
-                  name="confirmarSenha"
-                  type="password"
-                  placeholder="Digite a senha novamente"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                  disabled={isSubmitting}
-                  value={confirmarSenha}
-                  onChange={(event) => clearError(setConfirmarSenha, event.target.value)}
-                />
-                <p className="-mt-3 text-xs leading-5 text-muted">
-                  Use pelo menos 8 caracteres. O cadastro público cria automaticamente um perfil de morador.
-                </p>
-              </>
+              <p className="mt-1 text-sm text-muted">
+                Use pelo menos 8 caracteres.
+              </p>
             )}
+          </div>
 
-            {errorMessage && (
-              <div
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-danger"
-                role="alert"
-                aria-live="polite"
+          {isRegistering && (
+            <div>
+              <label
+                htmlFor="confirmarSenha"
+                className="block text-sm font-medium text-ink"
               >
-                {errorMessage}
-              </div>
-            )}
+                Confirme a senha
+              </label>
+              <input
+                id="confirmarSenha"
+                name="confirmarSenha"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                value={confirmarSenha}
+                onChange={(event) => setConfirmarSenha(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-brand-teal"
+              />
+            </div>
+          )}
 
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              className="w-full"
+          {errorMessage && (
+            <p
+              className="rounded-lg bg-red-50 p-3 text-sm text-danger"
+              role="alert"
             >
-              {isSubmitting
-                ? "Aguarde..."
-                : isRegistering
-                  ? "Criar conta"
-                  : "Entrar"}
-            </Button>
-          </form>
+              {errorMessage}
+            </p>
+          )}
 
-          <p className="mt-7 text-center text-sm text-muted">
-            {isRegistering ? "Já possui uma conta?" : "Ainda não tem uma conta?"}{" "}
-            <Link
-              to={isRegistering ? "/login" : "/cadastro"}
-              className="font-semibold text-brand-teal underline decoration-brand-green underline-offset-4 hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
-            >
-              {isRegistering ? "Entrar" : "Cadastre-se"}
-            </Link>
-          </p>
-        </section>
-      </main>
-    </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-lg bg-brand-teal px-4 py-3 font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSubmitting
+              ? "Aguarde..."
+              : isRegistering
+                ? "Criar conta"
+                : "Entrar"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted">
+          {isRegistering ? "Já tem uma conta?" : "Ainda não tem uma conta?"}{" "}
+          <button
+            type="button"
+            onClick={() => {
+              setIsRegistering((current) => !current);
+              setErrorMessage("");
+            }}
+            className="font-semibold text-brand-teal underline"
+          >
+            {isRegistering ? "Entrar" : "Cadastre-se"}
+          </button>
+        </p>
+      </div>
+    </main>
   );
 }
 

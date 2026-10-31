@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import authService from "../services/authService";
-import {
+import api, {
   AUTH_TOKEN_KEY,
   AUTH_UNAUTHORIZED_EVENT,
 } from "../services/api";
@@ -13,34 +12,30 @@ export function AuthProvider({ children }) {
   );
 
   useEffect(() => {
-    const handleUnauthorized = () => {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
+    function handleUnauthorized() {
       setUser(null);
-      setIsLoading(false);
-    };
+    }
 
     window.addEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+    return () =>
+      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+  }, []);
 
+  useEffect(() => {
     if (!localStorage.getItem(AUTH_TOKEN_KEY)) {
-      return () => {
-        window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
-      };
+      return undefined;
     }
 
     let active = true;
-
-    authService
-      .me()
-      .then((currentUser) => {
+    api
+      .get("/auth/me")
+      .then(({ data }) => {
         if (active) {
-          setUser(currentUser);
+          setUser(data);
         }
       })
       .catch(() => {
-        if (active) {
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-          setUser(null);
-        }
+        localStorage.removeItem(AUTH_TOKEN_KEY);
       })
       .finally(() => {
         if (active) {
@@ -50,37 +45,31 @@ export function AuthProvider({ children }) {
 
     return () => {
       active = false;
-      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
     };
   }, []);
 
-  const login = useCallback(async (credentials) => {
-    const result = await authService.login(credentials);
-    localStorage.setItem(AUTH_TOKEN_KEY, result.accessToken);
+  const login = useCallback(async ({ email, senha }) => {
+    const { data } = await api.post("/auth/login", { email, senha });
+    localStorage.setItem(AUTH_TOKEN_KEY, data.accessToken);
 
     try {
-      const currentUser = await authService.me();
-      setUser(currentUser);
-      return currentUser;
+      const response = await api.get("/auth/me");
+      setUser(response.data);
+      return response.data;
     } catch (error) {
       localStorage.removeItem(AUTH_TOKEN_KEY);
-      setUser(null);
       throw error;
     }
   }, []);
 
-  const register = useCallback(
-    async ({ nome, email, senha }) => {
-      await authService.register({ nome, email, senha });
-      return login({ email, senha });
-    },
-    [login],
-  );
+  const register = useCallback(async ({ nome, email, senha }) => {
+    await api.post("/auth/register", { nome, email, senha });
+    return login({ email, senha });
+  }, [login]);
 
   const logout = useCallback(() => {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     setUser(null);
-    setIsLoading(false);
   }, []);
 
   const value = useMemo(

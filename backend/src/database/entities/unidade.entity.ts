@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('unidades')
+@Index('UQ_unidades_bloco_numero', ['bloco', 'numero'], { unique: true })
 // Representa uma unidade habitacional do condomínio e seus dados básicos.
 export class Unidade {
   @PrimaryGeneratedColumn()

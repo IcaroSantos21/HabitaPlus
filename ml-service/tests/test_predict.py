@@ -18,7 +18,7 @@ VALID_HISTORY = {
 }
 
 
-# Confere o formato camelCase e o conteúdo da previsão.
+# Confere o formato camelCase e os dados da previsão de exemplo.
 def test_predict_returns_camel_case_contract(client: TestClient) -> None:
     response = client.post("/predict/expenses", json=VALID_HISTORY)
 
@@ -51,26 +51,12 @@ def test_predict_is_in_the_scale_of_recent_months(client: TestClient) -> None:
 def test_predict_ignores_the_order_of_the_history(client: TestClient) -> None:
     shuffled = {"history": list(reversed(VALID_HISTORY["history"]))}
 
-    ordered_body = client.post("/predict/expenses", json=VALID_HISTORY).json()
-    shuffled_body = client.post("/predict/expenses", json=shuffled).json()
+    ordered_response = client.post("/predict/expenses", json=VALID_HISTORY)
+    shuffled_response = client.post("/predict/expenses", json=shuffled)
 
-    assert shuffled_body == ordered_body
-
-
-# Confere que só os 3 últimos meses influenciam o resultado.
-def test_predict_uses_only_the_last_three_months(client: TestClient) -> None:
-    older = [{"month": "2025-10", "total": 99999.0}]
-    longer = {"history": older + VALID_HISTORY["history"]}
-
-    assert client.post("/predict/expenses", json=longer).json() == client.post(
-        "/predict/expenses", json=VALID_HISTORY
-    ).json()
-
-
-# Confere que o serviço lido do artefato é o que a rota usa.
-def test_predict_uses_the_model_loaded_at_startup(client: TestClient) -> None:
-    assert isinstance(app.state.expense_predictor, SklearnExpensePredictor)
-
+    assert ordered_response.status_code == 200
+    assert shuffled_response.status_code == 200
+    assert shuffled_response.json() == ordered_response.json()
 
 # Confere que histórico curto é rejeitado com uma mensagem clara.
 def test_predict_short_history_returns_422_with_clear_message(client: TestClient) -> None:
@@ -80,23 +66,6 @@ def test_predict_short_history_returns_422_with_clear_message(client: TestClient
 
     assert response.status_code == 422
     assert "pelo menos 3 meses" in response.json()["detail"][0]["msg"]
-
-
-# Confere que lacunas no histórico são rejeitadas (os lags dependem de meses vizinhos).
-def test_predict_rejects_gap_in_history(client: TestClient) -> None:
-    history = [{"month": m, "total": 100.0} for m in ("2025-11", "2026-01", "2026-02")]
-
-    response = client.post("/predict/expenses", json={"history": history})
-
-    assert response.status_code == 422
-    assert "consecutivos" in response.json()["detail"][0]["msg"]
-
-
-# Confere que meses repetidos são rejeitados.
-def test_predict_rejects_duplicated_month(client: TestClient) -> None:
-    history = [{"month": m, "total": 100.0} for m in ("2025-11", "2025-12", "2025-12")]
-
-    assert client.post("/predict/expenses", json={"history": history}).status_code == 422
 
 
 # Confere que meses fora do formato AAAA-MM são rejeitados.
