@@ -30,6 +30,13 @@ export enum StatusAnuncio {
   VENDIDO = 'VENDIDO',
 }
 
+// Lista os estados possíveis de um contrato de locação.
+export enum StatusLocacao {
+  ATIVO = 'ATIVO',
+  A_VENCER = 'A_VENCER',
+  ENCERRADO = 'ENCERRADO',
+}
+
 // Lista os estados possíveis de um chamado.
 export enum StatusChamado {
   ABERTO = 'ABERTO',

@@ -1,5 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
+import { ContratoLocacao } from '../../database/entities/contrato-locacao.entity';
 import { PerfilUsuario, TipoVinculo } from '../../database/entities/enums';
 import { Unidade } from '../../database/entities/unidade.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
@@ -34,6 +35,12 @@ describe('UnitsService', () => {
     findOneBy: findUnit,
     create: jest.fn(),
     save: jest.fn(),
+    createQueryBuilder: jest.fn(() => ({
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    })),
   } as unknown as Repository<Unidade>;
   const usersRepository = {
     findOneBy: findUser,
@@ -45,10 +52,19 @@ describe('UnitsService', () => {
     remove: removeLink,
   } as unknown as Repository<Vinculo>;
 
+  const findRentals = jest.fn<
+    Promise<ContratoLocacao[]>,
+    [FindManyOptions<ContratoLocacao>]
+  >();
+  const rentalsRepository = {
+    find: findRentals,
+  } as unknown as Repository<ContratoLocacao>;
+
   const service = new UnitsService(
     unitsRepository,
     usersRepository,
     linksRepository,
+    rentalsRepository,
   );
   const linkDto: LinkResidentDto = {
     usuarioId: user.id,

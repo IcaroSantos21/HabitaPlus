@@ -45,10 +45,30 @@ export class UnitsController {
     return this.unitsService.list(query);
   }
 
+  @Get('available')
+  @ApiOkResponse({ description: 'Unidades disponíveis para locação.' })
+  listAvailable(
+    @Query('bloco') bloco?: string,
+    @Query('quartos') quartos?: string,
+    @Query('valorMax') valorMax?: string,
+  ) {
+    return this.unitsService.listAvailableUnits({
+      bloco,
+      quartos: quartos ? Number(quartos) : undefined,
+      valorMax: valorMax !== undefined ? Number(valorMax) : undefined,
+    });
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Unidade e moradores vinculados.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.unitsService.findOne(id);
+  }
+
+  @Get(':id/rentals')
+  @ApiOkResponse({ description: 'Histórico de contratos da unidade.' })
+  listRentalsByUnit(@Param('id', ParseIntPipe) id: number) {
+    return this.unitsService.listRentalsByUnit(id);
   }
 
   @Patch(':id')
