@@ -91,3 +91,16 @@ A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos ar
 - O layout usa o painel de marca azul `#124170` e se reorganiza verticalmente em telas pequenas.
 
 Para testar com MSW, mantenha `VITE_USE_MOCKS=true` no `.env`. Para testar contra o backend real, configure `VITE_USE_MOCKS=false`, confirme que o backend está ativo e reinicie o Vite. Os endpoints de autenticação reais do backend são `/api/auth/login`, `/api/auth/register` e `/api/auth/me`.
+
+
+## Painel (FE-05)
+
+As rotas `/morador`, `/sindico` e `/admin` exibem painéis diferentes de acordo
+com o perfil autenticado. O painel administrativo consulta `GET /api/finance/dashboard`
+e `GET /api/predictions/expenses`; o painel do morador reutiliza os serviços de
+cobranças, chamados e anúncios. Com `VITE_USE_MOCKS=true`, o MSW fornece dados
+demonstrativos para esses indicadores e gráficos.
+
+O gráfico de despesas usa Recharts. As dependências `recharts` e `react-is` são
+instaladas com `npm install`; a versão de `react-is` deve acompanhar a versão
+instalada de React.
