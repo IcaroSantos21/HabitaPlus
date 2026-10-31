@@ -8,7 +8,9 @@ import { UnitsController } from './units.controller';
 import { UnitsService } from './units.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Unidade, Usuario, Vinculo, ContratoLocacao])],
+  imports: [
+    TypeOrmModule.forFeature([Unidade, Usuario, Vinculo, ContratoLocacao]),
+  ],
   controllers: [UnitsController],
   providers: [UnitsService],
 })

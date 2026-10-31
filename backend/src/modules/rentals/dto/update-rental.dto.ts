@@ -4,7 +4,9 @@ import { IsDateString, IsInt, IsOptional, Min } from 'class-validator';
 export class UpdateRentalDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'O identificador do locatário deve ser um número inteiro.' })
+  @IsInt({
+    message: 'O identificador do locatário deve ser um número inteiro.',
+  })
   @Min(1, { message: 'O locatário deve ser válido.' })
   locatarioId?: number;
 

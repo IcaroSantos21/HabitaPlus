@@ -190,7 +190,9 @@ export class UnitsService {
     }
 
     if (filters.quartos) {
-      query.andWhere('unidade.quartos = :quartos', { quartos: filters.quartos });
+      query.andWhere('unidade.quartos = :quartos', {
+        quartos: filters.quartos,
+      });
     }
 
     if (filters.valorMax !== undefined) {
@@ -222,7 +224,9 @@ export class UnitsService {
 
   private computeStatus(contract: Partial<ContratoLocacao>): StatusLocacao {
     const today = this.toDateOnly(new Date());
-    const endDate = contract.fim ? this.toDateOnly(new Date(contract.fim)) : null;
+    const endDate = contract.fim
+      ? this.toDateOnly(new Date(contract.fim))
+      : null;
 
     if (endDate && endDate < today) {
       return StatusLocacao.ENCERRADO;

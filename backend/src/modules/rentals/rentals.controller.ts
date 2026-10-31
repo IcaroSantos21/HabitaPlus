@@ -45,20 +45,14 @@ export class RentalsController {
   @Patch(':id')
   @Roles(PerfilUsuario.SINDICO, PerfilUsuario.ADMIN)
   @ApiOkResponse({ description: 'Contrato atualizado.' })
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateRentalDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRentalDto) {
     return this.rentalsService.update(id, dto);
   }
 
   @Patch(':id/end')
   @Roles(PerfilUsuario.SINDICO, PerfilUsuario.ADMIN)
   @ApiOkResponse({ description: 'Contrato encerrado.' })
-  end(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: EndRentalDto,
-  ) {
+  end(@Param('id', ParseIntPipe) id: number, @Body() dto: EndRentalDto) {
     return this.rentalsService.end(id, dto);
   }
 }

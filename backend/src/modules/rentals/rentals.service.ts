@@ -62,7 +62,9 @@ export class RentalsService {
       throw new NotFoundException('Unidade não encontrada.');
     }
 
-    const locatario = await this.usersRepository.findOneBy({ id: dto.locatarioId });
+    const locatario = await this.usersRepository.findOneBy({
+      id: dto.locatarioId,
+    });
     if (!locatario) {
       throw new NotFoundException('Locatário não encontrado.');
     }
@@ -75,11 +77,15 @@ export class RentalsService {
     });
 
     if (existingActive.some((contract) => this.isContractActive(contract))) {
-      throw new ConflictException('Já existe um contrato ativo para esta unidade.');
+      throw new ConflictException(
+        'Já existe um contrato ativo para esta unidade.',
+      );
     }
 
     if (!unit.disponivelLocacao) {
-      throw new ConflictException('Esta unidade já está indisponível para locação.');
+      throw new ConflictException(
+        'Esta unidade já está indisponível para locação.',
+      );
     }
 
     const contract = this.rentalsRepository.create({
@@ -170,10 +176,12 @@ export class RentalsService {
       relations: { unidade: true },
     });
 
-    const unit = await this.unitsRepository.findOneBy({ id: contract.unidade.id });
+    const unit = await this.unitsRepository.findOneBy({
+      id: contract.unidade.id,
+    });
     if (unit) {
-      unit.disponivelLocacao = !activeContracts.some((item) =>
-        item.id !== contract.id && this.isContractActive(item),
+      unit.disponivelLocacao = !activeContracts.some(
+        (item) => item.id !== contract.id && this.isContractActive(item),
       );
       await this.unitsRepository.save(unit);
     }
@@ -203,9 +211,13 @@ export class RentalsService {
     return this.computeContractStatus(contract) !== StatusLocacao.ENCERRADO;
   }
 
-  private computeContractStatus(contract: Partial<ContratoLocacao>): StatusLocacao {
+  private computeContractStatus(
+    contract: Partial<ContratoLocacao>,
+  ): StatusLocacao {
     const today = this.toDateOnly(new Date());
-    const endDate = contract.fim ? this.toDateOnly(new Date(contract.fim)) : null;
+    const endDate = contract.fim
+      ? this.toDateOnly(new Date(contract.fim))
+      : null;
 
     if (endDate && endDate < today) {
       return StatusLocacao.ENCERRADO;

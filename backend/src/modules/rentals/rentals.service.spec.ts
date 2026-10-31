@@ -3,9 +3,14 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import {
+  DeepPartial,
+  FindManyOptions,
+  FindOneOptions,
+  Repository,
+} from 'typeorm';
 import { ContratoLocacao } from '../../database/entities/contrato-locacao.entity';
-import { StatusLocacao } from '../../database/entities/enums';
+import { PerfilUsuario, StatusLocacao } from '../../database/entities/enums';
 import { Unidade } from '../../database/entities/unidade.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { RentalsService } from './rentals.service';
@@ -26,24 +31,47 @@ describe('RentalsService', () => {
     nome: 'Ana Souza',
     email: 'ana@example.com',
     senhaHash: 'hash',
-    perfil: 'MORADOR' as any,
+    perfil: PerfilUsuario.MORADOR,
   };
+
+  const rentalsFind = jest.fn<
+    Promise<ContratoLocacao[]>,
+    [FindManyOptions<ContratoLocacao>]
+  >();
+  const rentalsFindOne = jest.fn<
+    Promise<ContratoLocacao | null>,
+    [FindOneOptions<ContratoLocacao>]
+  >();
+  const rentalsCreate = jest.fn<
+    ContratoLocacao,
+    [DeepPartial<ContratoLocacao>]
+  >();
+  const rentalsSave = jest.fn<Promise<ContratoLocacao>, [ContratoLocacao]>();
+  const unitsFindOneBy = jest.fn<
+    Promise<Unidade | null>,
+    [Parameters<Repository<Unidade>['findOneBy']>[0]]
+  >();
+  const unitsSave = jest.fn<Promise<Unidade>, [Unidade]>();
+  const usersFindOneBy = jest.fn<
+    Promise<Usuario | null>,
+    [Parameters<Repository<Usuario>['findOneBy']>[0]]
+  >();
 
   const rentalsRepository = {
     findAndCount: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    create: jest.fn(),
-    save: jest.fn(),
+    findOne: rentalsFindOne,
+    find: rentalsFind,
+    create: rentalsCreate,
+    save: rentalsSave,
   } as unknown as Repository<ContratoLocacao>;
 
   const unitsRepository = {
-    findOneBy: jest.fn(),
-    save: jest.fn(),
+    findOneBy: unitsFindOneBy,
+    save: unitsSave,
   } as unknown as Repository<Unidade>;
 
   const usersRepository = {
-    findOneBy: jest.fn(),
+    findOneBy: usersFindOneBy,
   } as unknown as Repository<Usuario>;
 
   const service = new RentalsService(
@@ -57,15 +85,20 @@ describe('RentalsService', () => {
   });
 
   it('cria um contrato e marca a unidade como indisponível', async () => {
-    (unitsRepository as any).findOneBy.mockResolvedValue(unit);
-    (usersRepository as any).findOneBy.mockResolvedValue(locatario);
-    (rentalsRepository as any).find.mockResolvedValue([]);
-    (rentalsRepository as any).create.mockImplementation((entity) => entity);
-    (rentalsRepository as any).save.mockImplementation(async (entity) => ({
-      ...entity,
-      id: 5,
-    }));
-    (unitsRepository as any).save.mockResolvedValue({ ...unit, disponivelLocacao: false });
+    unitsFindOneBy.mockResolvedValue(unit);
+    usersFindOneBy.mockResolvedValue(locatario);
+    rentalsFind.mockResolvedValue([]);
+    rentalsCreate.mockImplementation((entity) => entity as ContratoLocacao);
+    rentalsSave.mockImplementation((entity) =>
+      Promise.resolve({
+        ...entity,
+        id: 5,
+      }),
+    );
+    unitsSave.mockResolvedValue({
+      ...unit,
+      disponivelLocacao: false,
+    });
 
     const result = await service.create({
       unidadeId: 1,
@@ -76,21 +109,23 @@ describe('RentalsService', () => {
     });
 
     expect(result.status).toBe(StatusLocacao.ATIVO);
-    expect((unitsRepository as any).save).toHaveBeenCalledWith(
+    expect(unitsSave).toHaveBeenCalledWith(
       expect.objectContaining({ disponivelLocacao: false }),
     );
   });
 
   it('rejeita criação de um segundo contrato ativo para a mesma unidade', async () => {
-    (unitsRepository as any).findOneBy.mockResolvedValue(unit);
-    (usersRepository as any).findOneBy.mockResolvedValue(locatario);
-    (rentalsRepository as any).find.mockResolvedValue([
+    unitsFindOneBy.mockResolvedValue(unit);
+    usersFindOneBy.mockResolvedValue(locatario);
+    rentalsFind.mockResolvedValue([
       {
         id: 99,
         unidade: unit,
         locatario,
+        valorMensal: 2500,
         fim: new Date('2027-12-31'),
         inicio: new Date('2026-01-01'),
+        status: StatusLocacao.ATIVO,
       },
     ]);
 
@@ -128,17 +163,19 @@ describe('RentalsService', () => {
       status: StatusLocacao.ATIVO,
     };
 
-    (rentalsRepository as any).findOne.mockResolvedValue(contrato);
-    (rentalsRepository as any).find.mockResolvedValue([contrato]);
-    (rentalsRepository as any).save.mockImplementation(async (entity) => ({
-      ...entity,
-      status: StatusLocacao.ENCERRADO,
-    }));
-    (unitsRepository as any).findOneBy.mockResolvedValue({
+    rentalsFindOne.mockResolvedValue(contrato);
+    rentalsFind.mockResolvedValue([contrato]);
+    rentalsSave.mockImplementation((entity) =>
+      Promise.resolve({
+        ...entity,
+        status: StatusLocacao.ENCERRADO,
+      }),
+    );
+    unitsFindOneBy.mockResolvedValue({
       ...unit,
       disponivelLocacao: false,
     });
-    (unitsRepository as any).save.mockResolvedValue({
+    unitsSave.mockResolvedValue({
       ...unit,
       disponivelLocacao: true,
     });
@@ -146,14 +183,16 @@ describe('RentalsService', () => {
     const result = await service.end(7, { fim: '2026-06-15' });
 
     expect(result.status).toBe(StatusLocacao.ENCERRADO);
-    expect((unitsRepository as any).save).toHaveBeenCalledWith(
+    expect(unitsSave).toHaveBeenCalledWith(
       expect.objectContaining({ disponivelLocacao: true }),
     );
   });
 
   it('retorna not found ao buscar contrato inexistente', async () => {
-    (rentalsRepository as any).findOne.mockResolvedValue(null);
+    rentalsFindOne.mockResolvedValue(null);
 
-    await expect(service.findOne(404)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });

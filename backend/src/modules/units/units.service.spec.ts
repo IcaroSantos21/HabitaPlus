@@ -1,5 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
+import { ContratoLocacao } from '../../database/entities/contrato-locacao.entity';
 import { PerfilUsuario, TipoVinculo } from '../../database/entities/enums';
 import { Unidade } from '../../database/entities/unidade.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
@@ -51,9 +52,13 @@ describe('UnitsService', () => {
     remove: removeLink,
   } as unknown as Repository<Vinculo>;
 
+  const findRentals = jest.fn<
+    Promise<ContratoLocacao[]>,
+    [FindManyOptions<ContratoLocacao>]
+  >();
   const rentalsRepository = {
-    find: jest.fn(),
-  } as unknown as Repository<any>;
+    find: findRentals,
+  } as unknown as Repository<ContratoLocacao>;
 
   const service = new UnitsService(
     unitsRepository,
