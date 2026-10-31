@@ -4,6 +4,7 @@ const configuredApiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000"
 const normalizedApiUrl = configuredApiUrl.replace(/\/+$/, "");
 
 export const AUTH_TOKEN_KEY = "habitaplus.accessToken";
+export const AUTH_UNAUTHORIZED_EVENT = "habitaplus:unauthorized";
 
 const api = axios.create({
   baseURL: normalizedApiUrl.endsWith("/api")

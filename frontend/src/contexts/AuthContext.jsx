@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import api, { AUTH_TOKEN_KEY } from "../services/api";
+import api, {
+  AUTH_TOKEN_KEY,
+  AUTH_UNAUTHORIZED_EVENT,
+} from "../services/api";
 import AuthContext from "./auth-context";
 
 export function AuthProvider({ children }) {
@@ -7,6 +10,16 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(() =>
     Boolean(localStorage.getItem(AUTH_TOKEN_KEY)),
   );
+
+  useEffect(() => {
+    function handleUnauthorized() {
+      setUser(null);
+    }
+
+    window.addEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+    return () =>
+      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+  }, []);
 
   useEffect(() => {
     if (!localStorage.getItem(AUTH_TOKEN_KEY)) {

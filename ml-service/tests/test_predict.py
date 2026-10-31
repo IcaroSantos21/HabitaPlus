@@ -2,6 +2,12 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.config import EXPENSE_MODEL_PATH
+from app.core.dependencies import get_expense_predictor
+from app.main import app
+from app.schemas.predict import ExpensesRequest, ExpensesResponse
+from app.services.expense_predictor import SklearnExpensePredictor
+
 # Exemplo de histórico válido, com o mínimo de meses exigido.
 VALID_HISTORY = {
     "history": [
@@ -44,6 +50,13 @@ def test_predict_is_in_the_scale_of_recent_months(client: TestClient) -> None:
 # Confere que a ordem dos meses no request não muda o resultado.
 def test_predict_ignores_the_order_of_the_history(client: TestClient) -> None:
     shuffled = {"history": list(reversed(VALID_HISTORY["history"]))}
+
+    ordered_response = client.post("/predict/expenses", json=VALID_HISTORY)
+    shuffled_response = client.post("/predict/expenses", json=shuffled)
+
+    assert ordered_response.status_code == 200
+    assert shuffled_response.status_code == 200
+    assert shuffled_response.json() == ordered_response.json()
 
 # Confere que histórico curto é rejeitado com uma mensagem clara.
 def test_predict_short_history_returns_422_with_clear_message(client: TestClient) -> None:

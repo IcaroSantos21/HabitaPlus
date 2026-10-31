@@ -14,7 +14,7 @@ def get_nlu_service() -> NluService:
 
 
 # Fornece a implementação de previsão usada pela rota.
-def get_expense_predictor() -> ExpensePredictor:
+def get_expense_predictor(request: Request) -> ExpensePredictor:
     """Devolve o serviço de previsão de despesas."""
     return request.app.state.expense_predictor
 
