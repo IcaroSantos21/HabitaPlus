@@ -54,6 +54,24 @@ npm run seed:privileged-user
 
 Esse seed falha se o e-mail já existir e nunca é exposto por uma rota pública.
 
+## Unidades
+
+Todas as rotas exigem autenticação. Criar, editar ou excluir unidades e
+vincular/desvincular moradores exige perfil `SINDICO` ou `ADMIN`.
+
+- `POST /api/units`: cria unidade (`bloco`, `numero`, `quartos`, `areaM2`,
+  `valorAluguelSugerido` e, opcionalmente, `disponivelLocacao`).
+- `GET /api/units?page=1&limit=10`: lista unidades com paginação (`data`,
+  `total`, `page`, `limit` e `totalPages`; limite máximo de 100).
+- `GET /api/units/:id`: retorna a unidade com a lista `moradores` vinculada.
+- `PATCH /api/units/:id` e `DELETE /api/units/:id`: atualiza ou exclui unidade.
+- `POST /api/units/:id/residents`: recebe `usuarioId` e `tipo`
+  (`PROPRIETARIO` ou `INQUILINO`) para vincular morador.
+- `DELETE /api/units/:id/residents/:usuarioId`: remove o vínculo.
+
+Bloco e número identificam uma unidade sem duplicidade; um usuário só pode
+ter um vínculo por unidade. Execute as migrations após atualizar o backend.
+
 ## Testes
 
 ```bash
