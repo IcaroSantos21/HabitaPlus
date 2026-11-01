@@ -38,6 +38,80 @@ function getAllUsers() {
   return [...demoUsers, ...getRegisteredUsers()];
 }
 
+function getMockRequestUser(request) {
+  const token = request.headers.get("authorization") || "";
+  const match = token.match(/^Bearer mock-token-(\d+)$/);
+  return match ? getAllUsers().find((item) => String(item.id) === match[1]) : null;
+}
+
+function isTicketManager(user) {
+  return ["SINDICO", "ADMIN"].includes(String(user?.perfil || "").toUpperCase());
+}
+
+function normalizeTicketIdentifier(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function ticketPagination(items, url) {
+  const pagina = Math.max(1, Number(url.searchParams.get("pagina") || 1));
+  const limite = Math.max(1, Math.min(100, Number(url.searchParams.get("limite") || 20)));
+  const inicio = (pagina - 1) * limite;
+  return {
+    data: items.slice(inicio, inicio + limite),
+    meta: { pagina, limite, total: items.length, totalPaginas: Math.ceil(items.length / limite) },
+  };
+}
+
+const ticketUnitDirectory = [
+  { id: 204, bloco: "A", numero: "204", residentIds: [] },
+  { id: 103, bloco: "B", numero: "103", residentIds: [1] },
+];
+
+const mockMaintenanceTickets = [
+  {
+    id: 1001,
+    usuario: { id: 1, nome: "Marina Morador" },
+    unidade: { id: 103, bloco: "B", numero: "103" },
+    areaComum: null,
+    categoria: "hidraulica",
+    equipamento: "bomba_de_agua",
+    descricao: "A bomba de água está fazendo um ruído incomum.",
+    status: "ABERTO",
+    abertoEm: "2026-10-30T09:15:00.000Z",
+    encerradoEm: null,
+  },
+  {
+    id: 1002,
+    usuario: { id: 1, nome: "Marina Morador" },
+    unidade: null,
+    areaComum: "garagem",
+    categoria: "eletrica",
+    equipamento: "portao_eletronico",
+    descricao: "O portão da garagem demora para fechar.",
+    status: "EM_ANDAMENTO",
+    abertoEm: "2026-10-28T13:40:00.000Z",
+    encerradoEm: null,
+  },
+  {
+    id: 1003,
+    usuario: { id: 4, nome: "João Pedro" },
+    unidade: null,
+    areaComum: "piscina",
+    categoria: "limpeza",
+    equipamento: "bomba_da_piscina",
+    descricao: "Solicitação de verificação da bomba da piscina.",
+    status: "ENCERRADO",
+    abertoEm: "2026-10-20T10:00:00.000Z",
+    encerradoEm: "2026-10-22T14:30:00.000Z",
+  },
+];
+
 function safeUser(user) {
   const publicUser = { ...user };
   delete publicUser.senha;
@@ -367,4 +441,123 @@ export const handlers = [
   http.get("*/api/predictions/expenses", ({ request }) =>
     protectedJson(request, mockExpensePrediction),
   ),
+
+  // Chamados: os caminhos e payloads seguem o ChamadosController/DTO do backend.
+  http.get("*/api/tickets/history", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json({ message: "Apenas síndico ou admin podem consultar o histórico." }, { status: 403 });
+    }
+    const url = new URL(request.url);
+    const equipment = normalizeTicketIdentifier(url.searchParams.get("equipamento"));
+    const area = normalizeTicketIdentifier(url.searchParams.get("area"));
+    if (!equipment && !area) {
+      return HttpResponse.json({ message: "Informe ao menos um filtro: equipamento ou area." }, { status: 400 });
+    }
+    const filtered = mockMaintenanceTickets.filter((ticket) =>
+      (!equipment || normalizeTicketIdentifier(ticket.equipamento) === equipment) &&
+      (!area || normalizeTicketIdentifier(ticket.areaComum) === area),
+    );
+    return HttpResponse.json(ticketPagination(filtered, url));
+  }),
+
+  http.get("*/api/tickets/stats", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json({ message: "Apenas síndico ou admin podem consultar as estatísticas." }, { status: 403 });
+    }
+    const totals = new Map();
+    const monthly = new Map();
+    mockMaintenanceTickets.forEach((ticket) => {
+      const equipment = ticket.equipamento || "nao_informado";
+      const month = String(ticket.abertoEm).slice(0, 7);
+      totals.set(equipment, (totals.get(equipment) || 0) + 1);
+      const key = `${month}|${equipment}`;
+      monthly.set(key, (monthly.get(key) || 0) + 1);
+    });
+    return HttpResponse.json({
+      porEquipamento: [...totals].map(([equipamento, total]) => ({ equipamento, total })).sort((a, b) => b.total - a.total),
+      porEquipamentoEMes: [...monthly].map(([key, total]) => {
+        const [mes, equipamento] = key.split("|");
+        return { mes, equipamento, total };
+      }),
+    });
+  }),
+
+  http.get("*/api/tickets", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const url = new URL(request.url);
+    let filtered = mockMaintenanceTickets;
+    if (!isTicketManager(user)) {
+      filtered = filtered.filter((ticket) => ticket.usuario.id === user.id);
+    }
+    const status = url.searchParams.get("status");
+    const category = normalizeTicketIdentifier(url.searchParams.get("categoria"));
+    const equipment = normalizeTicketIdentifier(url.searchParams.get("equipamento"));
+    if (status) filtered = filtered.filter((ticket) => ticket.status === status);
+    if (category) filtered = filtered.filter((ticket) => ticket.categoria === category);
+    if (equipment) filtered = filtered.filter((ticket) => ticket.equipamento === equipment);
+    return HttpResponse.json(ticketPagination(filtered, url));
+  }),
+
+  http.post("*/api/tickets", async ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const payload = await request.json();
+    const hasUnit = payload?.unidadeId !== undefined && payload?.unidadeId !== null && payload?.unidadeId !== "";
+    const hasArea = Boolean(String(payload?.areaComum || "").trim());
+    if (hasUnit === hasArea) {
+      return HttpResponse.json({ message: "Informe a unidade ou a área comum, não os dois." }, { status: 400 });
+    }
+    if (!String(payload?.categoria || "").trim() || !String(payload?.equipamento || "").trim() || !String(payload?.descricao || "").trim()) {
+      return HttpResponse.json({ message: "Informe a categoria, o equipamento e a descrição do chamado." }, { status: 400 });
+    }
+    let unit = null;
+    if (hasUnit) {
+      unit = ticketUnitDirectory.find((item) => item.id === Number(payload.unidadeId));
+      if (!unit) return HttpResponse.json({ message: "Unidade não encontrada." }, { status: 404 });
+      if (!isTicketManager(user) && !unit.residentIds.includes(user.id)) {
+        return HttpResponse.json({ message: "Você não possui vínculo com esta unidade." }, { status: 403 });
+      }
+    }
+    const ticket = {
+      id: Math.max(1000, ...mockMaintenanceTickets.map((item) => item.id)) + 1,
+      usuario: { id: user.id, nome: user.nome },
+      unidade: unit ? { id: unit.id, bloco: unit.bloco, numero: unit.numero } : null,
+      areaComum: hasArea ? normalizeTicketIdentifier(payload.areaComum) : null,
+      categoria: normalizeTicketIdentifier(payload.categoria),
+      equipamento: normalizeTicketIdentifier(payload.equipamento),
+      descricao: String(payload.descricao).trim(),
+      status: "ABERTO",
+      abertoEm: new Date().toISOString(),
+      encerradoEm: null,
+    };
+    mockMaintenanceTickets.unshift(ticket);
+    return HttpResponse.json(ticket, { status: 201 });
+  }),
+
+  http.patch("*/api/tickets/:id/status", async ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json({ message: "Apenas síndico ou admin podem alterar o status." }, { status: 403 });
+    }
+    const ticket = mockMaintenanceTickets.find((item) => String(item.id) === String(params.id));
+    if (!ticket) return HttpResponse.json({ message: "Chamado não encontrado" }, { status: 404 });
+    const payload = await request.json();
+    const nextByStatus = { ABERTO: "EM_ANDAMENTO", EM_ANDAMENTO: "ENCERRADO", ENCERRADO: null };
+    const allowed = nextByStatus[ticket.status];
+    if (allowed !== payload?.status) {
+      const message = allowed == null
+        ? "O chamado já foi encerrado e não pode mais mudar de status"
+        : `Transição inválida: o chamado está ${ticket.status} e só pode seguir para ${allowed}.`;
+      return HttpResponse.json({ message }, { status: 400 });
+    }
+    ticket.status = payload.status;
+    ticket.encerradoEm = payload.status === "ENCERRADO" ? new Date().toISOString() : null;
+    return HttpResponse.json(ticket);
+  }),
 ];
