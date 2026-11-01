@@ -81,7 +81,9 @@ export class ChamadosRepository {
       .take(filter.limite);
 
     if (filter.usuarioId !== undefined) {
-      query.andWhere('usuario.id = :usuarioId', { usarioId: filter.usuarioId });
+      query.andWhere('usuario.id = :usuarioId', {
+        usuarioId: filter.usuarioId,
+      });
     }
     if (filter.status) {
       query.andWhere('chamado.status = :status', { status: filter.status });
@@ -91,8 +93,13 @@ export class ChamadosRepository {
         categoria: filter.categoria,
       });
     }
+    if (filter.equipamento) {
+      query.andWhere('LOWER(chamado.equipamento) = LOWER(:equipamento)', {
+        equipamento: filter.equipamento,
+      });
+    }
     if (filter.areaComum) {
-      query.andHaving('chamado.areaComum = :areaComum', {
+      query.andWhere('LOWER(chamado.areaComum) = LOWER(:areaComum)', {
         areaComum: filter.areaComum,
       });
     }

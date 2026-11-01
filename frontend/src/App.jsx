@@ -7,6 +7,7 @@ import HomeRedirect from "./pages/HomeRedirect";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Rentals from "./pages/Rentals";
+import Tickets from "./pages/Tickets";
 import Units from "./pages/Units";
 
 function AuthenticatedPage({ children }) {
@@ -61,6 +62,14 @@ function App() {
             element={
               <AuthenticatedPage>
                 <Rentals />
+              </AuthenticatedPage>
+            }
+          />
+          <Route
+            path="/tickets"
+            element={
+              <AuthenticatedPage>
+                <Tickets />
               </AuthenticatedPage>
             }
           />

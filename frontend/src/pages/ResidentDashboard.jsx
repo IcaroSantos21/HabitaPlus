@@ -72,7 +72,7 @@ function ResidentDashboard() {
 
     Promise.allSettled([
       chargesService.list({ limit: 10 }),
-      ticketsService.list({ limit: 10 }),
+      ticketsService.list({ limite: 10 }),
       announcementsService.list({ limit: 5 }),
     ]).then(([chargesResult, ticketsResult, announcementsResult]) => {
       if (!active) return;
