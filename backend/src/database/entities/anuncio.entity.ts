@@ -32,7 +32,7 @@ export class Anuncio {
     precision: 10,
     scale: 2,
   })
-  preco!: string;
+  preco!: number;
 
   @Column({
     type: 'enum',
