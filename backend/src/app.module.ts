@@ -10,6 +10,7 @@ import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
 import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
+import { TransacoesModule } from './modules/transacoes/transacoes.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ChamadosModule } from './modules/chamados/chamado.module';
     UnitsModule,
     RentalsModule,
     ChamadosModule,
+    TransacoesModule,
   ],
 })
 export class AppModule {}
