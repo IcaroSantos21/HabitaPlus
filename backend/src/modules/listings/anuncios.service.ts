@@ -56,13 +56,15 @@ export class AnunciosService {
       titulo: dto.titulo.trim(),
       descricao: dto.descricao.trim(),
       categoria: dto.categoria,
-      preco: dto.preco.toFixed(2),
+      preco: dto.preco,
       imagemUrl: dto.imagemUrl ?? null,
       status: StatusAnuncio.DISPONIVEL,
       vendedor,
     });
 
-    return this.anunciosRepository.save(anuncio);
+    const anuncioSalvo = await this.anunciosRepository.save(anuncio);
+
+    return this.formatarAnuncio(anuncioSalvo);
   }
 
   async listar(filtros: FilterAnunciosDto) {
@@ -139,6 +141,13 @@ export class AnunciosService {
     }
   }
 
+  private formatarAnuncio(anuncio: Anuncio) {
+    return {
+      ...anuncio,
+      preco: Number(anuncio.preco),
+    };
+  }
+
   async categorias(): Promise<string[]> {
     return Object.values(CategoriaAnuncio);
   }
@@ -158,40 +167,40 @@ export class AnunciosService {
   }
 
   async buscarPorId(id: number) {
-    const anuncio = await this.criarConsulta()
-      .where('anuncio.id = :id', { id })
-      .getOne();
+  const anuncio = await this.criarConsulta()
+    .where('anuncio.id = :id', { id })
+    .getOne();
 
-    if (!anuncio) {
-      throw new NotFoundException('Anúncio não encontrado.');
-    }
-
-    const vinculo = await this.vinculosRepository.findOne({
-      where: {
-        usuario: { id: anuncio.vendedor.id },
-      },
-      relations: {
-        unidade: true,
-      },
-      order: {
-        id: 'ASC',
-      },
-    });
-
-    return {
-      ...this.resumoAnuncio(anuncio),
-      vendedor: {
-        id: anuncio.vendedor.id,
-        nome: anuncio.vendedor.nome,
-        unidade: vinculo
-          ? {
-              bloco: vinculo.unidade.bloco,
-              numero: vinculo.unidade.numero,
-            }
-          : null,
-      },
-    };
+  if (!anuncio) {
+    throw new NotFoundException('Anúncio não encontrado.');
   }
+
+  const vinculo = await this.vinculosRepository.findOne({
+    where: {
+      usuario: { id: anuncio.vendedor.id },
+    },
+    relations: {
+      unidade: true,
+    },
+    order: {
+      id: 'ASC',
+    },
+  });
+
+  return {
+    ...this.resumoAnuncio(anuncio),
+    vendedor: {
+      id: anuncio.vendedor.id,
+      nome: anuncio.vendedor.nome,
+      unidade: vinculo
+        ? {
+            bloco: vinculo.unidade.bloco,
+            numero: vinculo.unidade.numero,
+          }
+        : null,
+    },
+  };
+}
 
   async atualizar(
     id: number,
@@ -211,7 +220,7 @@ export class AnunciosService {
     }
 
     if (dto.preco !== undefined) {
-      anuncio.preco = dto.preco.toFixed(2);
+      anuncio.preco = dto.preco;
     }
 
     if (dto.categoria !== undefined) {
@@ -222,7 +231,9 @@ export class AnunciosService {
       anuncio.imagemUrl = dto.imagemUrl;
     }
 
-    return this.anunciosRepository.save(anuncio);
+    const anuncioAtualizado = await this.anunciosRepository.save(anuncio);
+
+    return this.formatarAnuncio(anuncioAtualizado);
   }
 
   async atualizarStatus(
@@ -236,7 +247,9 @@ export class AnunciosService {
 
     anuncio.status = dto.status;
 
-    return this.anunciosRepository.save(anuncio);
+    const anuncioAtualizado = await this.anunciosRepository.save(anuncio);
+
+    return this.formatarAnuncio(anuncioAtualizado);
   }
 
   async remover(

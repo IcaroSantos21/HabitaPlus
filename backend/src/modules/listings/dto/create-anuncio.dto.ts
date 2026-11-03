@@ -1,4 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
@@ -25,7 +26,7 @@ export class CreateAnuncioDto {
   @MaxLength(2000)
   descricao!: string;
 
-  @ApiProperty({ example: 250, minimum: 0.01 })
+  @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
   preco!: number;
