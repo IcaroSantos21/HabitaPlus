@@ -30,14 +30,22 @@ export class TransacaoResponseDto {
   static fromEntity(entity: Transacao): TransacaoResponseDto {
     return {
       id: entity.id,
-      usuarioId: entity.id,
+      usuarioId: entity.usuario.id,
       tipo: entity.tipo,
       categoria: entity.categoria,
       valor: entity.valor,
-      competencia: entity.competencia.toISOString().slice(0, 7),
-      data: entity.data.toISOString().slice(0, 10),
+      competencia: this.formatarData(entity.competencia).slice(0, 7),
+      data: this.formatarData(entity.data),
       descricao: entity.descricao,
     };
+  }
+
+  private static formatarData(data: Date | string): string {
+    if (data instanceof Date) {
+      return data.toISOString().slice(0, 10);
+    }
+
+    return data.slice(0, 10);
   }
 }
 

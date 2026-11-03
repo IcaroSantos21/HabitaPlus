@@ -12,8 +12,8 @@ import { TipoTransacao } from '../../../database/entities/enums';
 export class TransacaoQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ example: '2026-10' })
   @IsOptional()
-  @Matches(/^\d(4)-(0[1-9]|1[0-2])$/, {
-    message: 'A competencia deve estar no formato YYYY-MM.',
+  @Matches(/^\d{4}-(0[1-9]|1[0-2])$/, {
+    message: 'A competência deve estar no formato YYYY-MM.',
   })
   competencia?: string;
 

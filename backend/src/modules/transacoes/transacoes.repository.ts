@@ -49,7 +49,7 @@ export class TransacoesRepository {
       query.andWhere('transacao.tipo = :tipo', { tipo: filtros.tipo });
     }
     if (filtros.categoria) {
-      query.andWhere('LOWER(transacao.categoria) = LOWER(:categoira)', {
+      query.andWhere('LOWER(transacao.categoria) = LOWER(:categoria)', {
         categoria: filtros.categoria,
       });
     }
