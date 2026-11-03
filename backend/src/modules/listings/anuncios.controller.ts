@@ -9,11 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
@@ -32,10 +28,7 @@ export class AnunciosController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um anúncio' })
-  criar(
-    @Body() dto: CreateAnuncioDto,
-    @CurrentUser() usuario: AuthUserDto,
-  ) {
+  criar(@Body() dto: CreateAnuncioDto, @CurrentUser() usuario: AuthUserDto) {
     return this.anunciosService.criar(dto, usuario);
   }
 

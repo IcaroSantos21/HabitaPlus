@@ -10,10 +10,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Anuncio } from '../../database/entities/anuncio.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { Vinculo } from '../../database/entities/vinculo.entity';
-import {
-  CategoriaAnuncio,
-  StatusAnuncio,
-} from '../../database/entities/enums';
+import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
 
 import { CreateAnuncioDto } from './dto/create-anuncio.dto';
 import { UpdateAnuncioDto } from './dto/update-anuncio.dto';
@@ -40,10 +37,7 @@ export class AnunciosService {
       .leftJoinAndSelect('anuncio.vendedor', 'vendedor');
   }
 
-  async criar(
-    dto: CreateAnuncioDto,
-    usuario: AuthUserDto,
-  ): Promise<Anuncio> {
+  async criar(dto: CreateAnuncioDto, usuario: AuthUserDto): Promise<Anuncio> {
     const vendedor = await this.usuariosRepository.findOneBy({
       id: usuario.id,
     });
@@ -148,7 +142,7 @@ export class AnunciosService {
     };
   }
 
-  async categorias(): Promise<string[]> {
+  categorias(): string[] {
     return Object.values(CategoriaAnuncio);
   }
 
@@ -159,48 +153,46 @@ export class AnunciosService {
       usuarioId: usuario.id,
     });
 
-    const anuncios = await consulta
-      .orderBy('anuncio.id', 'DESC')
-      .getMany();
+    const anuncios = await consulta.orderBy('anuncio.id', 'DESC').getMany();
 
     return anuncios.map((anuncio) => this.resumoAnuncio(anuncio));
   }
 
   async buscarPorId(id: number) {
-  const anuncio = await this.criarConsulta()
-    .where('anuncio.id = :id', { id })
-    .getOne();
+    const anuncio = await this.criarConsulta()
+      .where('anuncio.id = :id', { id })
+      .getOne();
 
-  if (!anuncio) {
-    throw new NotFoundException('Anúncio não encontrado.');
+    if (!anuncio) {
+      throw new NotFoundException('Anúncio não encontrado.');
+    }
+
+    const vinculo = await this.vinculosRepository.findOne({
+      where: {
+        usuario: { id: anuncio.vendedor.id },
+      },
+      relations: {
+        unidade: true,
+      },
+      order: {
+        id: 'ASC',
+      },
+    });
+
+    return {
+      ...this.resumoAnuncio(anuncio),
+      vendedor: {
+        id: anuncio.vendedor.id,
+        nome: anuncio.vendedor.nome,
+        unidade: vinculo
+          ? {
+              bloco: vinculo.unidade.bloco,
+              numero: vinculo.unidade.numero,
+            }
+          : null,
+      },
+    };
   }
-
-  const vinculo = await this.vinculosRepository.findOne({
-    where: {
-      usuario: { id: anuncio.vendedor.id },
-    },
-    relations: {
-      unidade: true,
-    },
-    order: {
-      id: 'ASC',
-    },
-  });
-
-  return {
-    ...this.resumoAnuncio(anuncio),
-    vendedor: {
-      id: anuncio.vendedor.id,
-      nome: anuncio.vendedor.nome,
-      unidade: vinculo
-        ? {
-            bloco: vinculo.unidade.bloco,
-            numero: vinculo.unidade.numero,
-          }
-        : null,
-    },
-  };
-}
 
   async atualizar(
     id: number,
@@ -280,10 +272,7 @@ export class AnunciosService {
     return anuncio;
   }
 
-  private verificarProprietario(
-    anuncio: Anuncio,
-    usuario: AuthUserDto,
-  ): void {
+  private verificarProprietario(anuncio: Anuncio, usuario: AuthUserDto): void {
     if (anuncio.vendedor.id !== usuario.id) {
       throw new ForbiddenException(
         'Você não tem permissão para modificar este anúncio.',

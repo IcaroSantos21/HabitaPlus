@@ -9,13 +9,7 @@ import { AnunciosController } from './anuncios.controller';
 import { AnunciosService } from './anuncios.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Anuncio,
-      Usuario,
-      Vinculo,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Anuncio, Usuario, Vinculo])],
   controllers: [AnunciosController],
   providers: [AnunciosService],
   exports: [AnunciosService],
