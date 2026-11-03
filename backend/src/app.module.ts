@@ -7,8 +7,11 @@ import { HealthModule } from './modules/health/health.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
+import { UnitsModule } from './modules/units/units.module';
+import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
+import { TransacoesModule } from './modules/transacoes/transacoes.module';
 
 @Module({
   imports: [
@@ -39,8 +42,11 @@ import { AnunciosModule } from './modules/listings/anuncios.module';
     HealthModule,
     AuthModule,
     AccessTestModule,
+    UnitsModule,
+    RentalsModule,
     ChamadosModule,
     AnunciosModule,
+    TransacoesModule,
   ],
 })
 export class AppModule {}

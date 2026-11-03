@@ -8,6 +8,7 @@ import {
 
 import { Usuario } from './usuario.entity';
 import { TipoTransacao } from './enums';
+import { DecimalTransformer } from '../../common/transformers/decimal.transformer';
 
 @Entity('transacoes')
 // Representa uma receita ou despesa registrada por um usuário.
@@ -29,8 +30,9 @@ export class Transacao {
   categoria!: string;
 
   @Column('decimal', {
-    precision: 10,
+    precision: 12,
     scale: 2,
+    transformer: DecimalTransformer,
   })
   valor!: number;
 
