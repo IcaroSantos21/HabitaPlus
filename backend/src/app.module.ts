@@ -10,6 +10,7 @@ import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
 import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
+import { AnunciosModule } from './modules/listings/anuncios.module';
 import { TransacoesModule } from './modules/transacoes/transacoes.module';
 
 @Module({
@@ -44,6 +45,7 @@ import { TransacoesModule } from './modules/transacoes/transacoes.module';
     UnitsModule,
     RentalsModule,
     ChamadosModule,
+    AnunciosModule,
     TransacoesModule,
   ],
 })

@@ -43,3 +43,11 @@ export enum StatusChamado {
   EM_ANDAMENTO = 'EM_ANDAMENTO',
   ENCERRADO = 'ENCERRADO',
 }
+
+export enum CategoriaAnuncio {
+  MOVEIS = 'MOVEIS',
+  ELETRONICOS = 'ELETRONICOS',
+  UTENSILIOS = 'UTENSILIOS',
+  ESPORTE = 'ESPORTE',
+  OUTROS = 'OUTROS',
+}
