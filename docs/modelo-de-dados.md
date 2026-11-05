@@ -148,6 +148,19 @@ Status:
 - PAGA
 - ATRASADA
 
+Regras:
+
+- Existe no máximo uma cobrança por `unidade` + `competencia` (índice único
+  `UQ_cobrancas_unidade_competencia`). É isso que torna a geração mensal
+  idempotente.
+- `competencia` guarda o primeiro dia do mês (`2026-11-01`); a API a expõe como
+  `YYYY-MM`.
+- `valor` deve ser maior que zero (`CHK_cobrancas_valor_positivo`).
+- Quando a cobrança é paga, uma `Transacao` do tipo `RECEITA` é criada na mesma
+  operação, com categoria `taxa condominial`, a mesma `competencia` da cobrança
+  e `data` igual ao dia do pagamento. O resumo mensal de `/api/transactions`
+  passa a incluir essa receita sem nenhuma soma extra.
+
 ---
 
 ### Anuncio
