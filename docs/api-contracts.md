@@ -154,6 +154,37 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
   }
 }
 
+# Cobranças condominiais (implementado no backend)
+
+  # Método   Rota                                   Acesso                    Finalidade
+    POST     /api/charges/generate?competencia=YYYY-MM   Síndico e administrador   Gerar 1 cobrança por unidade ocupada (idempotente)
+    GET      /api/charges                           Autenticado               Síndico/admin: todas; morador: só as das suas unidades
+    GET      /api/charges/me                        Autenticado               Cobranças das unidades do usuário logado
+
+# Exemplo de resposta da geração (201)
+
+    {
+  "competencia": "2026-11",
+  "vencimento": "2026-11-10",
+  "valor": 650,
+  "totalUnidadesOcupadas": 120,
+  "criadas": 118,
+  "jaExistentes": 2
+}
+
+# Exemplo de item da listagem (200, dentro de data[])
+
+    {
+  "id": 10,
+  "unidade": { "id": 5, "bloco": "B", "numero": "302" },
+  "competencia": "2026-11",
+  "valor": 650,
+  "vencimento": "2026-11-10",
+  "status": "PENDENTE"
+}
+
+Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), unidadeId, pagina e limite.
+
 # Anúncios, mensagens e notificações
 
   # Méto              Rota              	         Acesso                           Finalidade

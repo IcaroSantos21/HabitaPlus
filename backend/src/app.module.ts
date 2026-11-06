@@ -4,6 +4,7 @@ import configuration, { AppConfig } from './config/configuration';
 import { validateEnv } from './config/env.validation';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
@@ -12,6 +13,7 @@ import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
 import { TransacoesModule } from './modules/transacoes/transacoes.module';
+import { CobrancasModule } from './modules/charges/cobrancas.module';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { TransacoesModule } from './modules/transacoes/transacoes.module';
         };
       },
     }),
+    ScheduleModule.forRoot(),
     HealthModule,
     AuthModule,
     AccessTestModule,
@@ -47,6 +50,7 @@ import { TransacoesModule } from './modules/transacoes/transacoes.module';
     ChamadosModule,
     AnunciosModule,
     TransacoesModule,
+    CobrancasModule,
   ],
 })
 export class AppModule {}
