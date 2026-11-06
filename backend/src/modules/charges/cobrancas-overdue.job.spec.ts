@@ -10,9 +10,7 @@ import { Cobrancas } from './cobrancas.service';
 
 describe('ChargesOverdueJob', () => {
   const chargesService = { markOverdue: jest.fn() };
-  const job = new ChargesOverdueJob(
-    chargesService as unknown as Cobrancas,
-  );
+  const job = new ChargesOverdueJob(chargesService as unknown as Cobrancas);
 
   let erroSpy: jest.SpyInstance;
 
