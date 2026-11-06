@@ -35,7 +35,7 @@ export interface ParametrosPagamento {
 }
 
 @Injectable()
-export class ChargesRepository {
+export class CobrancasRepository {
   constructor(
     @InjectRepository(Cobranca)
     private readonly repository: Repository<Cobranca>,

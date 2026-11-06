@@ -3,7 +3,7 @@ import { StatusCobranca } from '../../../database/entities/enums';
 import { Cobranca } from '../../../database/entities/cobranca.entity';
 import { PaginationMetaDto } from '../../../common/dto/paginated-response.dto';
 
-export class ChargeUnitDto {
+export class UnidadeCobrancaDto {
   @ApiProperty()
   id!: number;
 
@@ -14,12 +14,12 @@ export class ChargeUnitDto {
   numero!: string;
 }
 
-export class ChargeResponseDto {
+export class CobrancaResponseDto {
   @ApiProperty()
   id!: number;
 
-  @ApiProperty({ type: ChargeUnitDto })
-  unidade!: ChargeUnitDto;
+  @ApiProperty({ type: UnidadeCobrancaDto })
+  unidade!: UnidadeCobrancaDto;
 
   @ApiProperty({ example: '2026-11' })
   competencia!: string;
@@ -34,7 +34,7 @@ export class ChargeResponseDto {
   status!: StatusCobranca;
 
   // stripeSessionId fica de fora: é detalhe interno da integração de pagamento.
-  static fromEntity(entity: Cobranca): ChargeResponseDto {
+  static fromEntity(entity: Cobranca): CobrancaResponseDto {
     return {
       id: entity.id,
       unidade: {
@@ -42,12 +42,12 @@ export class ChargeResponseDto {
         bloco: entity.unidade.bloco,
         numero: entity.unidade.numero,
       },
-      competencia: ChargeResponseDto.formatarData(entity.competencia).slice(
+      competencia: CobrancaResponseDto.formatarData(entity.competencia).slice(
         0,
         7,
       ),
       valor: entity.valor,
-      vencimento: ChargeResponseDto.formatarData(entity.vencimento),
+      vencimento: CobrancaResponseDto.formatarData(entity.vencimento),
       status: entity.status,
     };
   }
@@ -59,15 +59,15 @@ export class ChargeResponseDto {
   }
 }
 
-export class PaginatedChargesResponseDto {
-  @ApiProperty({ type: [ChargeResponseDto] })
-  data!: ChargeResponseDto[];
+export class CobrancasPaginadasResponseDto {
+  @ApiProperty({ type: [CobrancaResponseDto] })
+  data!: CobrancaResponseDto[];
 
   @ApiProperty({ type: PaginationMetaDto })
   meta!: PaginationMetaDto;
 }
 
-export class GenerateChargesResponseDto {
+export class GerarCobrancasResponseDto {
   @ApiProperty({ example: '2026-11' })
   competencia!: string;
 

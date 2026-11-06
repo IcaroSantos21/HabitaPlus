@@ -7,11 +7,11 @@ import {
 import { AppConfig } from '../../config/configuration';
 import { PerfilUsuario } from '../../database/entities/enums';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import { ChargesRepository } from './cobrancas.repository';
-import { ChargeFiltersDto } from './dto/cobranca-filters.dto';
+import { CobrancasRepository } from './cobrancas.repository';
+import { FiltrosCobrancaDto } from './dto/filtros-cobranca.dto';
 import {
-  ChargeResponseDto,
-  GenerateChargesResponseDto,
+  CobrancaResponseDto,
+  GerarCobrancasResponseDto,
 } from './dto/cobranca-response.dto';
 import {
   dataDeHoje,
@@ -20,15 +20,15 @@ import {
 } from './utils/datas';
 
 @Injectable()
-export class Cobrancas {
-  private readonly logger = new Logger(Cobrancas.name);
+export class CobrancasService {
+  private readonly logger = new Logger(CobrancasService.name);
 
   constructor(
-    private readonly cobrancasRepository: ChargesRepository,
+    private readonly cobrancasRepository: CobrancasRepository,
     private readonly config: ConfigService<AppConfig, true>,
   ) {}
 
-  async generate(competencia: string): Promise<GenerateChargesResponseDto> {
+  async gerar(competencia: string): Promise<GerarCobrancasResponseDto> {
     const { valorPadrao, diaVencimento } = this.config.get('charges', {
       infer: true,
     });
@@ -51,23 +51,23 @@ export class Cobrancas {
     };
   }
 
-  findAll(
-    filtros: ChargeFiltersDto,
+  buscarTodas(
+    filtros: FiltrosCobrancaDto,
     user: AuthUserDto,
-  ): Promise<PaginatedResponseDto<ChargeResponseDto>> {
+  ): Promise<PaginatedResponseDto<CobrancaResponseDto>> {
     // Só síndico/admin veem tudo; morador enxerga apenas as suas unidades.
-    return this.list(filtros, this.isManager(user) ? undefined : user.id);
+    return this.listar(filtros, this.ehGestor(user) ? undefined : user.id);
   }
 
-  findMine(
-    filtros: ChargeFiltersDto,
+  buscarMinhas(
+    filtros: FiltrosCobrancaDto,
     user: AuthUserDto,
-  ): Promise<PaginatedResponseDto<ChargeResponseDto>> {
-    return this.list(filtros, user.id);
+  ): Promise<PaginatedResponseDto<CobrancaResponseDto>> {
+    return this.listar(filtros, user.id);
   }
 
   // Chamado pelo job diário. Recebe o instante atual para poder ser simulado em testes.
-  async markOverdue(agora: Date = new Date()): Promise<number> {
+  async marcarComoAtrasado(agora: Date = new Date()): Promise<number> {
     const hoje = dataDeHoje(agora);
     const total = await this.cobrancasRepository.markOverdue(hoje);
     this.logger.log(`Cobranças marcadas como ATRASADA em ${hoje}: ${total}`);
@@ -76,11 +76,11 @@ export class Cobrancas {
 
   // Ponto de entrada interno (sem rota HTTP) para o módulo de pagamentos/webhook.
   // Idempotente: pagar uma cobrança já paga não cria uma segunda receita.
-  async registerPayment(
+  async registrarPagamento(
     cobrancaId: number,
     usuarioId: number,
     agora: Date = new Date(),
-  ): Promise<ChargeResponseDto> {
+  ): Promise<CobrancaResponseDto> {
     await this.cobrancasRepository.markAsPaid({
       cobrancaId,
       usuarioId,
@@ -91,13 +91,13 @@ export class Cobrancas {
     if (!cobranca) {
       throw new NotFoundException('Cobrança não encontrada.');
     }
-    return ChargeResponseDto.fromEntity(cobranca);
+    return CobrancaResponseDto.fromEntity(cobranca);
   }
 
-  private async list(
-    filtros: ChargeFiltersDto,
+  private async listar(
+    filtros: FiltrosCobrancaDto,
     moradorId?: number,
-  ): Promise<PaginatedResponseDto<ChargeResponseDto>> {
+  ): Promise<PaginatedResponseDto<CobrancaResponseDto>> {
     const { items, total } = await this.cobrancasRepository.findPaginated({
       competencia: filtros.competencia,
       status: filtros.status,
@@ -107,14 +107,14 @@ export class Cobrancas {
       limite: filtros.limite,
     });
     return paginate(
-      items.map((item) => ChargeResponseDto.fromEntity(item)),
+      items.map((item) => CobrancaResponseDto.fromEntity(item)),
       total,
       filtros.pagina,
       filtros.limite,
     );
   }
 
-  private isManager(user: AuthUserDto): boolean {
+  private ehGestor(user: AuthUserDto): boolean {
     return (
       user.perfil === PerfilUsuario.SINDICO ||
       user.perfil === PerfilUsuario.ADMIN

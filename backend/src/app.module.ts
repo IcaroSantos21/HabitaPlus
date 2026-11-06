@@ -13,7 +13,7 @@ import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
 import { TransacoesModule } from './modules/transacoes/transacoes.module';
-import { ChargesModule } from './modules/charges/cobrancas.module';
+import { CobrancasModule } from './modules/charges/cobrancas.module';
 
 @Module({
   imports: [
@@ -50,7 +50,7 @@ import { ChargesModule } from './modules/charges/cobrancas.module';
     ChamadosModule,
     AnunciosModule,
     TransacoesModule,
-    ChargesModule,
+    CobrancasModule,
   ],
 })
 export class AppModule {}

@@ -13,33 +13,33 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { PerfilUsuario } from '../../database/entities/enums';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import { Cobrancas } from './cobrancas.service';
-import { ChargeFiltersDto } from './dto/cobranca-filters.dto';
+import { CobrancasService } from './cobrancas.service';
+import { FiltrosCobrancaDto } from './dto/filtros-cobranca.dto';
 import {
-  GenerateChargesResponseDto,
-  PaginatedChargesResponseDto,
+  GerarCobrancasResponseDto,
+  CobrancasPaginadasResponseDto,
 } from './dto/cobranca-response.dto';
-import { GenerateChargesQueryDto } from './dto/gerar-cobranca-query.dto';
+import { GerarCobrancasQueryDto } from './dto/gerar-cobrancas-query.dto';
 
 @ApiTags('charges')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Autenticação necessária' })
 @Controller('charges')
 export class ChargesController {
-  constructor(private readonly chargesService: Cobrancas) {}
+  constructor(private readonly cobrancasService: CobrancasService) {}
 
   @Post('generate')
   @Roles(PerfilUsuario.SINDICO, PerfilUsuario.ADMIN)
   @ApiOperation({
     summary: 'Gera 1 cobrança por unidade ocupada na competência (idempotente)',
   })
-  @ApiCreatedResponse({ type: GenerateChargesResponseDto })
+  @ApiCreatedResponse({ type: GerarCobrancasResponseDto })
   @ApiBadRequestResponse({ description: 'Competência ausente ou inválida' })
   @ApiForbiddenResponse({ description: 'Apenas síndico ou administrador' })
   generate(
-    @Query() query: GenerateChargesQueryDto,
-  ): Promise<GenerateChargesResponseDto> {
-    return this.chargesService.generate(query.competencia);
+    @Query() query: GerarCobrancasQueryDto,
+  ): Promise<GerarCobrancasResponseDto> {
+    return this.cobrancasService.gerar(query.competencia);
   }
 
   @Get()
@@ -47,23 +47,23 @@ export class ChargesController {
     summary:
       'Lista cobranças (síndico/admin: todas; morador: só as das suas unidades)',
   })
-  @ApiOkResponse({ type: PaginatedChargesResponseDto })
+  @ApiOkResponse({ type: CobrancasPaginadasResponseDto })
   findAll(
-    @Query() filtros: ChargeFiltersDto,
+    @Query() filtros: FiltrosCobrancaDto,
     @CurrentUser() user: AuthUserDto,
-  ): Promise<PaginatedChargesResponseDto> {
-    return this.chargesService.findAll(filtros, user);
+  ): Promise<CobrancasPaginadasResponseDto> {
+    return this.cobrancasService.buscarTodas(filtros, user);
   }
 
   @Get('me')
   @ApiOperation({
     summary: 'Lista as cobranças das unidades do usuário logado',
   })
-  @ApiOkResponse({ type: PaginatedChargesResponseDto })
+  @ApiOkResponse({ type: CobrancasPaginadasResponseDto })
   findMine(
-    @Query() filtros: ChargeFiltersDto,
+    @Query() filtros: FiltrosCobrancaDto,
     @CurrentUser() user: AuthUserDto,
-  ): Promise<PaginatedChargesResponseDto> {
-    return this.chargesService.findMine(filtros, user);
+  ): Promise<CobrancasPaginadasResponseDto> {
+    return this.cobrancasService.buscarMinhas(filtros, user);
   }
 }

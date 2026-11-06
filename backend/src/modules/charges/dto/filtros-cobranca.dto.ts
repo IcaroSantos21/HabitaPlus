@@ -4,7 +4,7 @@ import { IsEnum, IsInt, IsOptional, Matches, Min } from 'class-validator';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 import { StatusCobranca } from '../../../database/entities/enums';
 
-export class ChargeFiltersDto extends PaginationQueryDto {
+export class FiltrosCobrancaDto extends PaginationQueryDto {
   @ApiPropertyOptional({ example: '2026-11' })
   @IsOptional()
   @Matches(/^\d{4}-(0[1-9]|1[0-2])$/, {

@@ -6,12 +6,12 @@ import { PerfilUsuario, StatusCobranca } from '../../database/entities/enums';
 import { Unidade } from '../../database/entities/unidade.entity';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
 import {
-  ChargesRepository,
+  CobrancasRepository,
   ParametrosGeracao,
   ResultadoGeracao,
 } from './cobrancas.repository';
-import { Cobrancas } from './cobrancas.service';
-import { ChargeFiltersDto } from './dto/cobranca-filters.dto';
+import { CobrancasService } from './cobrancas.service';
+import { FiltrosCobrancaDto } from './dto/filtros-cobranca.dto';
 
 const morador: AuthUserDto = {
   id: 1,
@@ -39,8 +39,10 @@ function criarCobranca(overrides: Partial<Cobranca> = {}): Cobranca {
   };
 }
 
-function filtros(overrides: Partial<ChargeFiltersDto> = {}): ChargeFiltersDto {
-  return Object.assign(new ChargeFiltersDto(), overrides);
+function filtros(
+  overrides: Partial<FiltrosCobrancaDto> = {},
+): FiltrosCobrancaDto {
+  return Object.assign(new FiltrosCobrancaDto(), overrides);
 }
 
 // Repositório em memória que reproduz a regra do índice único do banco
@@ -77,10 +79,10 @@ describe('ChargesService', () => {
     get: jest.fn(),
   } as unknown as ConfigService<AppConfig, true>;
 
-  const criarService = (repo: unknown = repository): Cobrancas =>
-    new Cobrancas(repo as ChargesRepository, config);
+  const criarService = (repo: unknown = repository): CobrancasService =>
+    new CobrancasService(repo as CobrancasRepository, config);
 
-  let service: Cobrancas;
+  let service: CobrancasService;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -99,7 +101,7 @@ describe('ChargesService', () => {
         criadas: 118,
       });
 
-      const resultado = await service.generate('2026-11');
+      const resultado = await service.gerar('2026-11');
 
       expect(repository.generateForOccupiedUnits).toHaveBeenCalledWith({
         competencia: '2026-11-01',
@@ -122,7 +124,7 @@ describe('ChargesService', () => {
         criadas: 0,
       });
 
-      await expect(service.generate('2026-11')).resolves.toMatchObject({
+      await expect(service.gerar('2026-11')).resolves.toMatchObject({
         totalUnidadesOcupadas: 0,
         criadas: 0,
         jaExistentes: 0,
@@ -133,9 +135,9 @@ describe('ChargesService', () => {
       const memoria = new RepositorioEmMemoria([1, 2, 3]);
       const comMemoria = criarService(memoria);
 
-      const primeira = await comMemoria.generate('2026-11');
-      const segunda = await comMemoria.generate('2026-11');
-      const terceira = await comMemoria.generate('2026-11');
+      const primeira = await comMemoria.gerar('2026-11');
+      const segunda = await comMemoria.gerar('2026-11');
+      const terceira = await comMemoria.gerar('2026-11');
 
       expect(primeira).toMatchObject({ criadas: 3, jaExistentes: 0 });
       expect(segunda).toMatchObject({ criadas: 0, jaExistentes: 3 });
@@ -147,8 +149,8 @@ describe('ChargesService', () => {
       const memoria = new RepositorioEmMemoria([1, 2]);
       const comMemoria = criarService(memoria);
 
-      await comMemoria.generate('2026-11');
-      const dezembro = await comMemoria.generate('2026-12');
+      await comMemoria.gerar('2026-11');
+      const dezembro = await comMemoria.gerar('2026-12');
 
       expect(dezembro).toMatchObject({ criadas: 2, jaExistentes: 0 });
       expect(memoria.cobrancas.size).toBe(4);
@@ -164,7 +166,7 @@ describe('ChargesService', () => {
         criadas: 1,
       });
 
-      await service.generate('2027-02');
+      await service.gerar('2027-02');
 
       expect(repository.generateForOccupiedUnits).toHaveBeenCalledWith({
         competencia: '2027-02-01',
@@ -176,8 +178,8 @@ describe('ChargesService', () => {
 
   describe('listagem', () => {
     it('síndico e admin veem todas as cobranças (sem filtro de morador)', async () => {
-      await service.findAll(filtros(), sindico);
-      await service.findAll(filtros(), admin);
+      await service.buscarTodas(filtros(), sindico);
+      await service.buscarTodas(filtros(), admin);
 
       expect(repository.findPaginated).toHaveBeenNthCalledWith(
         1,
@@ -190,7 +192,7 @@ describe('ChargesService', () => {
     });
 
     it('morador só vê as cobranças das suas unidades', async () => {
-      await service.findAll(filtros(), morador);
+      await service.buscarTodas(filtros(), morador);
 
       expect(repository.findPaginated).toHaveBeenCalledWith(
         expect.objectContaining({ moradorId: morador.id }),
@@ -198,7 +200,7 @@ describe('ChargesService', () => {
     });
 
     it('/me sempre restringe ao usuário logado, mesmo para síndico', async () => {
-      await service.findMine(filtros(), sindico);
+      await service.buscarMinhas(filtros(), sindico);
 
       expect(repository.findPaginated).toHaveBeenCalledWith(
         expect.objectContaining({ moradorId: sindico.id }),
@@ -206,7 +208,7 @@ describe('ChargesService', () => {
     });
 
     it('deve repassar os filtros e a paginação ao repositório', async () => {
-      await service.findAll(
+      await service.buscarTodas(
         filtros({
           competencia: '2026-11',
           status: StatusCobranca.ATRASADA,
@@ -233,7 +235,7 @@ describe('ChargesService', () => {
         total: 21,
       });
 
-      const resposta = await service.findAll(
+      const resposta = await service.buscarTodas(
         filtros({ pagina: 2, limite: 20 }),
         sindico,
       );
@@ -278,7 +280,7 @@ describe('ChargesService', () => {
     ])('%s', async (_descricao, agora, hojeEsperado) => {
       repository.markOverdue.mockResolvedValue(4);
 
-      const total = await service.markOverdue(new Date(agora));
+      const total = await service.marcarComoAtrasado(new Date(agora));
 
       expect(repository.markOverdue).toHaveBeenCalledWith(hojeEsperado);
       expect(total).toBe(4);
@@ -288,7 +290,7 @@ describe('ChargesService', () => {
       jest.useFakeTimers().setSystemTime(new Date('2026-11-11T15:00:00Z'));
       repository.markOverdue.mockResolvedValue(0);
 
-      await service.markOverdue();
+      await service.marcarComoAtrasado();
 
       expect(repository.markOverdue).toHaveBeenCalledWith('2026-11-11');
       jest.useRealTimers();
@@ -298,8 +300,8 @@ describe('ChargesService', () => {
       repository.markOverdue.mockResolvedValueOnce(3).mockResolvedValueOnce(0);
 
       const agora = new Date('2026-11-11T12:00:00Z');
-      expect(await service.markOverdue(agora)).toBe(3);
-      expect(await service.markOverdue(agora)).toBe(0);
+      expect(await service.marcarComoAtrasado(agora)).toBe(3);
+      expect(await service.marcarComoAtrasado(agora)).toBe(0);
     });
   });
 
@@ -310,7 +312,7 @@ describe('ChargesService', () => {
         criarCobranca({ status: StatusCobranca.PAGA }),
       );
 
-      const resposta = await service.registerPayment(
+      const resposta = await service.registrarPagamento(
         10,
         1,
         new Date('2026-11-12T02:30:00Z'),
@@ -330,7 +332,7 @@ describe('ChargesService', () => {
         criarCobranca({ status: StatusCobranca.PAGA }),
       );
 
-      await expect(service.registerPayment(10, 1)).resolves.toMatchObject({
+      await expect(service.registrarPagamento(10, 1)).resolves.toMatchObject({
         id: 10,
         status: StatusCobranca.PAGA,
       });
@@ -340,7 +342,7 @@ describe('ChargesService', () => {
       repository.markAsPaid.mockResolvedValue(false);
       repository.findOneWithUnit.mockResolvedValue(null);
 
-      await expect(service.registerPayment(99, 1)).rejects.toThrow(
+      await expect(service.registrarPagamento(99, 1)).rejects.toThrow(
         new NotFoundException('Cobrança não encontrada.'),
       );
     });

@@ -16,8 +16,8 @@ import { Usuario } from '../src/database/entities/usuario.entity';
 import { AuthService } from '../src/modules/auth/auth.service';
 import { JwtStrategy } from '../src/modules/auth/jwt.strategy';
 import { ChargesController } from '../src/modules/charges/cobrancas.controller';
-import { ChargesRepository } from '../src/modules/charges/cobrancas.repository';
-import { Cobrancas } from '../src/modules/charges/cobrancas.service';
+import { CobrancasRepository } from '../src/modules/charges/cobrancas.repository';
+import { CobrancasService } from '../src/modules/charges/cobrancas.service';
 
 describe('Charges endpoints (e2e)', () => {
   interface ErrorBody {
@@ -83,7 +83,7 @@ describe('Charges endpoints (e2e)', () => {
       ],
       controllers: [ChargesController],
       providers: [
-        Cobrancas,
+        CobrancasService,
         AuthService,
         JwtStrategy,
         JwtAuthGuard,
@@ -99,7 +99,7 @@ describe('Charges endpoints (e2e)', () => {
               Promise.resolve(usuarios.get(id) ?? null),
           },
         },
-        { provide: ChargesRepository, useValue: chargesRepository },
+        { provide: CobrancasRepository, useValue: chargesRepository },
       ],
     }).compile();
 

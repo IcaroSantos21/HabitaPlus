@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Cobrancas } from './cobrancas.service';
+import { CobrancasService } from './cobrancas.service';
 import { FUSO_DO_CONDOMINIO } from './utils/datas';
 
 @Injectable()
-export class ChargesOverdueJob {
-  private readonly logger = new Logger(ChargesOverdueJob.name);
+export class CobrancasAtrasadasJob {
+  private readonly logger = new Logger(CobrancasAtrasadasJob.name);
 
-  constructor(private readonly chargesService: Cobrancas) {}
+  constructor(private readonly cobrancasService: CobrancasService) {}
 
   // 01:00 de Brasília: o dia do vencimento já terminou para todo mundo.
   @Cron(CronExpression.EVERY_DAY_AT_1AM, {
@@ -16,7 +16,7 @@ export class ChargesOverdueJob {
   })
   async run(): Promise<void> {
     try {
-      await this.chargesService.markOverdue();
+      await this.cobrancasService.marcarComoAtrasado();
     } catch (error) {
       // Falha do job não pode derrubar a API; a próxima execução refaz tudo.
       this.logger.error(
