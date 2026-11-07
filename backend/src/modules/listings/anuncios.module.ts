@@ -8,8 +8,11 @@ import { Vinculo } from '../../database/entities/vinculo.entity';
 import { AnunciosController } from './anuncios.controller';
 import { AnunciosService } from './anuncios.service';
 
+import { NotificationsModule } from '../notifications/notifications.module';
+
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Anuncio, Usuario, Vinculo])],
+  imports: [TypeOrmModule.forFeature([Anuncio, Usuario, Vinculo]), NotificationsModule],
   controllers: [AnunciosController],
   providers: [AnunciosService],
   exports: [AnunciosService],
