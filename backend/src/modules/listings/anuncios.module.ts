@@ -10,9 +10,11 @@ import { AnunciosService } from './anuncios.service';
 
 import { NotificationsModule } from '../notifications/notifications.module';
 
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Anuncio, Usuario, Vinculo]), NotificationsModule],
+  imports: [
+    TypeOrmModule.forFeature([Anuncio, Usuario, Vinculo]),
+    NotificationsModule,
+  ],
   controllers: [AnunciosController],
   providers: [AnunciosService],
   exports: [AnunciosService],

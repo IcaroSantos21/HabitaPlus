@@ -82,7 +82,9 @@ export class NotificationsService {
   }
 
   // Usa o mesmo filtro da listagem com apenasNaoLidas, então os números sempre batem.
-  async contarNaoLidas(usuario: AuthUserDto): Promise<ContagemNaoLidasResponseDto> {
+  async contarNaoLidas(
+    usuario: AuthUserDto,
+  ): Promise<ContagemNaoLidasResponseDto> {
     const naoLidas = await this.repository.count({
       where: { usuario: { id: usuario.id }, lida: false },
     });

@@ -52,6 +52,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     AnunciosModule,
     TransacoesModule,
     CobrancasModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

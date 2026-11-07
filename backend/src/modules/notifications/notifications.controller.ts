@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -37,7 +44,9 @@ export class NotificationsController {
 
   // Rotas fixas antes da rota com :id.
   @Get('unread-count')
-  @ApiOperation({ summary: 'Conta as notificações não lidas do usuário logado' })
+  @ApiOperation({
+    summary: 'Conta as notificações não lidas do usuário logado',
+  })
   @ApiOkResponse({ type: ContagemNaoLidasResponseDto })
   contarNaoLidas(
     @CurrentUser() usuario: AuthUserDto,
