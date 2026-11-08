@@ -160,6 +160,8 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
     POST     /api/charges/generate?competencia=YYYY-MM   Síndico e administrador   Gerar 1 cobrança por unidade ocupada (idempotente)
     GET      /api/charges                           Autenticado               Síndico/admin: todas; morador: só as das suas unidades
     GET      /api/charges/me                        Autenticado               Cobranças das unidades do usuário logado
+    POST     /api/charges/{id}/checkout             Autenticado               Cria a sessão de pagamento no Stripe e devolve { url } (morador: só as suas)
+    POST     /api/webhooks/stripe                   Público (assinatura)      Recebe checkout.session.completed do Stripe e marca a cobrança como PAGA
 
 # Exemplo de resposta da geração (201)
 
