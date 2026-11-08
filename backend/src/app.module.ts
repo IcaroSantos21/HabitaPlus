@@ -20,6 +20,7 @@ import { CobrancasModule } from './modules/charges/cobrancas.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
 import { FinanceModule } from './modules/finance/finance.module';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { FinanceModule } from './modules/finance/finance.module';
     NotificationsModule,
 
     FinanceModule,
+    MessagesModule,
   ],
 })
 export class AppModule {}
