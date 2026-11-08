@@ -14,6 +14,7 @@ import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
 import { TransacoesModule } from './modules/transacoes/transacoes.module';
 import { CobrancasModule } from './modules/charges/cobrancas.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { CobrancasModule } from './modules/charges/cobrancas.module';
     AnunciosModule,
     TransacoesModule,
     CobrancasModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

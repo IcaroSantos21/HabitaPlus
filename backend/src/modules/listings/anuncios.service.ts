@@ -1,18 +1,26 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Anuncio } from '../../database/entities/anuncio.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { Vinculo } from '../../database/entities/vinculo.entity';
-import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
+import {
+  CategoriaAnuncio,
+  PerfilUsuario,
+  StatusAnuncio,
+} from '../../database/entities/enums';
 
 import { CreateAnuncioDto } from './dto/create-anuncio.dto';
+import { TipoNotificacao } from '../notifications/enums/tipo-notificacao.enum';
+import { NotificationsService } from '../notifications/notifications.service';
 import { UpdateAnuncioDto } from './dto/update-anuncio.dto';
 import { UpdateStatusAnuncioDto } from './dto/update-status-anuncio.dto';
 import { FilterAnunciosDto } from './dto/filter-anuncios.dto';
@@ -20,6 +28,8 @@ import { AuthUserDto } from '../auth/dto/auth-response.dto';
 
 @Injectable()
 export class AnunciosService {
+  private readonly logger = new Logger(AnunciosService.name);
+
   constructor(
     @InjectRepository(Anuncio)
     private readonly anunciosRepository: Repository<Anuncio>,
@@ -29,6 +39,8 @@ export class AnunciosService {
 
     @InjectRepository(Vinculo)
     private readonly vinculosRepository: Repository<Vinculo>,
+
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private criarConsulta(): SelectQueryBuilder<Anuncio> {
@@ -57,8 +69,37 @@ export class AnunciosService {
     });
 
     const anuncioSalvo = await this.anunciosRepository.save(anuncio);
+    await this.notificarMoradores(anuncioSalvo, vendedor);
 
     return this.formatarAnuncio(anuncioSalvo);
+  }
+
+  // Falha ao notificar não pode impedir a criação do anúncio.
+  private async notificarMoradores(
+    anuncio: Anuncio,
+    vendedor: Usuario,
+  ): Promise<void> {
+    try {
+      const moradores = await this.usuariosRepository.find({
+        where: { perfil: PerfilUsuario.MORADOR },
+        select: { id: true },
+      });
+      const destinatarios = moradores
+        .map((morador) => morador.id)
+        .filter((id) => id !== vendedor.id);
+
+      await this.notificationsService.notifyMany(
+        destinatarios,
+        TipoNotificacao.ANUNCIO,
+        `Novo anúncio: ${anuncio.titulo}`,
+        anuncio.id,
+      );
+    } catch (erro) {
+      this.logger.error(
+        `Falha ao notificar moradores do anúncio ${anuncio.id}`,
+        erro,
+      );
+    }
   }
 
   async listar(filtros: FilterAnunciosDto) {
