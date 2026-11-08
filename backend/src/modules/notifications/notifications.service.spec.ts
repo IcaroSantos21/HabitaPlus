@@ -43,10 +43,18 @@ describe('NotificationsService', () => {
     findOne: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
+  const idempotentQueryBuilder = {
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    orIgnore: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue(undefined),
+  };
   let service: NotificationsService;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    repo.createQueryBuilder.mockReturnValue(idempotentQueryBuilder);
     service = new NotificationsService(
       repo as unknown as Repository<Notificacao>,
     );
@@ -71,6 +79,34 @@ describe('NotificationsService', () => {
   it('notifyMany não salva nada quando não há destinatários', async () => {
     await service.notifyMany([], TipoNotificacao.ANUNCIO, 'Olá');
     expect(repo.save).not.toHaveBeenCalled();
+  });
+
+  it('notifyManyOnce ignora a mesma chave e cria entradas por destinatário', async () => {
+    const criadaEm = new Date('2026-11-07T04:05:00.000Z');
+
+    await service.notifyManyOnce(
+      [5, 5, 6],
+      TipoNotificacao.ALERTA,
+      'Alerta diário',
+      'contrato-vencendo:12:2026-11-07',
+      criadaEm,
+      12,
+    );
+
+    expect(idempotentQueryBuilder.values).toHaveBeenCalledWith([
+      expect.objectContaining({
+        usuario: { id: 5 },
+        chaveUnica: 'contrato-vencendo:12:2026-11-07:5',
+        refId: 12,
+        criadaEm,
+      }),
+      expect.objectContaining({
+        usuario: { id: 6 },
+        chaveUnica: 'contrato-vencendo:12:2026-11-07:6',
+      }),
+    ]);
+    expect(idempotentQueryBuilder.orIgnore).toHaveBeenCalledTimes(1);
+    expect(idempotentQueryBuilder.execute).toHaveBeenCalledTimes(1);
   });
 
   it('listar filtra pelo usuário do token e pagina', async () => {

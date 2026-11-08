@@ -1,5 +1,6 @@
 import {
   dataDeHoje,
+  adicionarDias,
   primeiroDiaDaCompetencia,
   vencimentoDaCompetencia,
 } from './datas';
@@ -27,6 +28,12 @@ describe('utils de datas das cobranças', () => {
 
   it('usa o primeiro dia do mês como competência', () => {
     expect(primeiroDiaDaCompetencia('2026-11')).toBe('2026-11-01');
+  });
+
+  it('adiciona dias civis sem depender do fuso do servidor', () => {
+    expect(adicionarDias('2026-11-07', 30)).toBe('2026-12-07');
+    expect(adicionarDias('2026-11-07', 3)).toBe('2026-11-10');
+    expect(adicionarDias('2026-11-07', -89)).toBe('2026-08-10');
   });
 
   it('monta o vencimento com o dia configurado', () => {

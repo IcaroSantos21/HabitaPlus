@@ -58,6 +58,38 @@ export class NotificationsService {
     await this.repository.save(notificacoes, { chunk: 500 });
   }
 
+  async notifyManyOnce(
+    usuarioIds: number[],
+    tipo: TipoNotificacao,
+    texto: string,
+    chaveEvento: string,
+    criadaEm: Date = new Date(),
+    refId?: number,
+  ): Promise<void> {
+    const destinatarios = [...new Set(usuarioIds)];
+    if (destinatarios.length === 0) {
+      return;
+    }
+
+    await this.repository
+      .createQueryBuilder()
+      .insert()
+      .into(Notificacao)
+      .values(
+        destinatarios.map((id) => ({
+          usuario: { id } as Usuario,
+          tipo,
+          texto,
+          refId: refId ?? null,
+          chaveUnica: `${chaveEvento}:${id}`,
+          lida: false,
+          criadaEm,
+        })),
+      )
+      .orIgnore()
+      .execute();
+  }
+
   async listar(
     filtros: FiltrosNotificacaoDto,
     usuario: AuthUserDto,

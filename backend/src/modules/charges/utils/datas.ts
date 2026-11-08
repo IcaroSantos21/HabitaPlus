@@ -15,6 +15,12 @@ export function dataDeHoje(agora: Date): string {
   return formatadorDeData.format(agora);
 }
 
+export function adicionarDias(data: string, dias: number): string {
+  const [ano, mes, dia] = data.split('-').map(Number);
+  const resultado = new Date(Date.UTC(ano, mes - 1, dia + dias));
+  return resultado.toISOString().slice(0, 10);
+}
+
 // '2026-11' -> '2026-11-01' (a coluna `competencia` guarda o primeiro dia do mês).
 export function primeiroDiaDaCompetencia(competencia: string): string {
   return `${competencia}-01`;

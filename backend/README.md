@@ -102,6 +102,11 @@ migration incremental mantém compatibilidade com bancos que já executaram a
 migration inicial anterior. Para listar migrations pendentes no container sem
 aplicá-las, use `docker compose exec backend npm run migration:show:prod`.
 
+As notificações diárias são geradas às 01:05 no horário de Brasília. A migration
+`AdicionarChaveUnicaEmNotificacoes` adiciona a chave que impede duplicidade se
+um job for executado mais de uma vez no mesmo dia; aplique a migration antes
+de iniciar a nova versão do backend.
+
 ## Estrutura
 
 ```
