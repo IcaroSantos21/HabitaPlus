@@ -57,7 +57,7 @@ export class AnunciosController {
   registrarVisualizacao(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() usuario: AuthUserDto,
-) {
+  ) {
     return this.anunciosService.registrarVisualizacao(id, usuario);
   }
 

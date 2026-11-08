@@ -1,12 +1,9 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
   Logger,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,9 +13,7 @@ import { Anuncio } from '../../database/entities/anuncio.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { Vinculo } from '../../database/entities/vinculo.entity';
 import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizacao.entity';
-import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
 
-import { CreateAnuncioDto } from './dto/create-anuncio.dto';
 import {
   CategoriaAnuncio,
   PerfilUsuario,
@@ -26,12 +21,13 @@ import {
 } from '../../database/entities/enums';
 
 import { CreateAnuncioDto } from './dto/create-anuncio.dto';
-import { TipoNotificacao } from '../notifications/enums/tipo-notificacao.enum';
-import { NotificationsService } from '../notifications/notifications.service';
 import { UpdateAnuncioDto } from './dto/update-anuncio.dto';
 import { UpdateStatusAnuncioDto } from './dto/update-status-anuncio.dto';
 import { FilterAnunciosDto } from './dto/filter-anuncios.dto';
+
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
+import { TipoNotificacao } from '../notifications/enums/tipo-notificacao.enum';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class AnunciosService {
@@ -307,12 +303,10 @@ export class AnunciosService {
     return { message: 'Anúncio removido com sucesso.' };
   }
 
-    
   async registrarVisualizacao(
     anuncioId: number,
     usuario: AuthUserDto,
   ): Promise<{ message: string }> {
-
     // Verifica se o anúncio existe.
     const anuncio = await this.anunciosRepository.findOne({
       where: { id: anuncioId },
@@ -354,7 +348,6 @@ export class AnunciosService {
       message: 'Visualização processada com sucesso.',
     };
   }
-
 
   private async buscarAnuncioOuFalhar(id: number): Promise<Anuncio> {
     const anuncio = await this.anunciosRepository.findOne({

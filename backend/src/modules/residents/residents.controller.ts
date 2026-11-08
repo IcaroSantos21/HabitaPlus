@@ -1,4 +1,3 @@
-
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -11,9 +10,7 @@ import { ResidentsService } from './residents.service';
 @ApiBearerAuth()
 @Controller('residents')
 export class ResidentsController {
-  constructor(
-    private readonly residentsService: ResidentsService,
-  ) {}
+  constructor(private readonly residentsService: ResidentsService) {}
 
   @Get('me/interest-profile')
   @ApiOperation({
@@ -23,4 +20,3 @@ export class ResidentsController {
     return this.residentsService.obterPerfilDeInteresse(usuario);
   }
 }
-

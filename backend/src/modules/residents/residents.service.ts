@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +6,18 @@ import { Anuncio } from '../../database/entities/anuncio.entity';
 import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizacao.entity';
 import { Mensagem } from '../../database/entities/mensagem.entity';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
+
+interface ResultadoCategoria {
+  categoria: string;
+  total: string;
+}
+
+interface ResultadoMensagem {
+  anuncioId: number | string;
+  categoria: string;
+  remetenteId: number | string;
+  destinatarioId: number | string;
+}
 
 @Injectable()
 export class ResidentsService {
@@ -41,7 +52,7 @@ export class ResidentsService {
       .addSelect('COUNT(visualizacao.id)', 'total')
       .where('visualizacao.usuarioId = :usuarioId', { usuarioId })
       .groupBy('anuncio.categoria')
-      .getRawMany();
+      .getRawMany<ResultadoCategoria>();
 
     return this.converterResultados(resultados);
   }
@@ -54,7 +65,7 @@ export class ResidentsService {
       .addSelect('COUNT(anuncio.id)', 'total')
       .where('vendedor.id = :usuarioId', { usuarioId })
       .groupBy('anuncio.categoria')
-      .getRawMany();
+      .getRawMany<ResultadoCategoria>();
 
     return this.converterResultados(resultados);
   }
@@ -69,20 +80,20 @@ export class ResidentsService {
       .addSelect('anuncio.categoria', 'categoria')
       .addSelect('remetente.id', 'remetenteId')
       .addSelect('destinatario.id', 'destinatarioId')
-      .where(
-        '(remetente.id = :usuarioId OR destinatario.id = :usuarioId)',
-        { usuarioId },
-      )
-      .getRawMany();
+      .where('(remetente.id = :usuarioId OR destinatario.id = :usuarioId)', {
+        usuarioId,
+      })
+      .getRawMany<ResultadoMensagem>();
 
     const conversasUnicas = new Set<string>();
     const totais: Record<string, number> = {};
 
     for (const mensagem of mensagens) {
+      const remetenteId = Number(mensagem.remetenteId);
+      const destinatarioId = Number(mensagem.destinatarioId);
+
       const outroParticipante =
-        Number(mensagem.remetenteId) === usuarioId
-          ? mensagem.destinatarioId
-          : mensagem.remetenteId;
+        remetenteId === usuarioId ? destinatarioId : remetenteId;
 
       const chave = `${mensagem.anuncioId}-${outroParticipante}`;
 
@@ -98,7 +109,7 @@ export class ResidentsService {
   }
 
   private converterResultados(
-    resultados: Array<{ categoria: string; total: string }>,
+    resultados: ResultadoCategoria[],
   ): Record<string, number> {
     const totais: Record<string, number> = {};
 

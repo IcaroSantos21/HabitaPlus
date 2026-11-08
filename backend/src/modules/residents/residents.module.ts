@@ -9,13 +9,7 @@ import { ResidentsController } from './residents.controller';
 import { ResidentsService } from './residents.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Anuncio,
-      AnuncioVisualizacao,
-      Mensagem,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Anuncio, AnuncioVisualizacao, Mensagem])],
   controllers: [ResidentsController],
   providers: [ResidentsService],
 })
