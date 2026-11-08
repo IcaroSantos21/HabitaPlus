@@ -15,9 +15,11 @@ import { Unidade } from '../src/database/entities/unidade.entity';
 import { Usuario } from '../src/database/entities/usuario.entity';
 import { AuthService } from '../src/modules/auth/auth.service';
 import { JwtStrategy } from '../src/modules/auth/jwt.strategy';
-import { ChargesController } from '../src/modules/charges/cobrancas.controller';
+import { CobrancasCheckoutService } from '../src/modules/charges/cobrancas-checkout.service';
+import { CobrancasController } from '../src/modules/charges/cobrancas.controller';
 import { CobrancasRepository } from '../src/modules/charges/cobrancas.repository';
 import { CobrancasService } from '../src/modules/charges/cobrancas.service';
+import { PAGAMENTO_GATEWAY } from '../src/modules/payments/interfaces/gateway-pagamento.interface';
 
 describe('Charges endpoints (e2e)', () => {
   interface ErrorBody {
@@ -81,9 +83,11 @@ describe('Charges endpoints (e2e)', () => {
           signOptions: { expiresIn: 3600 },
         }),
       ],
-      controllers: [ChargesController],
+      controllers: [CobrancasController],
       providers: [
         CobrancasService,
+        CobrancasCheckoutService,
+        { provide: PAGAMENTO_GATEWAY, useValue: {} },
         AuthService,
         JwtStrategy,
         JwtAuthGuard,

@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  ParseIntPipe,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -20,13 +30,23 @@ import {
   CobrancasPaginadasResponseDto,
 } from './dto/cobranca-response.dto';
 import { GerarCobrancasQueryDto } from './dto/gerar-cobrancas-query.dto';
+import { CobrancasCheckoutService } from './cobrancas-checkout.service';
+import { CheckoutResponseDto } from './dto/checkout-response.dto';
+
+const idPipe = new ParseIntPipe({
+  exceptionFactory: () =>
+    new BadRequestException('O id da cobrança deve ser um número inteiro.'),
+});
 
 @ApiTags('charges')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Autenticação necessária' })
 @Controller('charges')
-export class ChargesController {
-  constructor(private readonly cobrancasService: CobrancasService) {}
+export class CobrancasController {
+  constructor(
+    private readonly cobrancasService: CobrancasService,
+    private readonly cobrancasCheckoutService: CobrancasCheckoutService,
+  ) {}
 
   @Post('generate')
   @Roles(PerfilUsuario.SINDICO, PerfilUsuario.ADMIN)
@@ -65,5 +85,21 @@ export class ChargesController {
     @CurrentUser() user: AuthUserDto,
   ): Promise<CobrancasPaginadasResponseDto> {
     return this.cobrancasService.buscarMinhas(filtros, user);
+  }
+
+  @Post(':id/checkout')
+  @ApiOperation({
+    summary: 'Cria uma sessão de checkout para pagamento da cobrança',
+  })
+  @ApiCreatedResponse({ type: CheckoutResponseDto })
+  @ApiBadRequestResponse({ description: 'Id inválido' })
+  @ApiForbiddenResponse({ description: 'Cobrança de outra unidade' })
+  @ApiNotFoundResponse({ description: 'Cobrança não encontrada' })
+  @ApiConflictResponse({ description: 'Cobrança já paga' })
+  checkout(
+    @Param('id', idPipe) id: number,
+    @CurrentUser() user: AuthUserDto,
+  ): Promise<CheckoutResponseDto> {
+    return this.cobrancasCheckoutService.criarCheckout(id, user);
   }
 }
