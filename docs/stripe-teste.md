@@ -26,8 +26,8 @@ Stripe -> POST /api/webhooks/stripe (checkout.session.completed) -> API marca a 
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 # Opcionais (os valores abaixo são os padrões)
-STRIPE_SUCCESS_URL=http://localhost:5173/pagamento/sucesso
-STRIPE_CANCEL_URL=http://localhost:5173/pagamento/cancelado
+STRIPE_SUCCESS_URL=http://localhost:5173/success
+STRIPE_CANCEL_URL=http://localhost:5173/cancel
 ```
 
 Nunca commite essas chaves. O backend acrescenta `?cobranca=<id>` às duas URLs de retorno.

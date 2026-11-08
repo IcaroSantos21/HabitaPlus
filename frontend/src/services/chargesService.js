@@ -2,22 +2,24 @@ import api from "./api";
 
 const chargesService = {
   async list(params = {}) {
-    const { data } = await api.get("/v1/cobrancas", { params });
+    const { data } = await api.get("/charges", { params });
     return data;
   },
 
-  async get(id) {
-    const { data } = await api.get(`/v1/cobrancas/${id}`);
+  async listMine(params = {}) {
+    const { data } = await api.get("/charges/me", { params });
     return data;
   },
 
-  async create(payload) {
-    const { data } = await api.post("/v1/cobrancas", payload);
+  async generate(competencia) {
+    const { data } = await api.post("/charges/generate", null, {
+      params: { competencia },
+    });
     return data;
   },
 
-  async pay(id, payload = {}) {
-    const { data } = await api.post(`/v1/cobrancas/${id}/pagamentos`, payload);
+  async checkout(id) {
+    const { data } = await api.post(`/charges/${id}/checkout`);
     return data;
   },
 };
