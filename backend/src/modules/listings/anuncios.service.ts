@@ -10,6 +10,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Anuncio } from '../../database/entities/anuncio.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { Vinculo } from '../../database/entities/vinculo.entity';
+import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizacao.entity';
 import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
 
 import { CreateAnuncioDto } from './dto/create-anuncio.dto';
@@ -29,6 +30,9 @@ export class AnunciosService {
 
     @InjectRepository(Vinculo)
     private readonly vinculosRepository: Repository<Vinculo>,
+
+    @InjectRepository(AnuncioVisualizacao)
+    private readonly visualizacoesRepository: Repository<AnuncioVisualizacao>,
   ) {}
 
   private criarConsulta(): SelectQueryBuilder<Anuncio> {
@@ -256,6 +260,55 @@ export class AnunciosService {
 
     return { message: 'Anúncio removido com sucesso.' };
   }
+
+    
+  async registrarVisualizacao(
+    anuncioId: number,
+    usuario: AuthUserDto,
+  ): Promise<{ message: string }> {
+
+    // Verifica se o anúncio existe.
+    const anuncio = await this.anunciosRepository.findOne({
+      where: { id: anuncioId },
+    });
+
+    if (!anuncio) {
+      throw new NotFoundException('Anúncio não encontrado.');
+    }
+
+    // Obtém a data atual no fuso horário do condomínio.
+    const partesData = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+
+    const valores = Object.fromEntries(
+      partesData.map((parte) => [parte.type, parte.value]),
+    );
+
+    const data = `${valores.year}-${valores.month}-${valores.day}`;
+
+    // Tenta registrar a visualização.
+    // A restrição UNIQUE impede duplicações no mesmo dia.
+    await this.visualizacoesRepository
+      .createQueryBuilder()
+      .insert()
+      .into(AnuncioVisualizacao)
+      .values({
+        usuarioId: usuario.id,
+        anuncioId,
+        data,
+      })
+      .orIgnore()
+      .execute();
+
+    return {
+      message: 'Visualização processada com sucesso.',
+    };
+  }
+
 
   private async buscarAnuncioOuFalhar(id: number): Promise<Anuncio> {
     const anuncio = await this.anunciosRepository.findOne({
