@@ -6,10 +6,11 @@ import App from "./App.jsx";
 async function startApplication() {
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCKS === "true") {
     const { worker } = await import("./mocks/browser.js");
+    const { unitRentalHandlers } = await import("./mocks/unitRentalHandlers.js");
+    worker.use(...unitRentalHandlers);
     await worker.start({ onUnhandledRequest: "bypass" });
     console.info("[Habita+] MSW ativado: usando a API simulada.");
   }
-
   createRoot(document.getElementById("root")).render(
     <StrictMode>
       <App />

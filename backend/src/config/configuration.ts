@@ -5,6 +5,10 @@ export interface AppConfig {
   corsOrigin: string;
   jwtSecret: string;
   jwtExpiresInSeconds: number;
+  charges: {
+    valorPadrao: number;
+    diaVencimento: number;
+  };
   database: {
     host: string;
     port: number;
@@ -24,6 +28,10 @@ export default (): AppConfig => ({
     process.env.JWT_EXPIRES_IN_SECONDS ?? '3600',
     10,
   ),
+  charges: {
+    valorPadrao: Number(process.env.CHARGE_AMOUNT ?? 650),
+    diaVencimento: parseInt(process.env.CHARGE_DUE_DAY ?? '10', 10),
+  },
   database: {
     host: process.env.DB_HOST ?? 'localhost',
     port: parseInt(process.env.DB_PORT ?? '5432', 10),

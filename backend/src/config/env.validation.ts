@@ -15,5 +15,25 @@ export function validateEnv(
     throw new Error('JWT_EXPIRES_IN_SECONDS deve ser um inteiro positivo');
   }
 
+  const chargeAmount = Number(env.CHARGE_AMOUNT ?? 650);
+  if (
+    !Number.isFinite(chargeAmount) ||
+    chargeAmount <= 0 ||
+    Math.abs(chargeAmount * 100 - Math.round(chargeAmount * 100)) > 1e-6
+  ) {
+    throw new Error(
+      'CHARGE_AMOUNT deve ser um valor positivo com até duas casas decimais',
+    );
+  }
+
+  const chargeDueDay = Number(env.CHARGE_DUE_DAY ?? 10);
+  if (
+    !Number.isInteger(chargeDueDay) ||
+    chargeDueDay < 1 ||
+    chargeDueDay > 28
+  ) {
+    throw new Error('CHARGE_DUE_DAY deve ser um inteiro entre 1 e 28');
+  }
+
   return env;
 }

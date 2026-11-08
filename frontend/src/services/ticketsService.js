@@ -2,27 +2,27 @@ import api from "./api";
 
 const ticketsService = {
   async list(params = {}) {
-    const { data } = await api.get("/v1/tickets", { params });
-    return data;
-  },
-
-  async get(id) {
-    const { data } = await api.get(`/v1/tickets/${id}`);
+    const { data } = await api.get("/tickets", { params });
     return data;
   },
 
   async create(payload) {
-    const { data } = await api.post("/v1/tickets", payload);
+    const { data } = await api.post("/tickets", payload);
     return data;
   },
 
-  async update(id, payload) {
-    const { data } = await api.patch(`/v1/tickets/${id}`, payload);
+  async updateStatus(id, payload) {
+    const { data } = await api.patch(`/tickets/${id}/status`, payload);
     return data;
   },
 
-  async sendMessage(id, payload) {
-    const { data } = await api.post(`/v1/tickets/${id}/mensagem`, payload);
+  async history(params = {}) {
+    const { data } = await api.get("/tickets/history", { params });
+    return data;
+  },
+
+  async stats() {
+    const { data } = await api.get("/tickets/stats");
     return data;
   },
 };

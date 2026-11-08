@@ -4,11 +4,11 @@ import configuration, { AppConfig } from './config/configuration';
 import { validateEnv } from './config/env.validation';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
-import { RentalsModule } from './modules/rentals/rentals.module';
 
 @Module({
   imports: [
@@ -36,11 +36,11 @@ import { RentalsModule } from './modules/rentals/rentals.module';
         };
       },
     }),
+    ScheduleModule.forRoot(),
     HealthModule,
     AuthModule,
     AccessTestModule,
     UnitsModule,
-    RentalsModule,
   ],
 })
 export class AppModule {}
