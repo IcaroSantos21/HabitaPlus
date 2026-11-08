@@ -19,6 +19,8 @@ import { ResidentsModule } from './modules/residents/residents.module';
 import { CobrancasModule } from './modules/charges/cobrancas.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
+import { FinanceModule } from './modules/finance/finance.module';
+
 @Module({
   imports: [
     // Carrega configurações do ambiente e disponibiliza o acesso ao banco.
@@ -64,6 +66,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ResidentsModule,
     CobrancasModule,
     NotificationsModule,
+
+    FinanceModule,
   ],
 })
 export class AppModule {}
