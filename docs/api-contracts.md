@@ -376,3 +376,35 @@ Uso interno: NotificationsService.notify(usuarioId, tipo, texto, refId?) e notif
 }
 
 Percentual = valor em atraso (status ATRASADA) / valor total cobrado, de 0 a 100. No dashboard, percentual e pendentes são do mês consultado.
+
+# Mensagens entre comprador e vendedor (implementado no backend)
+
+  # Método   Rota                                   Acesso         Finalidade
+    POST     /api/listings/{id}/messages            Autenticado    Envia mensagem (comprador -> vendedor; o vendedor informa destinatarioId e só responde a quem já lhe escreveu)
+    GET      /api/listings/{id}/messages            Participante   Conversa do usuário no anúncio (o vendedor informa ?usuarioId=comprador)
+    GET      /api/messages/inbox                    Autenticado    Conversas com a última mensagem e a contagem de não lidas
+    PATCH    /api/messages/{id}/read                Destinatário   Marca mensagem como lida (404 se não for sua)
+
+# Exemplo de mensagem (201 e itens de GET /listings/{id}/messages)
+
+    {
+  "id": 100,
+  "anuncioId": 5,
+  "remetenteId": 2,
+  "destinatarioId": 1,
+  "texto": "Ainda está disponível?",
+  "lida": false,
+  "criadaEm": "2026-11-08T12:00:00.000Z"
+}
+
+# Exemplo de item do inbox
+
+    {
+  "anuncioId": 5,
+  "anuncioTitulo": "Sofá 3 lugares",
+  "outroUsuario": { "id": 2, "nome": "Maria" },
+  "ultimaMensagem": { "id": 100, "texto": "Ainda está disponível?", "remetenteId": 2, "criadaEm": "2026-11-08T12:00:00.000Z" },
+  "naoLidas": 1
+}
+
+Erros: 400 (vendedor sem destinatarioId/usuarioId), 403 (destinatário ou conversa que não é sua), 404 (anúncio ou mensagem inexistente). Sem WebSocket: o front atualiza por polling. Cada envio gera uma notificação MENSAGEM (refId = id do anúncio).
