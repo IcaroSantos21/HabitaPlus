@@ -6,6 +6,18 @@ import { StatusCobranca, TipoTransacao } from '../../database/entities/enums';
 
 export const CATEGORIA_RECEITA_COBRANCA = 'taxa condominial';
 
+const FILTRO_MORADOR_SQL = `(EXISTS (
+    SELECT 1 FROM "vinculos" v
+    WHERE v."unidadeId" = unidade.id AND v."usuarioId" = :moradorId
+  )
+  OR EXISTS (
+    SELECT 1 FROM "contratos_locacao" ct
+    WHERE ct."unidadeId" = unidade.id
+      AND ct."locatarioId" = :moradorId
+      AND ct."inicio" < (cobranca.competencia + INTERVAL '1 month')
+      AND (ct."fim" IS NULL OR ct."fim" >= cobranca.competencia)
+  ))`;
+
 export interface ParametrosGeracao {
   // Primeiro dia do mês (YYYY-MM-01), como a coluna `competencia` armazena.
   competencia: string;
@@ -133,11 +145,28 @@ export class CobrancasRepository {
     return { items, total };
   }
 
+  async saveStripeSession(
+    cobrancaId: number,
+    stripeSessionId: string,
+  ): Promise<void> {
+    await this.repository.update({ id: cobrancaId }, { stripeSessionId });
+  }
+
   findOneWithUnit(id: number): Promise<Cobranca | null> {
     return this.repository.findOne({
       where: { id },
       relations: { unidade: true },
     });
+  }
+
+  async belongsToUser(cobrancaId: number, usuarioId: number): Promise<boolean> {
+    const total = await this.repository
+      .createQueryBuilder('cobranca')
+      .innerJoin('cobranca.unidade', 'unidade')
+      .where('cobranca.id = :cobrancaId', { cobrancaId })
+      .andWhere(FILTRO_MORADOR_SQL, { moradorId: usuarioId })
+      .getCount();
+    return total > 0;
   }
 
   // Marca como ATRASADA, num único UPDATE, o que está PENDENTE e venceu antes de `hoje`.

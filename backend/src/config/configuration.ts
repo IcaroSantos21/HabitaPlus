@@ -9,6 +9,12 @@ export interface AppConfig {
     valorPadrao: number;
     diaVencimento: number;
   };
+  stripe: {
+    secretKey: string;
+    webhookSecret: string;
+    successUrl: string;
+    cancelUrl: string;
+  };
   database: {
     host: string;
     port: number;
@@ -31,6 +37,13 @@ export default (): AppConfig => ({
   charges: {
     valorPadrao: Number(process.env.CHARGE_AMOUNT ?? 650),
     diaVencimento: parseInt(process.env.CHARGE_DUE_DAY ?? '10', 10),
+  },
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY ?? '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+    successUrl:
+      process.env.STRIPE_SUCCESS_URL ?? 'http://localhost:5173/success',
+    cancelUrl: process.env.STRIPE_CANCEL_URL ?? 'http://localhost:5173/cancel',
   },
   database: {
     host: process.env.DB_HOST ?? 'localhost',

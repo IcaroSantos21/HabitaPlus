@@ -1,5 +1,12 @@
 // Define as variáveis que precisam existir para conectar ao banco de dados.
-const REQUIRED = ['DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET'];
+const REQUIRED = [
+  'DB_USER',
+  'DB_PASSWORD',
+  'DB_NAME',
+  'JWT_SECRET',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+];
 
 // Interrompe a inicialização se alguma configuração obrigatória estiver ausente.
 export function validateEnv(
@@ -35,5 +42,30 @@ export function validateEnv(
     throw new Error('CHARGE_DUE_DAY deve ser um inteiro entre 1 e 28');
   }
 
+  // Escopo do projeto: só modo teste. Barrar chave live evita cobrança real por engano.
+  const stripeKey =
+    typeof env.STRIPE_SECRET_KEY === 'string' ? env.STRIPE_SECRET_KEY : '';
+  if (!/^(sk|rk)_test_/.test(stripeKey)) {
+    throw new Error(
+      'STRIPE_SECRET_KEY deve ser uma chave de teste válida do Stripe',
+    );
+  }
+  if (
+    typeof env.STRIPE_WEBHOOK_SECRET !== 'string' ||
+    !env.STRIPE_WEBHOOK_SECRET.startsWith('whsec_')
+  ) {
+    throw new Error(
+      'STRIPE_WEBHOOK_SECRET deve ser uma chave de webhook do Stripe (começa com whsec_)',
+    );
+  }
+  for (const nome of ['STRIPE_SUCCESS_URL', 'STRIPE_CANCEL_URL']) {
+    const valor = env[nome];
+    if (
+      valor !== undefined &&
+      !(typeof valor === 'string' && URL.canParse(valor))
+    ) {
+      throw new Error(`${nome} deve ser uma URL válida`);
+    }
+  }
   return env;
 }

@@ -9,7 +9,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap(): Promise<void> {
   // Cria a aplicação e obtém as configurações carregadas pelo módulo principal.
-  const app = await NestFactory.create(AppModule);
+  // rawBody: o webhook do Stripe só valida a assinatura com os bytes originais.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get<ConfigService<AppConfig, true>>(ConfigService);
 
   // Aplica prefixo da API, CORS, validação de entrada e formato padrão de erros.
