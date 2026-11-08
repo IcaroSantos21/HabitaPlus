@@ -9,13 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
-import { RentalsModule } from './modules/rentals/rentals.module';
-import { ChamadosModule } from './modules/chamados/chamado.module';
-import { AnunciosModule } from './modules/listings/anuncios.module';
-import { TransacoesModule } from './modules/transacoes/transacoes.module';
-import { ResidentsModule } from './modules/residents/residents.module';
-import { CobrancasModule } from './modules/charges/cobrancas.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -48,13 +41,6 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     AuthModule,
     AccessTestModule,
     UnitsModule,
-    RentalsModule,
-    ChamadosModule,
-    AnunciosModule,
-    TransacoesModule,
-    ResidentsModule,
-    CobrancasModule,
-    NotificationsModule,
   ],
 })
 export class AppModule {}

@@ -216,6 +216,7 @@ Principais campos:
 - texto
 - lida
 - criadaEm
+- chaveUnica (opcional; garante idempotência de notificações agendadas)
 
 ---
 
