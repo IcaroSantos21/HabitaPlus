@@ -20,7 +20,7 @@ Stripe -> POST /api/webhooks/stripe (checkout.session.completed) -> API marca a 
 2. Copie a **Secret key** (`sk_test_...`).
 3. O `STRIPE_WEBHOOK_SECRET` (`whsec_...`) sai do passo 3 abaixo.
 
-## 2. Configurar o `.env` do backend
+## 2. Configurar o `.env` da raiz do repositório
 
 ```env
 STRIPE_SECRET_KEY=sk_test_...
@@ -30,7 +30,8 @@ STRIPE_SUCCESS_URL=http://localhost:5173/success
 STRIPE_CANCEL_URL=http://localhost:5173/cancel
 ```
 
-Nunca commite essas chaves. O backend acrescenta `?cobranca=<id>` às duas URLs de retorno.
+O backend carrega o arquivo `.env` da raiz do repositório. Nunca commite essas
+chaves. O backend acrescenta `?cobranca=<id>` às duas URLs de retorno.
 
 ## 3. Encaminhar os webhooks para a sua máquina
 

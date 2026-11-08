@@ -14,7 +14,6 @@ API em NestJS + TypeScript + PostgreSQL + TypeORM.
   cp .env.example .env              # na raiz do repo; ajuste a senha
   docker compose up -d postgres     # só o banco, na raiz
   cd backend
-  cp .env.example .env              # mesmos DB_USER/DB_PASSWORD/DB_NAME
   npm install
   npm run start:dev
 ```
