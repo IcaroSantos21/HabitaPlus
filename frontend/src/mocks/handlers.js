@@ -171,13 +171,16 @@ const mockRentals = [
 ];
 
 const mockTransactions = [
-  { id: "tra_001", descricao: "Manutenção do elevador", tipo: "DESPESA", valor: 920, data: "2026-10-10" },
-  { id: "tra_002", descricao: "Taxa condominial", tipo: "RECEITA", valor: 650, data: "2026-10-12" },
+  { id: 501, usuarioId: 2, tipo: "DESPESA", categoria: "manutenção", valor: 920, competencia: "2026-11", data: "2026-11-04", descricao: "Manutenção preventiva do elevador" },
+  { id: 502, usuarioId: 2, tipo: "RECEITA", categoria: "condomínio", valor: 650, competencia: "2026-11", data: "2026-11-05", descricao: "Recebimento de taxa condominial" },
+  { id: 503, usuarioId: 2, tipo: "DESPESA", categoria: "energia", valor: 480, competencia: "2026-10", data: "2026-10-10", descricao: "Conta de energia das áreas comuns" },
 ];
 
 const mockCharges = [
-  { id: "chg_001", descricao: "Taxa condominial - outubro", valor: 650, status: "PENDENTE", vencimento: "2026-10-30" },
-  { id: "chg_002", descricao: "Fundo de reserva", valor: 90, status: "PAGA", vencimento: "2026-10-05" },
+  { id: 701, unidade: { id: 103, bloco: "B", numero: "103" }, competencia: "2026-11", valor: 650, vencimento: "2026-11-10", status: "PENDENTE", _moradorId: 1 },
+  { id: 702, unidade: { id: 103, bloco: "B", numero: "103" }, competencia: "2026-10", valor: 650, vencimento: "2026-10-10", status: "ATRASADA", _moradorId: 1 },
+  { id: 703, unidade: { id: 103, bloco: "B", numero: "103" }, competencia: "2026-09", valor: 650, vencimento: "2026-09-10", status: "PAGA", _moradorId: 1 },
+  { id: 704, unidade: { id: 204, bloco: "A", numero: "204" }, competencia: "2026-11", valor: 650, vencimento: "2026-11-05", status: "ATRASADA", _moradorId: 999 },
 ];
 
 const mockAnnouncements = [
@@ -277,6 +280,40 @@ const mockExpensePrediction = {
   versaoModelo: "expenses-v1",
   geradoEm: "2026-10-30T10:00:00-03:00",
 };
+
+
+function serializeMockCharge(charge) {
+  const publicCharge = { ...charge };
+  delete publicCharge._moradorId;
+  return publicCharge;
+}
+
+function listMockCharges(request, mineOnly) {
+  const user = getMockRequestUser(request);
+  if (!user) return unauthorized();
+
+  const url = new URL(request.url);
+  let filtered = [...mockCharges];
+  if (mineOnly || !isTicketManager(user)) {
+    filtered = filtered.filter((charge) => charge._moradorId === user.id);
+  }
+  const competencia = url.searchParams.get("competencia");
+  const status = url.searchParams.get("status");
+  const unidadeId = url.searchParams.get("unidadeId");
+  if (competencia) filtered = filtered.filter((charge) => charge.competencia === competencia);
+  if (status) filtered = filtered.filter((charge) => charge.status === status);
+  if (unidadeId) filtered = filtered.filter((charge) => String(charge.unidade.id) === unidadeId);
+
+  filtered.sort((a, b) =>
+    String(b.competencia).localeCompare(String(a.competencia)) ||
+    Number(b.id) - Number(a.id),
+  );
+  const page = ticketPagination(filtered, url);
+  return HttpResponse.json({
+    ...page,
+    data: page.data.map(serializeMockCharge),
+  });
+}
 
 export const handlers = [
   http.post("*/api/auth/login", async ({ request }) => {
@@ -560,4 +597,231 @@ export const handlers = [
     ticket.encerradoEm = payload.status === "ENCERRADO" ? new Date().toISOString() : null;
     return HttpResponse.json(ticket);
   }),
+
+  // FE-08: contratos alinhados aos controllers reais de cobranças e transações.
+  http.get("*/api/charges/me", ({ request }) => listMockCharges(request, true)),
+  http.get("*/api/charges", ({ request }) => listMockCharges(request, false)),
+
+  http.post("*/api/charges/generate", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json(
+        { message: "Apenas síndico ou administrador podem gerar cobranças." },
+        { status: 403 },
+      );
+    }
+
+    const url = new URL(request.url);
+    const competencia = url.searchParams.get("competencia") || "";
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(competencia)) {
+      return HttpResponse.json(
+        { message: "A competência deve estar no formato YYYY-MM." },
+        { status: 400 },
+      );
+    }
+
+    const occupiedUnits = [
+      { id: 103, bloco: "B", numero: "103", moradorId: 1 },
+      { id: 204, bloco: "A", numero: "204", moradorId: 999 },
+    ];
+    let criadas = 0;
+    for (const unit of occupiedUnits) {
+      const exists = mockCharges.some(
+        (charge) =>
+          charge.unidade.id === unit.id &&
+          charge.competencia === competencia,
+      );
+      if (!exists) {
+        const nextId = Math.max(700, ...mockCharges.map((charge) => Number(charge.id))) + 1;
+        mockCharges.push({
+          id: nextId,
+          unidade: { id: unit.id, bloco: unit.bloco, numero: unit.numero },
+          competencia,
+          valor: 650,
+          vencimento: `${competencia}-10`,
+          status: "PENDENTE",
+          _moradorId: unit.moradorId,
+        });
+        criadas += 1;
+      }
+    }
+
+    return HttpResponse.json(
+      {
+        competencia,
+        vencimento: `${competencia}-10`,
+        valor: 650,
+        totalUnidadesOcupadas: occupiedUnits.length,
+        criadas,
+        jaExistentes: occupiedUnits.length - criadas,
+      },
+      { status: 201 },
+    );
+  }),
+
+  http.post("*/api/charges/:id/checkout", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+
+    const charge = mockCharges.find(
+      (item) => String(item.id) === String(params.id),
+    );
+    if (!charge) {
+      return HttpResponse.json(
+        { message: "Cobrança não encontrada." },
+        { status: 404 },
+      );
+    }
+    if (!isTicketManager(user) && charge._moradorId !== user.id) {
+      return HttpResponse.json(
+        { message: "Você não tem permissão para pagar esta cobrança." },
+        { status: 403 },
+      );
+    }
+    if (charge.status === "PAGA") {
+      return HttpResponse.json(
+        { message: "Esta cobrança já foi paga." },
+        { status: 409 },
+      );
+    }
+
+    // No modo mock, simula o webhook confirmando o pagamento.
+    // O fluxo real usa Stripe Checkout e o webhook assinado do backend.
+    charge.status = "PAGA";
+    mockTransactions.unshift({
+      id: Date.now(),
+      usuarioId: user.id,
+      tipo: "RECEITA",
+      categoria: "condomínio",
+      valor: charge.valor,
+      competencia: charge.competencia,
+      data: new Date().toISOString().slice(0, 10),
+      descricao: `Pagamento de cobrança #${charge.id}`,
+    });
+
+    const returnUrl = new URL(
+      `/success?cobranca=${charge.id}&mock=1`,
+      window.location.origin,
+    ).toString();
+    return HttpResponse.json({ url: returnUrl }, { status: 201 });
+  }),
+
+  http.get("*/api/transactions/monthly-summary", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json(
+        { message: "Apenas síndico ou administrador podem consultar o financeiro." },
+        { status: 403 },
+      );
+    }
+
+    const url = new URL(request.url);
+    const from = url.searchParams.get("from") || new Date().toISOString().slice(0, 7);
+    const to = url.searchParams.get("to") || from;
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(from) || !/^\d{4}-(0[1-9]|1[0-2])$/.test(to) || from > to) {
+      return HttpResponse.json(
+        { message: "Informe um intervalo de competências válido." },
+        { status: 400 },
+      );
+    }
+
+    const result = [];
+    let cursor = from;
+    while (cursor <= to) {
+      const items = mockTransactions.filter(
+        (item) => item.competencia === cursor,
+      );
+      const receitas = items
+        .filter((item) => item.tipo === "RECEITA")
+        .reduce((sum, item) => sum + Number(item.valor), 0);
+      const despesas = items
+        .filter((item) => item.tipo === "DESPESA")
+        .reduce((sum, item) => sum + Number(item.valor), 0);
+      result.push({
+        month: cursor,
+        receitas: Number(receitas.toFixed(2)),
+        despesas: Number(despesas.toFixed(2)),
+        saldo: Number((receitas - despesas).toFixed(2)),
+      });
+
+      const [year, month] = cursor.split("-").map(Number);
+      const next = new Date(Date.UTC(year, month, 1));
+      cursor = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}`;
+    }
+    return HttpResponse.json(result);
+  }),
+
+  http.get("*/api/transactions", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json(
+        { message: "Apenas síndico ou administrador podem consultar transações." },
+        { status: 403 },
+      );
+    }
+
+    const url = new URL(request.url);
+    let filtered = [...mockTransactions];
+    const competencia = url.searchParams.get("competencia");
+    const tipo = url.searchParams.get("tipo");
+    const categoria = url.searchParams.get("categoria");
+    if (competencia) filtered = filtered.filter((item) => item.competencia === competencia);
+    if (tipo) filtered = filtered.filter((item) => item.tipo === tipo);
+    if (categoria) {
+      filtered = filtered.filter(
+        (item) => item.categoria.toLowerCase() === categoria.toLowerCase(),
+      );
+    }
+    filtered.sort((a, b) => String(b.data).localeCompare(String(a.data)));
+    return HttpResponse.json(ticketPagination(filtered, url));
+  }),
+
+  http.post("*/api/transactions", async ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json(
+        { message: "Apenas síndico ou administrador podem criar transações." },
+        { status: 403 },
+      );
+    }
+
+    const payload = await request.json();
+    if (!["RECEITA", "DESPESA"].includes(payload?.tipo)) {
+      return HttpResponse.json({ message: "O tipo deve ser RECEITA ou DESPESA." }, { status: 400 });
+    }
+    const amount = Number(payload?.valor);
+    if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) !== amount * 100) {
+      return HttpResponse.json({ message: "O valor deve ser maior que zero e ter no máximo duas casas decimais." }, { status: 400 });
+    }
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(String(payload?.competencia || ""))) {
+      return HttpResponse.json({ message: "A competência deve estar no formato YYYY-MM." }, { status: 400 });
+    }
+    if (!String(payload?.categoria || "").trim() || !String(payload?.data || "").trim()) {
+      return HttpResponse.json({ message: "Informe categoria e data do lançamento." }, { status: 400 });
+    }
+    const allowedExpenseCategories = ["água", "energia", "limpeza", "manutenção", "salários", "outros"];
+    if (payload.tipo === "DESPESA" && !allowedExpenseCategories.includes(String(payload.categoria).trim().toLowerCase())) {
+      return HttpResponse.json(
+        { message: "A categoria da despesa deve ser água, energia, limpeza, manutenção, salários ou outros." },
+        { status: 400 },
+      );
+    }
+
+    const transaction = {
+      id: Math.max(500, ...mockTransactions.map((item) => Number(item.id))) + 1,
+      usuarioId: user.id,
+      tipo: payload.tipo,
+      categoria: String(payload.categoria).trim().toLowerCase(),
+      valor: amount,
+      competencia: payload.competencia,
+      data: payload.data,
+      descricao: payload.descricao ? String(payload.descricao).trim() : null,
+    };
+    mockTransactions.unshift(transaction);
+    return HttpResponse.json(transaction, { status: 201 });
+  })
 ];

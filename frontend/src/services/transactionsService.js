@@ -2,12 +2,19 @@ import api from "./api";
 
 const transactionsService = {
   async list(params = {}) {
-    const { data } = await api.get("/v1/transacoes", { params });
+    const { data } = await api.get("/transactions", { params });
     return data;
   },
 
-  async get(id) {
-    const { data } = await api.get(`/v1/transacoes/${id}`);
+  async create(payload) {
+    const { data } = await api.post("/transactions", payload);
+    return data;
+  },
+
+  async monthlySummary(params = {}) {
+    const { data } = await api.get("/transactions/monthly-summary", {
+      params,
+    });
     return data;
   },
 };
