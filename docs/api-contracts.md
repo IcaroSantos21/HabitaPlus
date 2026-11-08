@@ -345,3 +345,34 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
 
 Contador: { "naoLidas": 3 }. Leitura em massa: { "atualizadas": 3 }.
 Uso interno: NotificationsService.notify(usuarioId, tipo, texto, refId?) e notifyMany(usuarioIds, tipo, texto, refId?).
+
+# Financeiro: inadimplência e painel (implementado no backend)
+
+  # Método   Rota                                              Acesso                    Finalidade
+    GET      /api/finance/delinquency?from=YYYY-MM&to=YYYY-MM   Síndico e administrador   Indicadores de inadimplência (período opcional; sem ele, todo o histórico)
+    GET      /api/finance/dashboard?competencia=YYYY-MM         Síndico e administrador   Resumo financeiro do mês (padrão: mês atual)
+
+# Exemplo de resposta de /finance/delinquency (200)
+
+    {
+  "totalEmAtraso": 1300,
+  "percentual": 20,
+  "porUnidade": [
+    { "unidadeId": 1, "bloco": "A", "numero": "101", "totalEmAtraso": 650, "cobrancasAtrasadas": 1 }
+  ],
+  "porMes": [
+    { "competencia": "2026-10", "totalCobrado": 3250, "totalEmAtraso": 1300, "percentual": 40 }
+  ]
+}
+
+# Exemplo de resposta de /finance/dashboard (200)
+
+    {
+  "receitaMes": 8000,
+  "despesaMes": 5000,
+  "saldoMes": 3000,
+  "inadimplenciaPercentual": 10,
+  "cobrancasPendentes": 4
+}
+
+Percentual = valor em atraso (status ATRASADA) / valor total cobrado, de 0 a 100. No dashboard, percentual e pendentes são do mês consultado.
