@@ -10,6 +10,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
 
+// Módulos restaurados
+import { RentalsModule } from './modules/rentals/rentals.module';
+import { ChamadosModule } from './modules/chamados/chamado.module';
+import { AnunciosModule } from './modules/listings/anuncios.module';
+import { TransacoesModule } from './modules/transacoes/transacoes.module';
+import { ResidentsModule } from './modules/residents/residents.module';
+import { CobrancasModule } from './modules/charges/cobrancas.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+
 @Module({
   imports: [
     // Carrega configurações do ambiente e disponibiliza o acesso ao banco.
@@ -19,11 +28,13 @@ import { UnitsModule } from './modules/units/units.module';
       load: [configuration],
       validate: validateEnv,
     }),
+
     TypeOrmModule.forRootAsync({
       // Monta a conexão com o PostgreSQL usando as configurações validadas.
       inject: [ConfigService],
       useFactory: (config: ConfigService<AppConfig, true>) => {
         const db = config.get('database', { infer: true });
+
         return {
           type: 'postgres' as const,
           host: db.host,
@@ -36,11 +47,23 @@ import { UnitsModule } from './modules/units/units.module';
         };
       },
     }),
+
     ScheduleModule.forRoot(),
+
+    // Módulos principais
     HealthModule,
     AuthModule,
     AccessTestModule,
     UnitsModule,
+
+    // Módulos restaurados
+    RentalsModule,
+    ChamadosModule,
+    AnunciosModule,
+    TransacoesModule,
+    ResidentsModule,
+    CobrancasModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
