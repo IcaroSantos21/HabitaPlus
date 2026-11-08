@@ -13,6 +13,7 @@ import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
 import { TransacoesModule } from './modules/transacoes/transacoes.module';
+import { ResidentsModule } from './modules/residents/residents.module';
 import { CobrancasModule } from './modules/charges/cobrancas.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
@@ -51,6 +52,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ChamadosModule,
     AnunciosModule,
     TransacoesModule,
+    ResidentsModule,
     CobrancasModule,
     NotificationsModule,
   ],
