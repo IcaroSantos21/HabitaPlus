@@ -24,6 +24,9 @@ export class Notificacao {
   @Column('text')
   texto!: string;
 
+  @Column({ type: 'integer', nullable: true })
+  refId!: number | null;
+
   @Column({ default: false })
   lida!: boolean;
 

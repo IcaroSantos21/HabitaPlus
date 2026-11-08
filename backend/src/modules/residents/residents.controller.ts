@@ -23,3 +23,4 @@ export class ResidentsController {
     return this.residentsService.obterPerfilDeInteresse(usuario);
   }
 }
+

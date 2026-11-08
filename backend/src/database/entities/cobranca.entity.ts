@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -8,8 +9,13 @@ import {
 
 import { Unidade } from './unidade.entity';
 import { StatusCobranca } from './enums';
+import { DecimalTransformer } from '../../common/transformers/decimal.transformer';
 
 @Entity('cobrancas')
+// Uma cobrança por unidade e competência: garante a idempotência da geração mensal.
+@Index('UQ_cobrancas_unidade_competencia', ['unidade', 'competencia'], {
+  unique: true,
+})
 // Representa uma cobrança vinculada a uma unidade do condomínio.
 export class Cobranca {
   @PrimaryGeneratedColumn()
@@ -25,6 +31,7 @@ export class Cobranca {
   @Column('decimal', {
     precision: 10,
     scale: 2,
+    transformer: DecimalTransformer,
   })
   valor!: number;
 

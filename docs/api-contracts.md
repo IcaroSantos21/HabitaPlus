@@ -154,6 +154,37 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
   }
 }
 
+# Cobranças condominiais (implementado no backend)
+
+  # Método   Rota                                   Acesso                    Finalidade
+    POST     /api/charges/generate?competencia=YYYY-MM   Síndico e administrador   Gerar 1 cobrança por unidade ocupada (idempotente)
+    GET      /api/charges                           Autenticado               Síndico/admin: todas; morador: só as das suas unidades
+    GET      /api/charges/me                        Autenticado               Cobranças das unidades do usuário logado
+
+# Exemplo de resposta da geração (201)
+
+    {
+  "competencia": "2026-11",
+  "vencimento": "2026-11-10",
+  "valor": 650,
+  "totalUnidadesOcupadas": 120,
+  "criadas": 118,
+  "jaExistentes": 2
+}
+
+# Exemplo de item da listagem (200, dentro de data[])
+
+    {
+  "id": 10,
+  "unidade": { "id": 5, "bloco": "B", "numero": "302" },
+  "competencia": "2026-11",
+  "valor": 650,
+  "vencimento": "2026-11-10",
+  "status": "PENDENTE"
+}
+
+Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), unidadeId, pagina e limite.
+
 # Anúncios, mensagens e notificações
 
   # Méto              Rota              	         Acesso                           Finalidade
@@ -290,3 +321,25 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
     },
     "versaoModelo": "nlu-v1"
   }
+
+  # Notificações (implementado no backend)
+
+  # Método   Rota                                  Acesso          Finalidade
+    GET      /api/notifications?apenasNaoLidas=&pagina=&limite=   Autenticado   Lista as notificações do próprio usuário (paginada)
+    GET      /api/notifications/unread-count        Autenticado     Conta as não lidas do próprio usuário
+    PATCH    /api/notifications/{id}/read           Destinatário    Marca uma notificação como lida (404 se não for sua)
+    PATCH    /api/notifications/read-all            Autenticado     Marca todas as suas como lidas
+
+# Exemplo de item da listagem (200, dentro de data[])
+
+    {
+  "id": 10,
+  "tipo": "ANUNCIO",
+  "texto": "Novo anúncio: Sofá 3 lugares",
+  "refId": 7,
+  "lida": false,
+  "criadaEm": "2026-11-07T12:00:00.000Z"
+}
+
+Contador: { "naoLidas": 3 }. Leitura em massa: { "atualizadas": 3 }.
+Uso interno: NotificationsService.notify(usuarioId, tipo, texto, refId?) e notifyMany(usuarioIds, tipo, texto, refId?).
