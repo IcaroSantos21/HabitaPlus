@@ -160,6 +160,9 @@ Regras:
   operação, com categoria `taxa condominial`, a mesma `competencia` da cobrança
   e `data` igual ao dia do pagamento. O resumo mensal de `/api/transactions`
   passa a incluir essa receita sem nenhuma soma extra.
+- `stripeSessionId` guarda a última Checkout Session criada para a cobrança. É só
+  referência de integração: a cobrança é ligada ao pagamento pelos metadados da
+  sessão, e o campo não aparece nas respostas da API.
 
 ---
 

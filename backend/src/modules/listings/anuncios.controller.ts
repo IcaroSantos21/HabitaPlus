@@ -52,6 +52,15 @@ export class AnunciosController {
     return this.anunciosService.listar(filtros);
   }
 
+  @Post(':id/view')
+  @ApiOperation({ summary: 'Registrar visualização de anúncio' })
+  registrarVisualizacao(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() usuario: AuthUserDto,
+  ) {
+    return this.anunciosService.registrarVisualizacao(id, usuario);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Consultar os detalhes de um anúncio' })
   buscarPorId(@Param('id', ParseIntPipe) id: number) {

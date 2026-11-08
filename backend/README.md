@@ -24,6 +24,15 @@ API em NestJS + TypeScript + PostgreSQL + TypeORM.
 - Health check: http://localhost:3000/api/health
 - Swagger: http://localhost:3000/docs
 
+## Pagamentos (Stripe, modo teste)
+
+`STRIPE_SECRET_KEY` (`sk_test_...`) e `STRIPE_WEBHOOK_SECRET` (`whsec_...`) são obrigatórias:
+a API não sobe sem elas nem com chave fora do modo teste. Passo a passo em
+[`docs/stripe-teste.md`](../docs/stripe-teste.md).
+
+- `POST /api/charges/:id/checkout`: cria a sessão de pagamento e devolve `{ url }`.
+- `POST /api/webhooks/stripe`: recebe o `checkout.session.completed` e marca a cobrança como `PAGA`.
+
 ## Autenticação
 
 Configure `JWT_SECRET` com uma chave aleatória longa antes de iniciar a API.
