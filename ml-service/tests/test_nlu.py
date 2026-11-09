@@ -5,7 +5,7 @@ from app.main import app
 from app.schemas.nlu import Entities, NluResponse
 
 
-# Confere se a interpretação retorna os campos e valores esperados.
+# Exemplo do contrato: intenção, confiança alta e entidades extraídas.
 def test_parse_returns_contract_example(client: TestClient) -> None:
     response = client.post(
         "/nlu/parse", json={"text": "quero abrir chamado do elevador do bloco B"}
@@ -14,16 +14,33 @@ def test_parse_returns_contract_example(client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["intent"] == "abrir_chamado"
-    assert body["confidence"] == 0.93
+    assert 0.5 <= body["confidence"] <= 1.0
     assert body["entities"] == {"equipamento": "elevador", "bloco": "B"}
+
+
+# As entidades numéricas saem com o tipo certo e em camelCase.
+def test_parse_returns_typed_entities_in_camel_case(client: TestClient) -> None:
+    body = client.post(
+        "/nlu/parse", json={"text": "tem apartamento de dois quartos no bloco c até 2 mil?"}
+    ).json()
+
+    assert body["intent"] == "consultar_apartamentos"
+    assert body["entities"] == {"bloco": "C", "quartos": 2, "valorMax": 2000.0}
 
 
 # Confere que entidades não encontradas são omitidas na resposta.
 def test_parse_omits_entities_not_found(client: TestClient) -> None:
     body = client.post("/nlu/parse", json={"text": "oi"}).json()
 
-    assert "quartos" not in body["entities"]
-    assert "valorMax" not in body["entities"]
+    assert body["intent"] == "saudacao"
+    assert body["entities"] == {}
+
+
+# Texto sem relação com o condomínio vira fora_de_escopo.
+def test_parse_unrelated_text_is_out_of_scope(client: TestClient) -> None:
+    body = client.post("/nlu/parse", json={"text": "asdfghjkl"}).json()
+
+    assert body["intent"] == "fora_de_escopo"
 
 
 # Confere que um texto composto apenas por espaços é rejeitado.
