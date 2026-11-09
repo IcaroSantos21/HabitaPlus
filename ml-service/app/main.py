@@ -1,4 +1,5 @@
 """Ponto de entrada do ml-service."""
+
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -36,6 +37,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         ARTIFACTS_DIR,
     )
     # Falha na subida se o artefato não existir: melhor que errar a cada requisição.
+    # Inicializa os serviços utilizados pelas rotas.
     app.state.expense_predictor = SklearnExpensePredictor.from_artifact(EXPENSE_MODEL_PATH)
     app.state.recommender = KMeansRecommender.from_artifact(RECOMMENDER_MODEL_PATH)
     app.state.nlu = NluParser(
