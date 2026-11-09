@@ -45,7 +45,7 @@ function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`w-full ${sizeStyles[size] || sizeStyles.md} rounded-xl bg-white shadow-xl`}
+        className={`max-h-[calc(100dvh-2rem)] w-full overflow-y-auto ${sizeStyles[size] || sizeStyles.md} rounded-xl bg-white shadow-xl`}
       >
         <header className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="text-lg font-bold text-brand-navy">{title}</h2>

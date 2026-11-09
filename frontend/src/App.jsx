@@ -7,6 +7,9 @@ import Home from "./pages/Home";
 import HomeRedirect from "./pages/HomeRedirect";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Marketplace from "./pages/Marketplace";
+import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
 import PaymentCancel from "./pages/PaymentCancel";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Rentals from "./pages/Rentals";
@@ -60,6 +63,18 @@ function App() {
           <Route
             path="/transactions"
             element={<AuthenticatedPage><Transactions /></AuthenticatedPage>}
+          />
+          <Route
+            path="/marketplace"
+            element={<AuthenticatedPage><Marketplace /></AuthenticatedPage>}
+          />
+          <Route
+            path="/messages"
+            element={<AuthenticatedPage><Messages /></AuthenticatedPage>}
+          />
+          <Route
+            path="/notifications"
+            element={<AuthenticatedPage><Notifications /></AuthenticatedPage>}
           />
           <Route
             path="/success"

@@ -195,6 +195,109 @@ const mockNotifications = [
   { id: "not_001", titulo: "Novo comunicado", mensagem: "Há um comunicado disponível.", lida: false },
 ];
 
+// FE-09/FE-11: marketplace, conversas e notificações seguem os contratos NestJS atuais.
+const mockListings = [
+  {
+    id: 801,
+    titulo: "Sofá retrátil de 3 lugares",
+    descricao: "Sofá em ótimo estado, pouco uso. Retirada no condomínio.",
+    categoria: "MOVEIS",
+    preco: 950,
+    status: "DISPONIVEL",
+    imagemUrl: null,
+    vendedor: { id: 2, nome: "Samuel Síndico" },
+    visualizacoes: 18,
+  },
+  {
+    id: 802,
+    titulo: "Bicicleta urbana aro 29",
+    descricao: "Bicicleta revisada, com pneus novos e trava inclusa.",
+    categoria: "ESPORTE",
+    preco: 780,
+    status: "DISPONIVEL",
+    imagemUrl: null,
+    vendedor: { id: 3, nome: "Ana Administradora" },
+    visualizacoes: 11,
+  },
+  {
+    id: 803,
+    titulo: "Jogo de panelas inox",
+    descricao: "Conjunto com cinco peças, sem amassados.",
+    categoria: "UTENSILIOS",
+    preco: 220,
+    status: "DISPONIVEL",
+    imagemUrl: null,
+    vendedor: { id: 1, nome: "Marina Morador" },
+    visualizacoes: 7,
+  },
+  {
+    id: 804,
+    titulo: "Monitor 24 polegadas",
+    descricao: "Monitor em bom estado, acompanha cabo HDMI.",
+    categoria: "ELETRONICOS",
+    preco: 540,
+    status: "VENDIDO",
+    imagemUrl: null,
+    vendedor: { id: 1, nome: "Marina Morador" },
+    visualizacoes: 23,
+  },
+  {
+    id: 805,
+    titulo: "Luminária de mesa",
+    descricao: "Luminária articulada, funcionando perfeitamente.",
+    categoria: "OUTROS",
+    preco: 65,
+    status: "DISPONIVEL",
+    imagemUrl: null,
+    vendedor: { id: 2, nome: "Samuel Síndico" },
+    visualizacoes: 4,
+  },
+];
+
+let mockListingMessages = [
+  { id: 9101, anuncioId: 801, remetenteId: 1, destinatarioId: 2, texto: "Olá! O sofá ainda está disponível?", lida: false, criadaEm: "2026-11-08T13:00:00.000Z" },
+  { id: 9102, anuncioId: 801, remetenteId: 2, destinatarioId: 1, texto: "Sim, está disponível. Podemos combinar a retirada.", lida: false, criadaEm: "2026-11-08T13:05:00.000Z" },
+];
+
+let mockMarketplaceNotifications = [
+  { id: 9201, usuarioId: 1, tipo: "ANUNCIO", texto: "Novo anúncio: Sofá retrátil de 3 lugares", refId: 801, lida: false, criadaEm: "2026-11-08T12:00:00.000Z" },
+  { id: 9202, usuarioId: 1, tipo: "MENSAGEM", texto: "Nova mensagem sobre Sofá retrátil de 3 lugares", refId: 801, lida: false, criadaEm: "2026-11-08T13:05:00.000Z" },
+  { id: 9203, usuarioId: 1, tipo: "COBRANCA", texto: "Sua cobrança de novembro está disponível.", refId: 701, lida: true, criadaEm: "2026-11-07T10:00:00.000Z" },
+  { id: 9204, usuarioId: 2, tipo: "MENSAGEM", texto: "Nova mensagem de Marina Morador sobre Sofá retrátil de 3 lugares", refId: 801, lida: false, criadaEm: "2026-11-08T13:00:00.000Z" },
+  { id: 9205, usuarioId: 1, tipo: "ALERTA", texto: "Há um chamado de manutenção aguardando acompanhamento.", refId: 1001, lida: false, criadaEm: "2026-11-06T09:00:00.000Z" },
+];
+
+function listingOwner(listing) {
+  return Number(listing?.vendedor?.id);
+}
+
+function listingPagination(rows, url) {
+  const page = Math.max(1, Number(url.searchParams.get("page") || 1));
+  const limit = Math.max(1, Math.min(100, Number(url.searchParams.get("limit") || 20)));
+  const start = (page - 1) * limit;
+  return {
+    data: rows.slice(start, start + limit),
+    meta: { page, limit, total: rows.length, totalPages: Math.max(1, Math.ceil(rows.length / limit)) },
+  };
+}
+
+function appendMockNotification(userId, tipo, texto, refId) {
+  mockMarketplaceNotifications.unshift({
+    id: Math.max(9200, ...mockMarketplaceNotifications.map((item) => Number(item.id))) + 1,
+    usuarioId: Number(userId),
+    tipo,
+    texto,
+    refId: refId ?? null,
+    lida: false,
+    criadaEm: new Date().toISOString(),
+  });
+}
+
+function listingForbidden() {
+  return HttpResponse.json({ message: "Você não tem permissão para modificar este anúncio." }, { status: 403 });
+}
+
+
 const mockConversation = {
   id: "conv_demo",
   mensagens: [
@@ -823,5 +926,225 @@ export const handlers = [
     };
     mockTransactions.unshift(transaction);
     return HttpResponse.json(transaction, { status: 201 });
-  })
+  }),
+
+  // FE-09: feed, meus anúncios, detalhes, visualizações e recomendações.
+  http.get("*/api/listings/categories", ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
+    return HttpResponse.json(["MOVEIS", "ELETRONICOS", "UTENSILIOS", "ESPORTE", "OUTROS"]);
+  }),
+  http.get("*/api/listings/mine", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    return HttpResponse.json(mockListings.filter((item) => listingOwner(item) === Number(user.id)));
+  }),
+  http.get("*/api/listings", ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
+    const url = new URL(request.url);
+    let rows = [...mockListings];
+    const category = url.searchParams.get("categoria");
+    const status = url.searchParams.get("status");
+    const q = String(url.searchParams.get("q") || "").trim().toLocaleLowerCase("pt-BR");
+    const min = url.searchParams.get("precoMin");
+    const max = url.searchParams.get("precoMax");
+    if (category) rows = rows.filter((item) => item.categoria === category);
+    if (status) rows = rows.filter((item) => item.status === status);
+    if (min !== null && min !== "") rows = rows.filter((item) => Number(item.preco) >= Number(min));
+    if (max !== null && max !== "") rows = rows.filter((item) => Number(item.preco) <= Number(max));
+    if (q) rows = rows.filter((item) => `${item.titulo} ${item.descricao}`.toLocaleLowerCase("pt-BR").includes(q));
+    rows.sort((a, b) => Number(b.id) - Number(a.id));
+    return HttpResponse.json(listingPagination(rows, url));
+  }),
+  http.post("*/api/listings", async ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const payload = await request.json();
+    if (String(payload?.titulo || "").trim().length < 3 || String(payload?.descricao || "").trim().length < 5 || !["MOVEIS", "ELETRONICOS", "UTENSILIOS", "ESPORTE", "OUTROS"].includes(payload?.categoria) || !Number.isFinite(Number(payload?.preco)) || Number(payload.preco) <= 0) {
+      return HttpResponse.json({ message: "Confira título, descrição, categoria e preço do anúncio." }, { status: 400 });
+    }
+    const listing = {
+      id: Math.max(800, ...mockListings.map((item) => Number(item.id))) + 1,
+      titulo: String(payload.titulo).trim(),
+      descricao: String(payload.descricao).trim(),
+      categoria: payload.categoria,
+      preco: Number(payload.preco),
+      status: "DISPONIVEL",
+      imagemUrl: payload.imagemUrl || null,
+      vendedor: { id: user.id, nome: user.nome },
+      visualizacoes: 0,
+    };
+    mockListings.unshift(listing);
+    getAllUsers().filter((item) => Number(item.id) !== Number(user.id)).forEach((item) => appendMockNotification(item.id, "ANUNCIO", `Novo anúncio: ${listing.titulo}`, listing.id));
+    return HttpResponse.json(listing, { status: 201 });
+  }),
+  http.post("*/api/listings/:id/view", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    listing.visualizacoes = Number(listing.visualizacoes || 0) + 1;
+    return HttpResponse.json({ message: "Visualização processada com sucesso." });
+  }),
+  http.get("*/api/listings/:id", ({ request, params }) => {
+    if (!isAuthorized(request)) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    return HttpResponse.json({ ...listing, vendedor: { ...listing.vendedor, unidade: { bloco: "B", numero: "103" } } });
+  }),
+  http.patch("*/api/listings/:id/status", async ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    if (listingOwner(listing) !== Number(user.id)) return listingForbidden();
+    const payload = await request.json();
+    if (!["DISPONIVEL", "VENDIDO"].includes(payload?.status)) return HttpResponse.json({ message: "Status de anúncio inválido." }, { status: 400 });
+    listing.status = payload.status;
+    return HttpResponse.json(listing);
+  }),
+  http.patch("*/api/listings/:id", async ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    if (listingOwner(listing) !== Number(user.id)) return listingForbidden();
+    const payload = await request.json();
+    Object.assign(listing, payload, { preco: payload.preco === undefined ? listing.preco : Number(payload.preco) });
+    return HttpResponse.json(listing);
+  }),
+  http.delete("*/api/listings/:id", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const index = mockListings.findIndex((item) => String(item.id) === String(params.id));
+    if (index < 0) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    if (listingOwner(mockListings[index]) !== Number(user.id)) return listingForbidden();
+    mockListings.splice(index, 1);
+    return HttpResponse.json({ message: "Anúncio removido com sucesso." });
+  }),
+  http.get("*/api/residents/me/recommendations", ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
+    const user = getMockRequestUser(request);
+    const recommendations = mockListings
+      .filter((item) => item.status === "DISPONIVEL" && listingOwner(item) !== Number(user?.id))
+      .sort((a, b) => Number(b.visualizacoes || 0) - Number(a.visualizacoes || 0))
+      .slice(0, 3)
+      .map((item, index) => ({
+        listingId: item.id,
+        score: Number((0.95 - index * 0.08).toFixed(2)),
+        anuncio: { titulo: item.titulo, descricao: item.descricao, categoria: item.categoria, preco: item.preco, imagemUrl: item.imagemUrl, vendedor: { nome: item.vendedor.nome } },
+      }));
+    return HttpResponse.json({ cluster: 1, recommendations });
+  }),
+
+  // FE-09: inbox, conversa do anúncio, envio e leitura de mensagens.
+  http.get("*/api/messages/inbox", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const groups = new Map();
+    mockListingMessages
+      .filter((message) => Number(message.remetenteId) === Number(user.id) || Number(message.destinatarioId) === Number(user.id))
+      .forEach((message) => {
+        const otherId = Number(message.remetenteId) === Number(user.id) ? Number(message.destinatarioId) : Number(message.remetenteId);
+        const key = `${message.anuncioId}-${otherId}`;
+        const current = groups.get(key);
+        if (!current || new Date(message.criadaEm) > new Date(current.ultimaMensagem.criadaEm)) {
+          const listing = mockListings.find((item) => Number(item.id) === Number(message.anuncioId));
+          const otherUser = getAllUsers().find((item) => Number(item.id) === otherId);
+          groups.set(key, {
+            anuncioId: Number(message.anuncioId),
+            anuncioTitulo: listing?.titulo || "Anúncio removido",
+            outroUsuario: { id: otherId, nome: otherUser?.nome || `Usuário ${otherId}` },
+            ultimaMensagem: { id: message.id, texto: message.texto, remetenteId: message.remetenteId, criadaEm: message.criadaEm },
+            naoLidas: mockListingMessages.filter((item) => Number(item.anuncioId) === Number(message.anuncioId) && Number(item.remetenteId) === otherId && Number(item.destinatarioId) === Number(user.id) && !item.lida).length,
+          });
+        }
+      });
+    return HttpResponse.json([...groups.values()].sort((a, b) => new Date(b.ultimaMensagem.criadaEm) - new Date(a.ultimaMensagem.criadaEm)));
+  }),
+  http.get("*/api/listings/:id/messages", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    const url = new URL(request.url);
+    const isOwner = listingOwner(listing) === Number(user.id);
+    const otherId = isOwner ? Number(url.searchParams.get("usuarioId")) : listingOwner(listing);
+    if (isOwner && !otherId) return HttpResponse.json({ message: "Informe o usuarioId (o comprador) para ver a conversa." }, { status: 400 });
+    const rows = mockListingMessages.filter((item) => Number(item.anuncioId) === Number(listing.id) && ((Number(item.remetenteId) === Number(user.id) && Number(item.destinatarioId) === otherId) || (Number(item.remetenteId) === otherId && Number(item.destinatarioId) === Number(user.id))));
+    return HttpResponse.json(rows.sort((a, b) => new Date(a.criadaEm) - new Date(b.criadaEm)));
+  }),
+  http.post("*/api/listings/:id/messages", async ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const listing = mockListings.find((item) => String(item.id) === String(params.id));
+    if (!listing) return HttpResponse.json({ message: "Anúncio não encontrado." }, { status: 404 });
+    const payload = await request.json();
+    const text = String(payload?.texto || "").trim();
+    if (!text || text.length > 2000) return HttpResponse.json({ message: "O texto da mensagem é obrigatório e deve ter até 2000 caracteres." }, { status: 400 });
+    const sellerId = listingOwner(listing);
+    let recipientId = sellerId;
+    if (Number(user.id) === sellerId) {
+      recipientId = Number(payload?.destinatarioId);
+      const buyerAlreadyMessaged = mockListingMessages.some((item) => Number(item.anuncioId) === Number(listing.id) && Number(item.remetenteId) === recipientId && Number(item.destinatarioId) === sellerId);
+      if (!recipientId || recipientId === sellerId || !buyerAlreadyMessaged) return HttpResponse.json({ message: "Informe um comprador que já iniciou uma conversa neste anúncio." }, { status: 400 });
+    }
+    const message = { id: Math.max(9100, ...mockListingMessages.map((item) => Number(item.id))) + 1, anuncioId: Number(listing.id), remetenteId: Number(user.id), destinatarioId: recipientId, texto: text, lida: false, criadaEm: new Date().toISOString() };
+    mockListingMessages.push(message);
+    appendMockNotification(recipientId, "MENSAGEM", `Nova mensagem de ${user.nome} sobre "${listing.titulo}"`, listing.id);
+    return HttpResponse.json(message, { status: 201 });
+  }),
+  http.patch("*/api/messages/:id/read", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const message = mockListingMessages.find((item) => String(item.id) === String(params.id) && Number(item.destinatarioId) === Number(user.id));
+    if (!message) return HttpResponse.json({ message: "Mensagem não encontrada." }, { status: 404 });
+    message.lida = true;
+    return HttpResponse.json(message);
+  }),
+
+  // FE-11: notificações paginadas e controle de leitura por usuário.
+  http.get("*/api/notifications/unread-count", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    return HttpResponse.json({ naoLidas: mockMarketplaceNotifications.filter((item) => Number(item.usuarioId) === Number(user.id) && !item.lida).length });
+  }),
+  http.get("*/api/notifications", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const url = new URL(request.url);
+    let rows = mockMarketplaceNotifications.filter((item) => Number(item.usuarioId) === Number(user.id));
+    if (url.searchParams.get("apenasNaoLidas") === "true") rows = rows.filter((item) => !item.lida);
+    rows.sort((a, b) => new Date(b.criadaEm) - new Date(a.criadaEm));
+    const pagina = Math.max(1, Number(url.searchParams.get("pagina") || 1));
+    const limite = Math.max(1, Math.min(100, Number(url.searchParams.get("limite") || 20)));
+    const start = (pagina - 1) * limite;
+    return HttpResponse.json({
+      data: rows.slice(start, start + limite).map((item) => {
+        const publicItem = { ...item };
+        delete publicItem.usuarioId;
+        return publicItem;
+      }),
+      meta: { pagina, limite, total: rows.length, totalPaginas: Math.max(1, Math.ceil(rows.length / limite)) },
+    });
+  }),
+  http.patch("*/api/notifications/:id/read", ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    const item = mockMarketplaceNotifications.find((row) => String(row.id) === String(params.id) && Number(row.usuarioId) === Number(user.id));
+    if (!item) return HttpResponse.json({ message: "Notificação não encontrada." }, { status: 404 });
+    item.lida = true;
+    const publicItem = { ...item };
+    delete publicItem.usuarioId;
+    return HttpResponse.json(publicItem);
+  }),
+  http.patch("*/api/notifications/read-all", ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    let updated = 0;
+    mockMarketplaceNotifications.forEach((item) => {
+      if (Number(item.usuarioId) === Number(user.id) && !item.lida) { item.lida = true; updated += 1; }
+    });
+    return HttpResponse.json({ atualizadas: updated });
+  }),
+
 ];
