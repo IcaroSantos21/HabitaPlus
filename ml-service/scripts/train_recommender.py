@@ -66,20 +66,21 @@ def make_pipeline(k: int) -> Pipeline:
     """Proporção por categoria + K-Means. O `Normalizer` não aprende nada (sem vazamento)."""
     return Pipeline([
         ("normalizer", Normalizer(norm="l1")),
-        ("kmeans", KMeans(n_clusters=k, n_init=N_INIT, random_state=SEED)),
+        ("kmeans", KMeans(n_clusters=k, n_init=N_INIT, random_state=SEED)),  # type: ignore[arg-type]
     ])
 
 
 def load_interest_matrix(path: Path = DATA_DIR / "resident_profiles.csv") -> tuple[np.ndarray, np.ndarray]:
     """Vetores de interesse e grupo latente de cada morador (mesma conta da inferência)."""
     df = pd.read_csv(path)
+
+    def counts(prefix: str) -> np.ndarray:
+        return df[[f"{prefix}_{c}" for c in CATEGORIES]].to_numpy(dtype=int)
+
+    views, listed, chats = counts("visualizacoes"), counts("anunciadas"), counts("conversas")
     vectors = np.vstack([
-        build_interest_vector(
-            {c: int(row[f"visualizacoes_{c}"]) for c in CATEGORIES},
-            {c: int(row[f"anunciadas_{c}"]) for c in CATEGORIES},
-            {c: int(row[f"conversas_{c}"]) for c in CATEGORIES},
-        )
-        for _, row in df.iterrows()
+        build_interest_vector(dict(zip(CATEGORIES, v)), dict(zip(CATEGORIES, a)), dict(zip(CATEGORIES, c)))
+        for v, a, c in zip(views, listed, chats, strict=True)
     ])
     return vectors, df["grupo_latente"].to_numpy()
 

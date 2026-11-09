@@ -109,3 +109,96 @@ cd ml-service
 python -m scripts.train_recommender   # regrava artifacts/recommender_model.joblib e docs/img/ml-recommend-k-selection.png
 pytest
 ```
+
+
+## ML-04: NLU (`POST /nlu/parse`)
+
+Código: `ml-service/app/services/text_preprocessing.py`, `intent_classifier.py`, `entity_extractor.py`, `nlu_parser.py` e `ml-service/scripts/train_intents.py` (treino).
+
+### Método
+
+- **Pré-processamento:** minúsculas, remoção de acentos e tokenização (`text_preprocessing.py`), usado dentro do `Pipeline`.
+- **Divisão treino e teste:** `StratifiedGroupKFold` por `base_id` (1 dobra de 5 para o teste). Cada frase-modelo inteira, com suas variações, fica de um lado só, e cada intenção aparece nos dois lados. Resultado: 1.092 frases de treino (340 templates) e 272 de teste (84 templates), sem nenhuma frase em comum. Um split aleatório simples daria F1 de ~0,98 e não vale nada, porque a frase original estaria no treino e a variação no teste.
+- **Candidatos:** 3 vetorizadores (TF-IDF de palavras, Bag-of-Words de palavras e TF-IDF de caracteres) x 3 modelos (`LogisticRegression`, `LinearSVC`, Naive Bayes), com um grid pequeno de hiperparâmetros (`C` da regressão logística: 1, 10 e 100; `alpha` do Naive Bayes: 0,1 e 1).
+- **Escolha:** pela validação cruzada agrupada (4 dobras) dentro do treino, medindo o F1 macro com a regra de confiança da API. O conjunto de teste só é usado depois, para reportar.
+- **Confiança:** `predict_proba`. Abaixo de 0,5 a API devolve `fora_de_escopo` (a confiança devolvida continua sendo a original).
+
+### Resultado: tfidf_char + LogisticRegression (C = 100)
+
+| Métrica no teste | Valor |
+|---|---|
+| Accuracy | 0,875 |
+| **F1 macro** (com o limite de 0,5, como a API responde) | **0,873** (meta: 0,85) |
+| F1 macro sem o limite | 0,907 |
+| Baseline (classe mais frequente): accuracy / F1 macro | 0,132 / 0,023 |
+
+### Comparação dos modelos
+
+F1 de validação vem da validação cruzada do treino (é com ele que se escolhe). As colunas de teste são só informativas. O `LinearSVC` tem o melhor F1 bruto, mas não tem `predict_proba` e por isso não pode fornecer a confiança que a API exige; ele não concorre à escolha.
+
+| Modelo | Hiperparâmetro | F1 valid. | Accuracy | F1 macro | F1 sem limite |
+|---|---|---|---|---|---|
+| tfidf_word + logreg | C = 100 | 0,771 | 0,849 | 0,854 | 0,868 |
+| tfidf_word + linear_svc | C = 1 | 0,795 | 0,871 | 0,876 | 0,876 |
+| tfidf_word + naive_bayes | alpha = 0,1 | 0,794 | 0,794 | 0,802 | 0,803 |
+| bow_word + logreg | C = 100 | 0,751 | 0,842 | 0,838 | 0,842 |
+| bow_word + linear_svc | C = 1 | 0,763 | 0,860 | 0,852 | 0,852 |
+| bow_word + naive_bayes | alpha = 0,1 | 0,812 | 0,809 | 0,808 | 0,796 |
+| **tfidf_char + logreg** | **C = 100** | **0,842** | **0,875** | **0,873** | **0,907** |
+| tfidf_char + linear_svc | C = 1 | 0,853 | 0,926 | 0,927 | 0,927 |
+| tfidf_char + naive_bayes | alpha = 0,1 | 0,825 | 0,901 | 0,900 | 0,901 |
+
+**Por que `tfidf_char + logreg`:** o TF-IDF de caracteres (n-gramas de 2 a 5 dentro de cada palavra) foi o melhor vetorizador com folga, porque o dataset tem erros de digitação e gírias ("pracelas", "mosta", "canelo") que quebram o vocabulário por palavra. Entre os modelos com `predict_proba`, a regressão logística teve a melhor validação (0,842 contra 0,825 do Naive Bayes). O Bag-of-Words ficou claramente abaixo do TF-IDF com o mesmo modelo, o que justifica o ponderamento por TF-IDF. `C` baixo (1) dá probabilidades achatadas e o limite de 0,5 derrubaria quase tudo para `fora_de_escopo`; `C = 100` dá probabilidades utilizáveis (7,7% das frases de teste ficam abaixo de 0,5).
+
+### Matriz de confusão (teste, comportamento da API)
+
+![Matriz de confusão](img/ml-intents-confusion-matrix.png)
+
+| Intenção | Precision | Recall | F1 | Suporte |
+|---|---|---|---|---|
+| saudacao | 1,000 | 0,562 | 0,720 | 16 |
+| consultar_apartamentos | 0,944 | 0,944 | 0,944 | 36 |
+| abrir_chamado | 0,818 | 1,000 | 0,900 | 36 |
+| status_chamado | 0,893 | 0,806 | 0,847 | 31 |
+| segunda_via_boleto | 1,000 | 0,810 | 0,895 | 21 |
+| status_financeiro | 1,000 | 0,931 | 0,964 | 29 |
+| previsao_despesas | 1,000 | 1,000 | 1,000 | 24 |
+| recomendar_produtos | 1,000 | 0,917 | 0,957 | 24 |
+| regras_condominio | 0,889 | 0,727 | 0,800 | 22 |
+| fora_de_escopo | 0,596 | 0,848 | 0,700 | 33 |
+
+Os erros mais frequentes: `saudacao` e `status_chamado` caindo em `fora_de_escopo` (7 e 6 frases, quase todas por confiança abaixo de 0,5) e `regras_condominio` confundida com `abrir_chamado` (6 frases com vocabulário de reforma e obra). A baixa precision de `fora_de_escopo` vem do limite de confiança: ele "recolhe" frases válidas de baixa confiança.
+
+### Ampliação dos exemplos
+
+Com os 289 templates originais (24 a 52 por intenção), o F1 macro no teste agrupado ficou em ~0,80, abaixo da meta. Como a issue manda, ampliei os exemplos: +135 templates novos (de 289 para 424), escritos no fim de cada lista em `scripts/intent_templates.py` para os `base_id` antigos não mudarem, com mais negativos difíceis em `fora_de_escopo` (por exemplo "quanto custa um sofá novo?" e "meu notebook quebrou, onde conserto?"). Os outros quatro CSVs ficaram idênticos byte a byte. As frases do teste continuam sendo templates que o modelo nunca viu.
+
+### Extração de entidades
+
+Regex, uma função por entidade (`entity_extractor.py`), cada uma com testes positivos e negativos:
+
+| Entidade | Exemplos reconhecidos | Saída |
+|---|---|---|
+| `unidade` | "apto 302", "ap. 302", "apartamento nº 58", "unidade 1204" | `"302"` |
+| `bloco` | "bloco b", "Bloco B", "bl. c" (blocos A a D) | `"B"` |
+| `equipamento` | elevador, portão, bomba, interfone, iluminação (e lâmpada) | `"portao"` (id ASCII) |
+| `quartos` | "2 quartos", "dois quartos", "um quarto" | `2` |
+| `valorMax` | "até 2 mil", "R$ 2.500", "1500 reais", "R$ 2,5 mil" | `2500.0` |
+| `data` | "amanhã", "dia 10", "dia 15/11", "segunda-feira", "15 de novembro" | `"amanha"` (texto normalizado) |
+
+### Limitações
+
+- Dados sintéticos: as frases vêm de templates e as variações são geradas por regras; o F1 de 0,87 mostra que o pipeline funciona, não que acerta o jeito real de falar dos moradores.
+- `saudacao` tem recall de 0,56: saudações de gíria que o modelo nunca viu ("salve", "eae") caem abaixo de 0,5 de confiança. Mais exemplos de gíria resolvem.
+- A data sai como a expressão do texto, sem resolver para uma data: "amanhã" depende do dia de hoje, que é papel do back.
+- O valor citado é sempre tratado como teto (`valorMax`), com ou sem "até".
+- Blocos reconhecidos: A a D (`BLOCK_LETTERS`), para "bloco e o elevador" não virar o bloco E. Ampliar a constante se o condomínio tiver mais blocos.
+
+### Como retreinar
+
+```bash
+cd ml-service
+python -m scripts.generate_data   # só se mudar intent_templates.py
+python -m scripts.train_intents   # regrava artifacts/intent_model.joblib e docs/img/ml-intents-confusion-matrix.png
+pytest
+```

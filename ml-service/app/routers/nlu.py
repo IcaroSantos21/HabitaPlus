@@ -20,5 +20,5 @@ def parse(
     body: NluRequest,
     service: Annotated[NluService, Depends(get_nlu_service)],
 ) -> NluResponse:
-    """Interpreta o texto do morador (stub)."""
+    """Intenção, confiança e entidades; confiança abaixo de 0.5 vira fora_de_escopo."""
     return service.parse(body.text)
