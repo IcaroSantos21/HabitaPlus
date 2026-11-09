@@ -7,7 +7,10 @@ import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizaca
 import { Mensagem } from '../../database/entities/mensagem.entity';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
 import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
-import { MlService } from './ml.service';
+import {
+  MlClientService,
+  RecommendRequest,
+} from '../ml-client/ml-client.service';
 
 interface ResultadoCategoria {
   categoria: string;
@@ -28,33 +31,6 @@ interface ResultadoCandidato {
   popularidade: number | string;
 }
 
-export interface RecommendRequest {
-  residentId: number;
-
-  profile: {
-    visualizacoes: Record<string, number>;
-    anunciadas: Record<string, number>;
-    conversas: Record<string, number>;
-  };
-
-  candidates: {
-    listingId: number;
-    categoria: string;
-    preco: number;
-    popularidade: number;
-  }[];
-
-  topN: number;
-}
-
-export interface RecommendResponse {
-  cluster: number;
-  recommendations: {
-    listingId: number;
-    score: number;
-  }[];
-}
-
 @Injectable()
 export class ResidentsService {
   constructor(
@@ -67,7 +43,7 @@ export class ResidentsService {
     @InjectRepository(Mensagem)
     private readonly mensagensRepository: Repository<Mensagem>,
 
-    private readonly mlService: MlService,
+    private readonly mlClientService: MlClientService,
   ) {}
 
   async obterPerfilDeInteresse(usuario: AuthUserDto) {
@@ -107,10 +83,7 @@ export class ResidentsService {
     };
 
     // Envia os dados ao serviço Python.
-    const resultado = await this.mlService.recomendar<
-      RecommendRequest,
-      RecommendResponse
-    >(payload);
+    const resultado = await this.mlClientService.recommend(payload);
 
     const ids = resultado.recommendations.map(
       (recomendacao) => recomendacao.listingId,

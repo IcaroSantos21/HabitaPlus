@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-// Utilize os mesmos caminhos de importação do seu anuncios.controller.ts
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import { ResidentsService, RecommendResponse } from './residents.service';
+import { RecommendResponse } from '../ml-client/ml-client.service';
+import { ResidentsService } from './residents.service';
 
 @ApiTags('Residents')
 @ApiBearerAuth()
