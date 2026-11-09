@@ -4,6 +4,7 @@ from typing import Protocol
 
 from app.core.constants import Intent
 from app.schemas.nlu import Entities, NluResponse
+from app.schemas.maintenance import MaintenanceAnalysisRequest, MaintenanceAnalysisResponse
 from app.schemas.predict import ExpensesRequest, ExpensesResponse
 from app.schemas.recommend import RecommendRequest, RecommendResponse
 
@@ -50,3 +51,8 @@ class Recommender(Protocol):
     """Recomenda anúncios do marketplace."""
 
     def recommend(self, request: RecommendRequest) -> RecommendResponse: ...
+
+class MaintenanceAnalyzerProtocol(Protocol):
+    """Analisa recorrência de chamados para manutenção preventiva."""
+
+    def analyze(self, request: MaintenanceAnalysisRequest) -> MaintenanceAnalysisResponse: ...
