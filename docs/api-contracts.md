@@ -345,3 +345,66 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
 
 Contador: { "naoLidas": 3 }. Leitura em massa: { "atualizadas": 3 }.
 Uso interno: NotificationsService.notify(usuarioId, tipo, texto, refId?) e notifyMany(usuarioIds, tipo, texto, refId?).
+
+# Financeiro: inadimplência e painel (implementado no backend)
+
+  # Método   Rota                                              Acesso                    Finalidade
+    GET      /api/finance/delinquency?from=YYYY-MM&to=YYYY-MM   Síndico e administrador   Indicadores de inadimplência (período opcional; sem ele, todo o histórico)
+    GET      /api/finance/dashboard?competencia=YYYY-MM         Síndico e administrador   Resumo financeiro do mês (padrão: mês atual)
+
+# Exemplo de resposta de /finance/delinquency (200)
+
+    {
+  "totalEmAtraso": 1300,
+  "percentual": 20,
+  "porUnidade": [
+    { "unidadeId": 1, "bloco": "A", "numero": "101", "totalEmAtraso": 650, "cobrancasAtrasadas": 1 }
+  ],
+  "porMes": [
+    { "competencia": "2026-10", "totalCobrado": 3250, "totalEmAtraso": 1300, "percentual": 40 }
+  ]
+}
+
+# Exemplo de resposta de /finance/dashboard (200)
+
+    {
+  "receitaMes": 8000,
+  "despesaMes": 5000,
+  "saldoMes": 3000,
+  "inadimplenciaPercentual": 10,
+  "cobrancasPendentes": 4
+}
+
+Percentual = valor em atraso (status ATRASADA) / valor total cobrado, de 0 a 100. No dashboard, percentual e pendentes são do mês consultado.
+
+# Mensagens entre comprador e vendedor (implementado no backend)
+
+  # Método   Rota                                   Acesso         Finalidade
+    POST     /api/listings/{id}/messages            Autenticado    Envia mensagem (comprador -> vendedor; o vendedor informa destinatarioId e só responde a quem já lhe escreveu)
+    GET      /api/listings/{id}/messages            Participante   Conversa do usuário no anúncio (o vendedor informa ?usuarioId=comprador)
+    GET      /api/messages/inbox                    Autenticado    Conversas com a última mensagem e a contagem de não lidas
+    PATCH    /api/messages/{id}/read                Destinatário   Marca mensagem como lida (404 se não for sua)
+
+# Exemplo de mensagem (201 e itens de GET /listings/{id}/messages)
+
+    {
+  "id": 100,
+  "anuncioId": 5,
+  "remetenteId": 2,
+  "destinatarioId": 1,
+  "texto": "Ainda está disponível?",
+  "lida": false,
+  "criadaEm": "2026-11-08T12:00:00.000Z"
+}
+
+# Exemplo de item do inbox
+
+    {
+  "anuncioId": 5,
+  "anuncioTitulo": "Sofá 3 lugares",
+  "outroUsuario": { "id": 2, "nome": "Maria" },
+  "ultimaMensagem": { "id": 100, "texto": "Ainda está disponível?", "remetenteId": 2, "criadaEm": "2026-11-08T12:00:00.000Z" },
+  "naoLidas": 1
+}
+
+Erros: 400 (vendedor sem destinatarioId/usuarioId), 403 (destinatário ou conversa que não é sua), 404 (anúncio ou mensagem inexistente). Sem WebSocket: o front atualiza por polling. Cada envio gera uma notificação MENSAGEM (refId = id do anúncio).
