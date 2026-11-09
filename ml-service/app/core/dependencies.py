@@ -7,7 +7,6 @@ from app.services.protocols import ExpensePredictor, NluService, Recommender, Ma
 from fastapi import Request
 
 # Fornece a implementação de NLU usada pela rota.
-=======
 """Providers de dependência (FastAPI Depends)."""
 
 from fastapi import Request
