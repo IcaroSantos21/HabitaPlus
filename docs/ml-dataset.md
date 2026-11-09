@@ -22,7 +22,7 @@ python -m scripts.generate_data --out-dir /tmp/x   # grava em outra pasta
 | `expenses.csv` | 180 (36 meses x 5 categorias) | ML-03 |
 | `expenses_total.csv` | 36 | ML-03 (mesmo formato do histórico de `POST /predict/expenses`) |
 | `resident_profiles.csv` | 240 | ML-05 |
-| `intents.csv` | 907 | ML-04 |
+| `intents.csv` | 1364 | ML-04 |
 | `tickets.csv` | 659 | ML-06 e seed do back (BE-18) |
 
 Valores de categoria são ids ASCII em `snake_case` (`agua`, `portao`, `iluminacao`), no mesmo estilo de `moveis` e `consultar_apartamentos` do contrato.
@@ -87,18 +87,18 @@ Colunas: `text`, `intent`, `base_id`, `variant`. Linhas embaralhadas com seed fi
 
 | Intenção | Linhas | Templates (`base_id`) |
 |---|---|---|
-| `abrir_chamado` | 113 | 25 |
-| `consultar_apartamentos` | 119 | 31 |
-| `fora_de_escopo` | 134 | 52 |
-| `previsao_despesas` | 76 | 24 |
-| `recomendar_produtos` | 72 | 24 |
-| `regras_condominio` | 67 | 24 |
-| `saudacao` | 59 | 29 |
-| `segunda_via_boleto` | 66 | 24 |
-| `status_chamado` | 99 | 24 |
-| `status_financeiro` | 102 | 32 |
+| `abrir_chamado` | 180 | 39 |
+| `consultar_apartamentos` | 177 | 46 |
+| `fora_de_escopo` | 165 | 66 |
+| `previsao_despesas` | 124 | 38 |
+| `recomendar_produtos` | 123 | 38 |
+| `regras_condominio` | 111 | 38 |
+| `saudacao` | 79 | 37 |
+| `segunda_via_boleto` | 106 | 38 |
+| `status_chamado` | 154 | 38 |
+| `status_financeiro` | 145 | 46 |
 
-Como foi montado: cada intenção tem 24 a 52 frases-modelo escritas à mão, algumas com campos (`{bloco}`, `{quartos}`, `{valor}`, `{unidade}`, equipamentos, `{data}`...) preenchidos por sorteio, de modo que as entidades do ML-02 aparecem em formas variadas ("bloco b", "apto 302", "R$ 2.500", "dois quartos"). Cada preenchimento gera a frase original mais 2 variações sorteadas entre:
+Como foi montado: cada intenção tem 37 a 66 frases-modelo escritas à mão (as 24 a 52 primeiras do ML-02, mais uma ampliação feita no ML-04 para atingir a meta de F1 macro), algumas com campos (`{bloco}`, `{quartos}`, `{valor}`, `{unidade}`, equipamentos, `{data}`...) preenchidos por sorteio, de modo que as entidades do ML-02 aparecem em formas variadas ("bloco b", "apto 302", "R$ 2.500", "dois quartos"). Cada preenchimento gera a frase original mais 2 variações sorteadas entre:
 
 - `sem_acento`: remove acentos ("voce esta no portao");
 - `informal`: minúsculas, abreviações de chat ("vc", "pra", "apto", "pfv", "qro") e sem pontuação;
@@ -146,5 +146,5 @@ Mesmo período das despesas (2023-11-01 a 2026-10-31). O número de chamados por
 ## Como evoluir
 
 1. Mudou uma premissa? Edite as constantes no topo do script, rode `python -m scripts.generate_data` e commite os CSVs junto.
-2. Quer mais frases? Acrescente templates em `scripts/intent_templates.py`. As frases novas mudam a ordem do embaralhamento e, por consequência, o `intents.csv` inteiro; isso é esperado.
+2. Quer mais frases? Acrescente templates em `scripts/intent_templates.py`. As frases novas mudam a ordem do embaralhamento e, por consequência, o `intents.csv` inteiro; isso é esperado. Acrescente sempre no fim de cada lista (em `_EXTRA_TEMPLATES`), para os `base_id` das frases antigas não mudarem. Depois rode `python -m scripts.generate_data` e `python -m scripts.train_intents`.
 3. Quando existirem dados reais, troque os CSVs mantendo as colunas; os scripts de treino não precisam mudar.

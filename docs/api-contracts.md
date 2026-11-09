@@ -408,3 +408,21 @@ Percentual = valor em atraso (status ATRASADA) / valor total cobrado, de 0 a 100
 }
 
 Erros: 400 (vendedor sem destinatarioId/usuarioId), 403 (destinatário ou conversa que não é sua), 404 (anúncio ou mensagem inexistente). Sem WebSocket: o front atualiza por polling. Cada envio gera uma notificação MENSAGEM (refId = id do anúncio).
+
+# Comunicados do condomínio (implementado no backend)
+
+  # Método   Rota                                      Acesso                 Finalidade
+    POST     /api/announcements                        Síndico/administrador  Criar comunicado e notificar todos os moradores
+    GET      /api/announcements?pagina=1&limite=20     Autenticado            Listar comunicados, mais recentes primeiro e paginados
+    PATCH    /api/announcements/{id}                   Síndico/administrador  Atualizar comunicado
+    DELETE   /api/announcements/{id}                   Síndico/administrador  Excluir comunicado
+
+# Exemplo de criação/atualização
+
+    {
+      "titulo": "Manutenção da piscina",
+      "conteudo": "A piscina ficará fechada para manutenção nesta sexta-feira."
+    }
+
+A criação envia uma notificação do tipo ANUNCIO para cada usuário com perfil MORADOR.
+Cada item listado contém id, titulo, conteudo, criadaEm e atualizadaEm.
