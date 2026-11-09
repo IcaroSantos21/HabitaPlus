@@ -22,6 +22,7 @@ function criarNotificacao(overrides: Partial<Notificacao> = {}): Notificacao {
     tipo: TipoNotificacao.ANUNCIO,
     texto: 'Novo anúncio: Sofá',
     refId: 7,
+    chaveUnica: null,
     lida: false,
     criadaEm: new Date('2026-11-07T12:00:00Z'),
     ...overrides,
