@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 // Utilize os mesmos caminhos de importação do seu anuncios.controller.ts
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import { ResidentsService,  RecommendResponse} from './residents.service';
+import { ResidentsService, RecommendResponse } from './residents.service';
 
 @ApiTags('Residents')
 @ApiBearerAuth()
@@ -25,8 +25,8 @@ export class ResidentsController {
     summary: 'Consultar anúncios recomendados para o morador',
   })
   obterRecomendacoes(
-  @CurrentUser() usuario: AuthUserDto,
-): Promise<RecommendResponse> {
-  return this.residentsService.obterRecomendacoes(usuario);
+    @CurrentUser() usuario: AuthUserDto,
+  ): Promise<RecommendResponse> {
+    return this.residentsService.obterRecomendacoes(usuario);
   }
 }

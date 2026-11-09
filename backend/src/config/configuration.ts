@@ -1,4 +1,3 @@
-
 // Descreve as configurações tipadas usadas pelo backend.
 export interface AppConfig {
   nodeEnv: string;
@@ -54,8 +53,7 @@ export default (): AppConfig => ({
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
     successUrl:
       process.env.STRIPE_SUCCESS_URL ?? 'http://localhost:5173/success',
-    cancelUrl:
-      process.env.STRIPE_CANCEL_URL ?? 'http://localhost:5173/cancel',
+    cancelUrl: process.env.STRIPE_CANCEL_URL ?? 'http://localhost:5173/cancel',
   },
 
   database: {

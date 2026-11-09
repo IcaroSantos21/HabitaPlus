@@ -6,7 +6,7 @@ import { Anuncio } from '../../database/entities/anuncio.entity';
 import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizacao.entity';
 import { Mensagem } from '../../database/entities/mensagem.entity';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import {CategoriaAnuncio,StatusAnuncio } from '../../database/entities/enums';
+import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
 import { MlService } from './ml.service';
 
 interface ResultadoCategoria {
@@ -97,12 +97,8 @@ export class ResidentsService {
         visualizacoes: this.converterCategoriasParaMinusculas(
           perfil.visualizacoes,
         ),
-        anunciadas: this.converterCategoriasParaMinusculas(
-          perfil.anunciadas,
-        ),
-        conversas: this.converterCategoriasParaMinusculas(
-          perfil.conversas,
-        ),
+        anunciadas: this.converterCategoriasParaMinusculas(perfil.anunciadas),
+        conversas: this.converterCategoriasParaMinusculas(perfil.conversas),
       },
 
       candidates: candidatos,
@@ -112,76 +108,76 @@ export class ResidentsService {
 
     // Envia os dados ao serviço Python.
     const resultado = await this.mlService.recomendar<
-  RecommendRequest,
-  RecommendResponse
->(payload);
+      RecommendRequest,
+      RecommendResponse
+    >(payload);
 
-const ids = resultado.recommendations.map(
-  (recomendacao) => recomendacao.listingId,
-);
+    const ids = resultado.recommendations.map(
+      (recomendacao) => recomendacao.listingId,
+    );
 
-if (ids.length === 0) {
-  return {
-    cluster: resultado.cluster,
-    recommendations: [],
-  };
-}
-
-const anuncios = await this.anunciosRepository.find({
-  where: {
-    id: In(ids),
-  },
-  relations: {
-    vendedor: true,
-  },
-});
-
-const anunciosPorId = new Map(
-  anuncios.map((anuncio) => [anuncio.id, anuncio]),
-);
-
-return {
-  cluster: resultado.cluster,
-
-  recommendations: resultado.recommendations
-    .map((recomendacao) => {
-      const anuncio = anunciosPorId.get(recomendacao.listingId);
-
-      if (!anuncio) {
-        return null;
-      }
-
+    if (ids.length === 0) {
       return {
-        listingId: anuncio.id,
-        score: recomendacao.score,
-
-        anuncio: {
-          titulo: anuncio.titulo,
-          descricao: anuncio.descricao,
-          categoria: anuncio.categoria,
-          preco: Number(anuncio.preco),
-          imagemUrl: anuncio.imagemUrl,
-
-          vendedor: {
-            nome: anuncio.vendedor.nome,
-          },
-        },
+        cluster: resultado.cluster,
+        recommendations: [],
       };
-    })
-    .filter((item) => item !== null),
-};
+    }
+
+    const anuncios = await this.anunciosRepository.find({
+      where: {
+        id: In(ids),
+      },
+      relations: {
+        vendedor: true,
+      },
+    });
+
+    const anunciosPorId = new Map(
+      anuncios.map((anuncio) => [anuncio.id, anuncio]),
+    );
+
+    return {
+      cluster: resultado.cluster,
+
+      recommendations: resultado.recommendations
+        .map((recomendacao) => {
+          const anuncio = anunciosPorId.get(recomendacao.listingId);
+
+          if (!anuncio) {
+            return null;
+          }
+
+          return {
+            listingId: anuncio.id,
+            score: recomendacao.score,
+
+            anuncio: {
+              titulo: anuncio.titulo,
+              descricao: anuncio.descricao,
+              categoria: anuncio.categoria,
+              preco: Number(anuncio.preco),
+              imagemUrl: anuncio.imagemUrl,
+
+              vendedor: {
+                nome: anuncio.vendedor.nome,
+              },
+            },
+          };
+        })
+        .filter((item) => item !== null),
+    };
   }
 
   private converterCategoriasParaMinusculas(
-  categorias: Record<string, number>,
-): Record<string, number> {
-  return Object.fromEntries(
-    Object.entries(categorias).map(([categoria, total]) => [
-      categoria.toLowerCase(),
-      total,
-    ]),
-  );
-}
+    categorias: Record<string, number>,
+  ): Record<string, number> {
+    return Object.fromEntries(
+      Object.entries(categorias).map(([categoria, total]) => [
+        categoria.toLowerCase(),
+        total,
+      ]),
+    );
+  }
 
   private async buscarVisualizacoes(usuarioId: number) {
     const resultados = await this.visualizacoesRepository
@@ -248,33 +244,33 @@ return {
   }
 
   private async buscarCandidatos(usuarioId: number) {
-  const resultados = await this.anunciosRepository
-    .createQueryBuilder('anuncio')
-    .select('anuncio.id', 'listingId')
-    .addSelect('anuncio.categoria', 'categoria')
-    .addSelect('anuncio.preco', 'preco')
-    .addSelect(
-      (subQuery) =>
-        subQuery
-          .select('COUNT(visualizacao.id)')
-          .from(AnuncioVisualizacao, 'visualizacao')
-          .where('visualizacao.anuncioId = anuncio.id'),
-      'popularidade',
-    )
-    .where('anuncio.status = :status', {
-      status: StatusAnuncio.DISPONIVEL,
-    })
-    .andWhere('anuncio.vendedorId != :usuarioId', {
-      usuarioId,
-    })
-    .getRawMany<ResultadoCandidato>();
+    const resultados = await this.anunciosRepository
+      .createQueryBuilder('anuncio')
+      .select('anuncio.id', 'listingId')
+      .addSelect('anuncio.categoria', 'categoria')
+      .addSelect('anuncio.preco', 'preco')
+      .addSelect(
+        (subQuery) =>
+          subQuery
+            .select('COUNT(visualizacao.id)')
+            .from(AnuncioVisualizacao, 'visualizacao')
+            .where('visualizacao.anuncioId = anuncio.id'),
+        'popularidade',
+      )
+      .where('anuncio.status = :status', {
+        status: StatusAnuncio.DISPONIVEL,
+      })
+      .andWhere('anuncio.vendedorId != :usuarioId', {
+        usuarioId,
+      })
+      .getRawMany<ResultadoCandidato>();
 
-  return resultados.map((anuncio) => ({
-    listingId: Number(anuncio.listingId),
-    categoria: anuncio.categoria.toLowerCase() as Lowercase<CategoriaAnuncio>,
-    preco: Number(anuncio.preco),
-    popularidade: Number(anuncio.popularidade),
-  }));
+    return resultados.map((anuncio) => ({
+      listingId: Number(anuncio.listingId),
+      categoria: anuncio.categoria.toLowerCase() as Lowercase<CategoriaAnuncio>,
+      preco: Number(anuncio.preco),
+      popularidade: Number(anuncio.popularidade),
+    }));
   }
 
   private converterResultados(

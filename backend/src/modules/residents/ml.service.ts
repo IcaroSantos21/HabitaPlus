@@ -1,8 +1,4 @@
-
-import {
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig } from '../../config/configuration';
 
@@ -10,9 +6,7 @@ import { AppConfig } from '../../config/configuration';
 export class MlService {
   private readonly baseUrl: string;
 
-  constructor(
-    private readonly config: ConfigService<AppConfig, true>,
-  ) {
+  constructor(private readonly config: ConfigService<AppConfig, true>) {
     const mlConfig = this.config.get('mlService', { infer: true });
 
     this.baseUrl = mlConfig.url.replace(/\/+$/, '');
