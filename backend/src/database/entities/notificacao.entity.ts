@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -9,6 +10,7 @@ import {
 import { Usuario } from './usuario.entity';
 
 @Entity('notificacoes')
+@Index('UQ_notificacoes_chave_unica', ['chaveUnica'], { unique: true })
 // Representa uma notificação enviada a um usuário.
 export class Notificacao {
   @PrimaryGeneratedColumn()
@@ -26,6 +28,9 @@ export class Notificacao {
 
   @Column({ type: 'integer', nullable: true })
   refId!: number | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  chaveUnica!: string | null;
 
   @Column({ default: false })
   lida!: boolean;

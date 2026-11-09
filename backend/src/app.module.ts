@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccessTestModule } from './modules/access-test/access-test.module';
 import { UnitsModule } from './modules/units/units.module';
+
+// Módulos restaurados
 import { RentalsModule } from './modules/rentals/rentals.module';
 import { ChamadosModule } from './modules/chamados/chamado.module';
 import { AnunciosModule } from './modules/listings/anuncios.module';
@@ -16,6 +18,9 @@ import { TransacoesModule } from './modules/transacoes/transacoes.module';
 import { ResidentsModule } from './modules/residents/residents.module';
 import { CobrancasModule } from './modules/charges/cobrancas.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+
+import { FinanceModule } from './modules/finance/finance.module';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -26,11 +31,13 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
       load: [configuration],
       validate: validateEnv,
     }),
+
     TypeOrmModule.forRootAsync({
       // Monta a conexão com o PostgreSQL usando as configurações validadas.
       inject: [ConfigService],
       useFactory: (config: ConfigService<AppConfig, true>) => {
         const db = config.get('database', { infer: true });
+
         return {
           type: 'postgres' as const,
           host: db.host,
@@ -43,11 +50,16 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
         };
       },
     }),
+
     ScheduleModule.forRoot(),
+
+    // Módulos principais
     HealthModule,
     AuthModule,
     AccessTestModule,
     UnitsModule,
+
+    // Módulos restaurados
     RentalsModule,
     ChamadosModule,
     AnunciosModule,
@@ -55,6 +67,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ResidentsModule,
     CobrancasModule,
     NotificationsModule,
+
+    FinanceModule,
+    MessagesModule,
   ],
 })
 export class AppModule {}

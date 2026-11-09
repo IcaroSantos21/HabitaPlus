@@ -132,12 +132,11 @@ function ResidentDashboard() {
     setPayment({ id: charge.id, message: "", error: "" });
 
     try {
-      await chargesService.pay(charge.id, { origem: "dashboard" });
-      setPayment({
-        id: null,
-        message: "Solicitação de pagamento enviada. Aguarde a confirmação da API.",
-        error: "",
-      });
+      const checkout = await chargesService.checkout(charge.id);
+      if (!checkout?.url) {
+        throw new Error("A API não retornou a URL de pagamento do Stripe.");
+      }
+      window.location.assign(checkout.url);
     } catch (error) {
       setPayment({
         id: null,

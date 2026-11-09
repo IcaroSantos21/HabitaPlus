@@ -11,10 +11,12 @@ from app.core.config import (
     APP_VERSION,
     ARTIFACTS_DIR,
     EXPENSE_MODEL_PATH,
+    RECOMMENDER_MODEL_PATH,
     configure_logging,
 )
 from app.routers import health, nlu, predict, recommend
 from app.services.expense_predictor import SklearnExpensePredictor
+from app.services.recommender import KMeansRecommender
 
 logger = logging.getLogger(__name__)
 
@@ -24,13 +26,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Ciclo de vida: carrega os modelos treinados uma única vez, na subida."""
     configure_logging()
     logger.info(
-        "Iniciando %s v%s (artefatos em %s; NLU e recomendação ainda em stub)",
+        "Iniciando %s v%s (artefatos em %s; NLU ainda em stub)",
         APP_NAME,
         APP_VERSION,
         ARTIFACTS_DIR,
     )
     # Falha na subida se o artefato não existir: melhor que errar a cada requisição.
     app.state.expense_predictor = SklearnExpensePredictor.from_artifact(EXPENSE_MODEL_PATH)
+    app.state.recommender = KMeansRecommender.from_artifact(RECOMMENDER_MODEL_PATH)
     yield
     logger.info("Encerrando %s", APP_NAME)
 

@@ -14,7 +14,6 @@ API em NestJS + TypeScript + PostgreSQL + TypeORM.
   cp .env.example .env              # na raiz do repo; ajuste a senha
   docker compose up -d postgres     # só o banco, na raiz
   cd backend
-  cp .env.example .env              # mesmos DB_USER/DB_PASSWORD/DB_NAME
   npm install
   npm run start:dev
 ```
@@ -23,6 +22,15 @@ API em NestJS + TypeScript + PostgreSQL + TypeORM.
 - API: http://localhost:3000/api
 - Health check: http://localhost:3000/api/health
 - Swagger: http://localhost:3000/docs
+
+## Pagamentos (Stripe, modo teste)
+
+`STRIPE_SECRET_KEY` (`sk_test_...`) e `STRIPE_WEBHOOK_SECRET` (`whsec_...`) são obrigatórias:
+a API não sobe sem elas nem com chave fora do modo teste. Passo a passo em
+[`docs/stripe-teste.md`](../docs/stripe-teste.md).
+
+- `POST /api/charges/:id/checkout`: cria a sessão de pagamento e devolve `{ url }`.
+- `POST /api/webhooks/stripe`: recebe o `checkout.session.completed` e marca a cobrança como `PAGA`.
 
 ## Autenticação
 
@@ -101,6 +109,11 @@ O comando de produção usa os arquivos JavaScript compilados em `dist/`; a
 migration incremental mantém compatibilidade com bancos que já executaram a
 migration inicial anterior. Para listar migrations pendentes no container sem
 aplicá-las, use `docker compose exec backend npm run migration:show:prod`.
+
+As notificações diárias são geradas às 01:05 no horário de Brasília. A migration
+`AdicionarChaveUnicaEmNotificacoes` adiciona a chave que impede duplicidade se
+um job for executado mais de uma vez no mesmo dia; aplique a migration antes
+de iniciar a nova versão do backend.
 
 ## Estrutura
 

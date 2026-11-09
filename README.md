@@ -42,16 +42,18 @@ Se faltar uma variável obrigatória, o `docker compose` para com uma mensagem d
 
 ### Rodando o backend fora do Docker
 
-Para desenvolver com `npm run start:dev`, suba só o banco e use o `.env` do `backend/`:
+Para desenvolver com `npm run start:dev`, suba só o banco. O backend usa o `.env`
+da raiz do repositório, assim como o Docker Compose:
 
 ```bash
 docker compose up -d postgres
 cd backend
-cp .env.example .env
 npm run start:dev
 ```
 
-`DB_USER`, `DB_PASSWORD` e `DB_NAME` precisam ser iguais nos dois `.env` (raiz e `backend/`), senão o backend não conecta no banco do Compose.
+Antes de iniciar, configure no `.env` da raiz as credenciais do banco, `JWT_SECRET`
+e as chaves Stripe de teste (`STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`).
+Consulte [`docs/stripe-teste.md`](docs/stripe-teste.md) para obter as chaves.
 
 ### Dados e migrations
 
