@@ -1,25 +1,22 @@
-"""Providers de dependência (FastAPI `Depends`).
 
-Para trocar um stub pelo modelo real, basta mudar o retorno aqui.
-"""
-from app.services.protocols import ExpensePredictor, NluService, Recommender
-from app.services.stubs import  StubNluService, StubRecommender
+"""Providers de dependência (FastAPI Depends)."""
 
 from fastapi import Request
 
-# Fornece a implementação de NLU usada pela rota.
+from app.services.protocols import ExpensePredictor, NluService, Recommender
+from app.services.stubs import StubNluService
+
+
 def get_nlu_service() -> NluService:
-    """Devolve o serviço de NLU."""
+    """Devolve a implementação de NLU."""
     return StubNluService()
 
 
-# Fornece a implementação de previsão usada pela rota.
 def get_expense_predictor(request: Request) -> ExpensePredictor:
     """Devolve o serviço de previsão de despesas."""
     return request.app.state.expense_predictor
 
 
-# Fornece a implementação de recomendações usada pela rota.
 def get_recommender(request: Request) -> Recommender:
     """Devolve o serviço de recomendação."""
     return request.app.state.recommender

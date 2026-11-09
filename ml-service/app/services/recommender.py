@@ -1,6 +1,6 @@
-"""Recomendação de anúncios por cluster de interesse: só inferência, o treino fica em `scripts/`."""
-import logging
-from collections.abc import Sequence
+
+"""Serviço de recomendação de anúncios usando K-Means."""
+
 from pathlib import Path
 from typing import Any
 
@@ -10,82 +10,174 @@ from sklearn.pipeline import Pipeline
 
 from app.core.constants import NO_CLUSTER
 from app.schemas.recommend import (
-    Candidate,
-    Recommendation,
     RecommendRequest,
     RecommendResponse,
+    Recommendation,
 )
-from app.services.recommender_features import FEATURE_NAMES, build_interest_vector
-
-logger = logging.getLogger(__name__)
-
-# O score mistura o quanto o cluster gosta da categoria e a popularidade do anúncio.
-CATEGORY_WEIGHT = 0.7
-POPULARITY_WEIGHT = 0.3
+from app.services.recommender_features import (
+    FEATURE_NAMES,
+    build_interest_vector,
+)
 
 
-def normalized_popularity(candidates: Sequence[Candidate]) -> list[float]:
-    """Popularidade dividida pela maior entre os candidatos (0 a 1; tudo zero se ninguém tem)."""
-    highest = max((c.popularidade for c in candidates), default=0)
-    return [c.popularidade / highest if highest else 0.0 for c in candidates]
+def normalized_popularity(candidates) -> list[float]:
+    """Normaliza a popularidade dos anúncios entre zero e um."""
+
+    if not candidates:
+        return []
+
+    max_popularity = max(
+        (candidate.popularidade for candidate in candidates),
+        default=0,
+    )
+
+    if max_popularity == 0:
+        return [0.0 for _ in candidates]
+
+    return [
+        candidate.popularidade / max_popularity
+        for candidate in candidates
+    ]
 
 
 class KMeansRecommender:
-    """Atribui o morador a um cluster do K-Means e ordena os anúncios pelas categorias fortes dele."""
+    """Recomenda anúncios com base no cluster de interesse do morador."""
 
-    def __init__(self, pipeline: Pipeline, silhouette: float) -> None:
-        self._pipeline = pipeline
-        self._silhouette = silhouette
-        centers: np.ndarray = pipeline.named_steps["kmeans"].cluster_centers_
-        # Cada centro soma 1 (média de proporções). Dividir pelo maior deixa a categoria
-        # mais forte do cluster com 1,0 e as demais relativas a ela.
-        self._strength = centers / centers.max(axis=1, keepdims=True)
+    def __init__(
+        self,
+        pipeline: Pipeline,
+        silhouette: float = 0.0,
+    ) -> None:
+        self.pipeline = pipeline
+        self.silhouette = silhouette
+
+        self.kmeans = pipeline.named_steps["kmeans"]
+        self.centroids = self.kmeans.cluster_centers_
+
+        self.category_indexes = {
+            category: index
+            for index, category in enumerate(FEATURE_NAMES)
+        }
 
     @classmethod
-    def from_artifact(cls, path: Path) -> "KMeansRecommender":
-        """Carrega o artefato gerado por `scripts/train_recommender.py`."""
-        if not path.exists():
+    def from_artifact(cls, model_path: Path) -> "KMeansRecommender":
+        """Carrega o modelo treinado a partir do arquivo joblib."""
+
+        if not model_path.exists():
             raise FileNotFoundError(
-                f"Modelo de recomendação não encontrado em {path}. "
-                "Rode `python -m scripts.train_recommender` dentro de ml-service/."
+                f"Modelo de recomendação não encontrado em {model_path}. "
+                "Execute: python -m scripts.train_recommender"
             )
-        artifact: dict[str, Any] = joblib.load(path)
-        if tuple(artifact["feature_names"]) != FEATURE_NAMES:
+
+        artifact: dict[str, Any] = joblib.load(model_path)
+
+        if artifact.get("feature_names") != list(FEATURE_NAMES):
             raise ValueError(
-                "O modelo salvo usa outras features que o código atual. "
-                "Rode `python -m scripts.train_recommender` para gerar o artefato de novo."
+                "As características do modelo são incompatíveis "
+                "com a implementação atual."
             )
-        logger.info(
-            "Modelo de recomendação carregado: k=%d (silhouette %.3f)",
-            artifact["k"], artifact["silhouette"],
+
+        pipeline = artifact["pipeline"]
+
+        return cls(
+            pipeline=pipeline,
+            silhouette=float(artifact["silhouette"]),
         )
-        return cls(artifact["pipeline"], artifact["silhouette"])
 
-    def recommend(self, request: RecommendRequest) -> RecommendResponse:
-        """Cold start devolve os mais populares; senão ordena pelo cluster do morador."""
+    def recommend(
+        self,
+        request: RecommendRequest,
+    ) -> RecommendResponse:
+        """Classifica o morador e ordena os anúncios por relevância."""
+
         profile = request.profile
-        vector = build_interest_vector(profile.visualizacoes, profile.anunciadas, profile.conversas)
-        popularity = normalized_popularity(request.candidates)
 
-        if not vector.any():  # sem nenhum sinal não há cluster para atribuir
-            cluster = NO_CLUSTER
-            scores = popularity
-        else:
-            cluster = int(self._pipeline.predict(vector.reshape(1, -1))[0])  # type: ignore[arg-type]
-            strength = dict(zip(FEATURE_NAMES, self._strength[cluster], strict=True))
-            scores = [
-                CATEGORY_WEIGHT * strength[c.categoria] + POPULARITY_WEIGHT * pop
-                for c, pop in zip(request.candidates, popularity, strict=True)
-            ]
+        interest_vector = build_interest_vector(
+            profile.visualizacoes,
+            profile.anunciadas,
+            profile.conversas,
+        )
 
-        # Empate no score: o menor listingId vence, para a resposta ser sempre a mesma.
-        ranked = sorted(
-            zip(request.candidates, scores, strict=True),
-            key=lambda pair: (-pair[1], pair[0].listing_id),
-        )[: request.top_n]
+        # Morador sem histórico: recomenda os anúncios mais populares.
+        if interest_vector.sum() == 0:
+            return self._recommend_cold_start(request)
+
+        # Identifica o cluster ao qual o morador pertence.
+        cluster = int(
+            self.pipeline.predict(
+                interest_vector.reshape(1, -1)
+            )[0]
+        )
+
+        # Recupera as proporções de interesse do cluster.
+        centroid = self.centroids[cluster]
+
+        popularities = normalized_popularity(request.candidates)
+
+        scored_candidates = []
+
+        for candidate, popularity in zip(
+            request.candidates,
+            popularities,
+            strict=True,
+        ):
+            category_index = self.category_indexes[candidate.categoria]
+
+            category_score = float(centroid[category_index])
+
+            # O interesse do cluster tem maior peso que a popularidade.
+            score = (
+                category_score * 0.80
+                + popularity * 0.20
+            )
+
+            scored_candidates.append(
+                Recommendation(
+                    listing_id=candidate.listing_id,
+                    score=round(score, 4),
+                )
+            )
+
+        scored_candidates.sort(
+            key=lambda recommendation: (
+                -recommendation.score,
+                recommendation.listing_id,
+            )
+        )
+
         return RecommendResponse(
             cluster=cluster,
-            recommendations=[
-                Recommendation(listing_id=c.listing_id, score=round(score, 4)) for c, score in ranked
-            ],
+            recommendations=scored_candidates[:request.top_n],
+        )
+
+    def _recommend_cold_start(
+        self,
+        request: RecommendRequest,
+    ) -> RecommendResponse:
+        """Recomenda os anúncios populares para moradores sem histórico."""
+
+        popularities = normalized_popularity(request.candidates)
+
+        scored_candidates = [
+            Recommendation(
+                listing_id=candidate.listing_id,
+                score=round(popularity, 4),
+            )
+            for candidate, popularity in zip(
+                request.candidates,
+                popularities,
+                strict=True,
+            )
+        ]
+
+        scored_candidates.sort(
+            key=lambda recommendation: (
+                -recommendation.score,
+                recommendation.listing_id,
+            )
+        )
+
+        return RecommendResponse(
+            cluster=NO_CLUSTER,
+            recommendations=scored_candidates[:request.top_n],
         )
