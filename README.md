@@ -1,4 +1,5 @@
 # Habita+ - Gestão Condominial
+![CI](https://github.com/IcaroSantos21/HabitaPlus/actions/workflows/ci.yml/badge.svg)
 ## Subindo o sistema com Docker
 
 Pré-requisito: Docker com Compose v2.
