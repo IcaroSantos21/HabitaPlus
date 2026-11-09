@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Anuncio } from '../../database/entities/anuncio.entity';
 import { AnuncioVisualizacao } from '../../database/entities/anuncio-visualizacao.entity';
 import { Mensagem } from '../../database/entities/mensagem.entity';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
+import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
+import { MlService } from './ml.service';
 
 interface ResultadoCategoria {
   categoria: string;
@@ -19,6 +21,40 @@ interface ResultadoMensagem {
   destinatarioId: number | string;
 }
 
+interface ResultadoCandidato {
+  listingId: number | string;
+  categoria: string;
+  preco: number | string;
+  popularidade: number | string;
+}
+
+export interface RecommendRequest {
+  residentId: number;
+
+  profile: {
+    visualizacoes: Record<string, number>;
+    anunciadas: Record<string, number>;
+    conversas: Record<string, number>;
+  };
+
+  candidates: {
+    listingId: number;
+    categoria: string;
+    preco: number;
+    popularidade: number;
+  }[];
+
+  topN: number;
+}
+
+export interface RecommendResponse {
+  cluster: number;
+  recommendations: {
+    listingId: number;
+    score: number;
+  }[];
+}
+
 @Injectable()
 export class ResidentsService {
   constructor(
@@ -30,6 +66,8 @@ export class ResidentsService {
 
     @InjectRepository(Mensagem)
     private readonly mensagensRepository: Repository<Mensagem>,
+
+    private readonly mlService: MlService,
   ) {}
 
   async obterPerfilDeInteresse(usuario: AuthUserDto) {
@@ -42,6 +80,103 @@ export class ResidentsService {
       anunciadas,
       conversas,
     };
+  }
+
+  async obterRecomendacoes(usuario: AuthUserDto) {
+    // Recupera o histórico de interesse do morador.
+    const perfil = await this.obterPerfilDeInteresse(usuario);
+
+    // Recupera os anúncios disponíveis para recomendação.
+    const candidatos = await this.buscarCandidatos(usuario.id);
+
+    // Monta o contrato esperado pelo ML-service.
+    const payload: RecommendRequest = {
+      residentId: usuario.id,
+
+      profile: {
+        visualizacoes: this.converterCategoriasParaMinusculas(
+          perfil.visualizacoes,
+        ),
+        anunciadas: this.converterCategoriasParaMinusculas(perfil.anunciadas),
+        conversas: this.converterCategoriasParaMinusculas(perfil.conversas),
+      },
+
+      candidates: candidatos,
+
+      topN: 5,
+    };
+
+    // Envia os dados ao serviço Python.
+    const resultado = await this.mlService.recomendar<
+      RecommendRequest,
+      RecommendResponse
+    >(payload);
+
+    const ids = resultado.recommendations.map(
+      (recomendacao) => recomendacao.listingId,
+    );
+
+    if (ids.length === 0) {
+      return {
+        cluster: resultado.cluster,
+        recommendations: [],
+      };
+    }
+
+    const anuncios = await this.anunciosRepository.find({
+      where: {
+        id: In(ids),
+      },
+      relations: {
+        vendedor: true,
+      },
+    });
+
+    const anunciosPorId = new Map(
+      anuncios.map((anuncio) => [anuncio.id, anuncio]),
+    );
+
+    return {
+      cluster: resultado.cluster,
+
+      recommendations: resultado.recommendations
+        .map((recomendacao) => {
+          const anuncio = anunciosPorId.get(recomendacao.listingId);
+
+          if (!anuncio) {
+            return null;
+          }
+
+          return {
+            listingId: anuncio.id,
+            score: recomendacao.score,
+
+            anuncio: {
+              titulo: anuncio.titulo,
+              descricao: anuncio.descricao,
+              categoria: anuncio.categoria,
+              preco: Number(anuncio.preco),
+              imagemUrl: anuncio.imagemUrl,
+
+              vendedor: {
+                nome: anuncio.vendedor.nome,
+              },
+            },
+          };
+        })
+        .filter((item) => item !== null),
+    };
+  }
+
+  private converterCategoriasParaMinusculas(
+    categorias: Record<string, number>,
+  ): Record<string, number> {
+    return Object.fromEntries(
+      Object.entries(categorias).map(([categoria, total]) => [
+        categoria.toLowerCase(),
+        total,
+      ]),
+    );
   }
 
   private async buscarVisualizacoes(usuarioId: number) {
@@ -106,6 +241,36 @@ export class ResidentsService {
     }
 
     return totais;
+  }
+
+  private async buscarCandidatos(usuarioId: number) {
+    const resultados = await this.anunciosRepository
+      .createQueryBuilder('anuncio')
+      .select('anuncio.id', 'listingId')
+      .addSelect('anuncio.categoria', 'categoria')
+      .addSelect('anuncio.preco', 'preco')
+      .addSelect(
+        (subQuery) =>
+          subQuery
+            .select('COUNT(visualizacao.id)')
+            .from(AnuncioVisualizacao, 'visualizacao')
+            .where('visualizacao.anuncioId = anuncio.id'),
+        'popularidade',
+      )
+      .where('anuncio.status = :status', {
+        status: StatusAnuncio.DISPONIVEL,
+      })
+      .andWhere('anuncio.vendedorId != :usuarioId', {
+        usuarioId,
+      })
+      .getRawMany<ResultadoCandidato>();
+
+    return resultados.map((anuncio) => ({
+      listingId: Number(anuncio.listingId),
+      categoria: anuncio.categoria.toLowerCase() as Lowercase<CategoriaAnuncio>,
+      preco: Number(anuncio.preco),
+      popularidade: Number(anuncio.popularidade),
+    }));
   }
 
   private converterResultados(

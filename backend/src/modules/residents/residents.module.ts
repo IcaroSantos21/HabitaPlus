@@ -7,10 +7,11 @@ import { Mensagem } from '../../database/entities/mensagem.entity';
 
 import { ResidentsController } from './residents.controller';
 import { ResidentsService } from './residents.service';
+import { MlService } from './ml.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Anuncio, AnuncioVisualizacao, Mensagem])],
   controllers: [ResidentsController],
-  providers: [ResidentsService],
+  providers: [ResidentsService, MlService],
 })
 export class ResidentsModule {}

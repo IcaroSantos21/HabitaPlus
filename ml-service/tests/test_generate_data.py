@@ -39,7 +39,11 @@ def test_committed_csvs_match_the_generator(generated: dict[str, Path]) -> None:
     for path in generated.values():
         committed = DATA_DIR / path.name
         assert committed.exists(), f"{path.name} não está versionado em data/"
-        assert committed.read_bytes() == path.read_bytes(), (
+
+        committed_content = committed.read_bytes().replace(b"\r\n", b"\n")
+        generated_content = path.read_bytes().replace(b"\r\n", b"\n")
+
+        assert committed_content == generated_content, (
             f"{path.name} está desatualizado: rode `python -m scripts.generate_data`."
         )
 
