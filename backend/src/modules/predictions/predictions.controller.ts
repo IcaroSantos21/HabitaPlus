@@ -10,9 +10,7 @@ import {
 
 import { Roles } from '../../common/decorators/roles.decorator';
 import { PerfilUsuario } from '../../database/entities/enums';
-import {
-  PredictExpensesResponse,
-} from '../ml-client/ml-client.service';
+import { PredictExpensesResponse } from '../ml-client/ml-client.service';
 import { PredictionsService } from './predictions.service';
 
 @ApiTags('predictions')
@@ -26,7 +24,8 @@ export class PredictionsController {
 
   @Get('expenses')
   @ApiOperation({
-    summary: 'Prevê as despesas do próximo mês com base no histórico financeiro',
+    summary:
+      'Prevê as despesas do próximo mês com base no histórico financeiro',
   })
   @ApiOkResponse({
     description: 'Previsão de despesas do próximo mês',

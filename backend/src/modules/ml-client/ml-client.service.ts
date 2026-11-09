@@ -1,5 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
@@ -55,7 +59,10 @@ export class MlClientService {
     private readonly configService: ConfigService<AppConfig, true>,
   ) {
     const mlConfig = this.configService.get('mlService', { infer: true });
-    this.baseUrl = (mlConfig?.url ?? 'http://127.0.0.1:8000').replace(/\/+$/, '');
+    this.baseUrl = (mlConfig?.url ?? 'http://127.0.0.1:8000').replace(
+      /\/+$/,
+      '',
+    );
   }
 
   async predictExpenses(

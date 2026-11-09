@@ -14,7 +14,10 @@ import { MlClientService } from './ml-client.service';
         const mlConfig = config.get('mlService', { infer: true });
 
         return {
-          baseURL: (mlConfig?.url ?? 'http://127.0.0.1:8000').replace(/\/+$/, ''),
+          baseURL: (mlConfig?.url ?? 'http://127.0.0.1:8000').replace(
+            /\/+$/,
+            '',
+          ),
           timeout: 3000,
           maxRedirects: 5,
         };

@@ -18,7 +18,9 @@ export class RecommendationsController {
   constructor(private readonly residentsService: ResidentsService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Retorna recomendações do marketplace para o morador' })
+  @ApiOperation({
+    summary: 'Retorna recomendações do marketplace para o morador',
+  })
   @ApiOkResponse({ description: 'Lista de recomendações personalizadas' })
   getMyRecommendations(
     @CurrentUser() usuario: AuthUserDto,

@@ -1,18 +1,19 @@
-import { ServiceUnavailableException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { ServiceUnavailableException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
-import { firstValueFrom } from 'rxjs';
 
+import { AppConfig } from '../../config/configuration';
 import { MlClientService } from './ml-client.service';
 
 describe('MlClientService', () => {
   const httpService = {
     post: jest.fn(),
-  } as unknown as HttpService;
+  } as Pick<HttpService, 'post'>;
 
   const configService = {
     get: jest.fn(),
-  } as any;
+  } as jest.Mocked<Pick<ConfigService<AppConfig, true>, 'get'>>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -20,12 +21,16 @@ describe('MlClientService', () => {
       if (key === 'mlService') {
         return { url: 'http://ml-service:8000' };
       }
+
       return undefined;
     });
   });
 
   it('deve repetir uma chamada falha e devolver a resposta do ML service', async () => {
-    const service = new MlClientService(httpService, configService);
+    const service = new MlClientService(
+      httpService as HttpService,
+      configService as ConfigService<AppConfig, true>,
+    );
 
     httpService.post = jest
       .fn()
@@ -59,9 +64,14 @@ describe('MlClientService', () => {
   });
 
   it('deve transformar erros de conectividade em 503 em português', async () => {
-    const service = new MlClientService(httpService, configService);
+    const service = new MlClientService(
+      httpService as HttpService,
+      configService as ConfigService<AppConfig, true>,
+    );
 
-    httpService.post = jest.fn().mockReturnValue(throwError(() => new Error('ECONNREFUSED')));
+    httpService.post = jest
+      .fn()
+      .mockReturnValue(throwError(() => new Error('ECONNREFUSED')));
 
     await expect(
       service.predictExpenses({

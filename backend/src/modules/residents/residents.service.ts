@@ -10,7 +10,6 @@ import { CategoriaAnuncio, StatusAnuncio } from '../../database/entities/enums';
 import {
   MlClientService,
   RecommendRequest,
-  RecommendResponse,
 } from '../ml-client/ml-client.service';
 
 interface ResultadoCategoria {
