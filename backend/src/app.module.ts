@@ -21,6 +21,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 
 import { FinanceModule } from './modules/finance/finance.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 
     FinanceModule,
     MessagesModule,
+    AnnouncementsModule,
   ],
 })
 export class AppModule {}
