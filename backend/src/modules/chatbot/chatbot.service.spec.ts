@@ -6,16 +6,6 @@ import {
   StatusCobranca,
 } from '../../database/entities/enums';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
-import { CobrancasCheckoutService } from '../charges/cobrancas-checkout.service';
-import { CobrancasService } from '../charges/cobrancas.service';
-import { ChamadosService } from '../chamados/chamados.service';
-import {
-  MlClientService,
-  NluParseResponse,
-} from '../ml-client/ml-client.service';
-import { PredictionsService } from '../predictions/predictions.service';
-import { ResidentsService } from '../residents/residents.service';
-import { UnitsService } from '../units/units.service';
 import { ChatbotService } from './chatbot.service';
 
 describe('ChatbotService', () => {
