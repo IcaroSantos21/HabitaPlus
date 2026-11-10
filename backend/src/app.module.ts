@@ -22,6 +22,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { FinanceModule } from './modules/finance/finance.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
+import { MlClientModule } from './modules/ml-client/ml-client.module';
+import { PredictionsModule } from './modules/predictions/predictions.module';
+import { ChatbotModule } from './modules/chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -72,6 +75,9 @@ import { AnnouncementsModule } from './modules/announcements/announcements.modul
     FinanceModule,
     MessagesModule,
     AnnouncementsModule,
+    MlClientModule,
+    PredictionsModule,
+    ChatbotModule,
   ],
 })
 export class AppModule {}

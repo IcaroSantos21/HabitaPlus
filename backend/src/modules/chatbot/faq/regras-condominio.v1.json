@@ -1,0 +1,17 @@
+{
+  "versao": "2026-11",
+  "regras": [
+    {
+      "titulo": "Silêncio",
+      "texto": "O uso de sons deve ser controlado após as 22h para preservar o conforto dos moradores."
+    },
+    {
+      "titulo": "Animais de estimação",
+      "texto": "Animais devem estar sempre com coleira, em áreas permitidas e sem causar incômodo ao entorno."
+    },
+    {
+      "titulo": "Uso de áreas comuns",
+      "texto": "Áreas comuns devem ser usadas com responsabilidade, respeitando horários e regras específicas de cada espaço."
+    }
+  ]
+}

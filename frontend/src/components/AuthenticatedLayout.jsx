@@ -3,17 +3,16 @@ import { Link } from "react-router-dom";
 import Button from "./Button";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import NotificationBell from "./NotificationBell";
 import { useAuth } from "../hooks/useAuth";
 import { getHomePath, getUserRole, roleLabel } from "../utils/roles";
 
 const commonLinks = {
   tickets: { label: "Chamados", to: "/tickets" },
   charges: { label: "Cobranças", to: "/charges" },
-  announcements: { label: "Anúncios", to: "/announcements" },
+  marketplace: { label: "Marketplace", to: "/marketplace" },
   messages: { label: "Mensagens", to: "/messages" },
   notifications: { label: "Notificações", to: "/notifications" },
-  chatbot: { label: "Assistente virtual", to: "/chatbot" },
-  recommendations: { label: "Recomendações", to: "/recommendations" },
 };
 
 const linksByRole = {
@@ -21,11 +20,9 @@ const linksByRole = {
     { label: "Visão geral", to: "/morador" },
     commonLinks.tickets,
     commonLinks.charges,
-    commonLinks.announcements,
+    commonLinks.marketplace,
     commonLinks.messages,
     commonLinks.notifications,
-    commonLinks.chatbot,
-    commonLinks.recommendations,
   ],
   SINDICO: [
     { label: "Visão geral", to: "/sindico" },
@@ -34,12 +31,9 @@ const linksByRole = {
     commonLinks.tickets,
     { label: "Transações", to: "/transactions" },
     commonLinks.charges,
-    commonLinks.announcements,
+    commonLinks.marketplace,
     commonLinks.messages,
     commonLinks.notifications,
-    commonLinks.chatbot,
-    { label: "Previsão de despesas", to: "/forecasts" },
-    commonLinks.recommendations,
   ],
   ADMIN: [
     { label: "Visão geral", to: "/admin" },
@@ -48,12 +42,9 @@ const linksByRole = {
     commonLinks.tickets,
     { label: "Transações", to: "/transactions" },
     commonLinks.charges,
-    commonLinks.announcements,
+    commonLinks.marketplace,
     commonLinks.messages,
     commonLinks.notifications,
-    { label: "Previsão de despesas", to: "/forecasts" },
-    commonLinks.chatbot,
-    commonLinks.recommendations,
   ],
 };
 
@@ -69,17 +60,16 @@ function AuthenticatedLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-ink">
+    <div className="min-h-screen w-full overflow-x-clip bg-gray-50 text-ink">
       <Navbar
         brand="Habita+"
-        links={[
-          { label: "Catálogo de componentes", to: "/dev/components" },
-        ]}
+        links={[]}
         actions={
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
             <span className="hidden text-sm text-white sm:inline">
               {user?.nome || user?.name} · {roleLabel(user)}
             </span>
+            <NotificationBell />
             <Button
               variant="secondary"
               size="sm"
@@ -123,7 +113,7 @@ function AuthenticatedLayout({ children }) {
           />
         </div>
 
-        <main className="min-w-0 flex-1 py-2">
+        <main className="min-w-0 w-full flex-1 py-2">
           {children}
         </main>
       </div>

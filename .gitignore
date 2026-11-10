@@ -14,3 +14,6 @@ build/
 #arquivos do sistema
 .DS_Store
 Thumbs.db
+
+# Configs
+ml-service/.vscode
