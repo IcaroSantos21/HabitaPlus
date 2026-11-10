@@ -21,7 +21,7 @@ import { UnitsService } from '../units/units.service';
 export interface ChatbotMessageResponse {
   reply: string;
   intent: string;
-  data?: Record<string, unknown>;
+  data?: unknown;
 }
 
 interface ChatConversationContext {
