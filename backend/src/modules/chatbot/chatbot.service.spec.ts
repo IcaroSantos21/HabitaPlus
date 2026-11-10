@@ -6,6 +6,16 @@ import {
   StatusCobranca,
 } from '../../database/entities/enums';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
+import { CobrancasCheckoutService } from '../charges/cobrancas-checkout.service';
+import { CobrancasService } from '../charges/cobrancas.service';
+import { ChamadosService } from '../chamados/chamados.service';
+import {
+  MlClientService,
+  NluParseResponse,
+} from '../ml-client/ml-client.service';
+import { PredictionsService } from '../predictions/predictions.service';
+import { ResidentsService } from '../residents/residents.service';
+import { UnitsService } from '../units/units.service';
 import { ChatbotService } from './chatbot.service';
 
 describe('ChatbotService', () => {
@@ -17,43 +27,75 @@ describe('ChatbotService', () => {
   };
 
   const mlClientService = {
-    parse: jest.fn(),
-  } as any;
+    parse: jest.fn<() => Promise<NluParseResponse>>(),
+  } as jest.Mocked<Pick<MlClientService, 'parse'>>;
 
   const unitsService = {
-    listAvailableUnits: jest.fn(),
-  } as any;
+    listAvailableUnits: jest.fn<
+      () => Promise<
+        Array<{
+          id: number;
+          bloco: string;
+          numero: string;
+          quartos: number;
+          valorAluguelSugerido: number;
+          areaM2?: number;
+          disponivelLocacao?: boolean;
+        }>
+      >
+    >(),
+  } as jest.Mocked<Pick<UnitsService, 'listAvailableUnits'>>;
 
   const chamadosService = {
-    buscaTodos: jest.fn(),
+    buscaTodos: jest.fn<
+      () => Promise<{
+        data: Array<{ id: number; status: StatusChamado }>;
+        meta: {
+          total: number;
+          pagina: number;
+          limite: number;
+          totalPaginas?: number;
+        };
+      }>
+    >(),
     create: jest.fn(),
-  } as any;
+  } as jest.Mocked<Pick<ChamadosService, 'buscaTodos' | 'create'>>;
 
   const cobrancasService = {
-    buscarMinhas: jest.fn(),
-  } as any;
+    buscarMinhas: jest.fn<
+      () => Promise<{
+        data: Array<{ id: number; valor: number; status: StatusCobranca }>;
+        meta: {
+          total: number;
+          pagina: number;
+          limite: number;
+          totalPaginas?: number;
+        };
+      }>
+    >(),
+  } as jest.Mocked<Pick<CobrancasService, 'buscarMinhas'>>;
 
   const cobrancasCheckoutService = {
-    criarCheckout: jest.fn(),
-  } as any;
+    criarCheckout: jest.fn<() => Promise<{ url: string }>>(),
+  } as jest.Mocked<Pick<CobrancasCheckoutService, 'criarCheckout'>>;
 
   const predictionsService = {
-    getExpensesForecast: jest.fn(),
-  } as any;
+    getExpensesForecast: jest.fn<() => Promise<unknown>>(),
+  } as jest.Mocked<Pick<PredictionsService, 'getExpensesForecast'>>;
 
   const residentsService = {
-    obterRecomendacoes: jest.fn(),
-  } as any;
+    obterRecomendacoes: jest.fn<() => Promise<unknown>>(),
+  } as jest.Mocked<Pick<ResidentsService, 'obterRecomendacoes'>>;
 
-  const createService = () =>
+  const createService = (): ChatbotService =>
     new ChatbotService(
-      mlClientService as any,
-      unitsService as any,
-      chamadosService as any,
-      cobrancasService as any,
-      cobrancasCheckoutService as any,
-      predictionsService as any,
-      residentsService as any,
+      mlClientService as unknown as MlClientService,
+      unitsService as unknown as UnitsService,
+      chamadosService as unknown as ChamadosService,
+      cobrancasService as unknown as CobrancasService,
+      cobrancasCheckoutService as unknown as CobrancasCheckoutService,
+      predictionsService as unknown as PredictionsService,
+      residentsService as unknown as ResidentsService,
     );
 
   beforeEach(() => {
