@@ -10,7 +10,10 @@ import { AuthUserDto } from '../auth/dto/auth-response.dto';
 import { CobrancasCheckoutService } from '../charges/cobrancas-checkout.service';
 import { CobrancasService } from '../charges/cobrancas.service';
 import { ChamadosService } from '../chamados/chamados.service';
-import { MlClientService, NluParseResponse } from '../ml-client/ml-client.service';
+import {
+  MlClientService,
+  NluParseResponse,
+} from '../ml-client/ml-client.service';
 import { PredictionsService } from '../predictions/predictions.service';
 import { ResidentsService } from '../residents/residents.service';
 import { UnitsService } from '../units/units.service';
@@ -63,7 +66,7 @@ export class ChatbotService {
 
     switch (intent) {
       case 'consultar_apartamentos':
-        return this.consultarApartamentos(parsed, user);
+        return this.consultarApartamentos(parsed);
       case 'abrir_chamado':
         return this.abrirChamado(parsed, text, user);
       case 'status_chamado':
@@ -85,10 +88,11 @@ export class ChatbotService {
 
   private async consultarApartamentos(
     payload: NluParseResponse,
-    user: AuthUserDto,
   ): Promise<ChatbotMessageResponse> {
     const entities = this.normalizarEntities(payload.entities);
-    const quartos = this.lerNumero(entities.quartos ?? entities.quartos_minimos);
+    const quartos = this.lerNumero(
+      entities.quartos ?? entities.quartos_minimos,
+    );
     const valorMax = this.lerNumero(entities.valor ?? entities.valor_maximo);
 
     const unidades = await this.unitsService.listAvailableUnits({
@@ -128,7 +132,9 @@ export class ChatbotService {
   ): Promise<ChatbotMessageResponse> {
     const entities = this.normalizarEntities(payload.entities);
     const existing = this.pendingContext.get(user.id);
-    const local = this.valorTexto(entities.local ?? entities.localizacao ?? existing?.local);
+    const local = this.valorTexto(
+      entities.local ?? entities.localizacao ?? existing?.local,
+    );
     const equipamento = this.valorTexto(
       entities.equipamento ?? existing?.equipamento,
     );
@@ -141,7 +147,8 @@ export class ChatbotService {
       });
       return {
         intent: 'abrir_chamado',
-        reply: 'Em qual local? Posso registrar o chamado para piscina, garagem, salão, ou outra área comum.',
+        reply:
+          'Em qual local? Posso registrar o chamado para piscina, garagem, salão, ou outra área comum.',
         data: {
           require: 'local',
           pending: true,
@@ -157,7 +164,8 @@ export class ChatbotService {
       });
       return {
         intent: 'abrir_chamado',
-        reply: 'Qual equipamento está com problema? Ex.: elevador, ar-condicionado, portão, energia.',
+        reply:
+          'Qual equipamento está com problema? Ex.: elevador, ar-condicionado, portão, energia.',
         data: {
           require: 'equipamento',
           pending: true,
@@ -171,7 +179,8 @@ export class ChatbotService {
         categoria: 'manutencao',
         equipamento,
         descricao:
-          textoOriginal || `Solicitação de manutenção em ${local} para ${equipamento}`,
+          textoOriginal ||
+          `Solicitação de manutenção em ${local} para ${equipamento}`,
       },
       user,
     );
@@ -188,7 +197,9 @@ export class ChatbotService {
     };
   }
 
-  private async statusChamado(user: AuthUserDto): Promise<ChatbotMessageResponse> {
+  private async statusChamado(
+    user: AuthUserDto,
+  ): Promise<ChatbotMessageResponse> {
     const resultado = await this.chamadosService.buscaTodos(
       { status: StatusChamado.ABERTO, pagina: 1, limite: 10 },
       user,
@@ -213,7 +224,9 @@ export class ChatbotService {
     };
   }
 
-  private async segundaViaBoleto(user: AuthUserDto): Promise<ChatbotMessageResponse> {
+  private async segundaViaBoleto(
+    user: AuthUserDto,
+  ): Promise<ChatbotMessageResponse> {
     const cobrancas = await this.cobrancasService.buscarMinhas(
       { status: StatusCobranca.PENDENTE, pagina: 1, limite: 10 },
       user,
@@ -222,7 +235,8 @@ export class ChatbotService {
     if (!cobrancas.data.length) {
       return {
         intent: 'segunda_via_boleto',
-        reply: 'Você não possui cobranças pendentes para emitir a segunda via do boleto.',
+        reply:
+          'Você não possui cobranças pendentes para emitir a segunda via do boleto.',
       };
     }
 
@@ -242,7 +256,9 @@ export class ChatbotService {
     };
   }
 
-  private async statusFinanceiro(user: AuthUserDto): Promise<ChatbotMessageResponse> {
+  private async statusFinanceiro(
+    user: AuthUserDto,
+  ): Promise<ChatbotMessageResponse> {
     const cobrancas = await this.cobrancasService.buscarMinhas(
       { status: StatusCobranca.PENDENTE, pagina: 1, limite: 10 },
       user,
@@ -255,7 +271,10 @@ export class ChatbotService {
       };
     }
 
-    const total = cobrancas.data.reduce((soma, item) => soma + Number(item.valor), 0);
+    const total = cobrancas.data.reduce(
+      (soma, item) => soma + Number(item.valor),
+      0,
+    );
 
     return {
       intent: 'status_financeiro',
@@ -267,7 +286,9 @@ export class ChatbotService {
     };
   }
 
-  private async previsaoDespesas(user: AuthUserDto): Promise<ChatbotMessageResponse> {
+  private async previsaoDespesas(
+    user: AuthUserDto,
+  ): Promise<ChatbotMessageResponse> {
     if (user.perfil === PerfilUsuario.MORADOR) {
       throw new ForbiddenException(
         'A previsão de despesas é exclusiva para síndico ou administrador.',
@@ -283,19 +304,24 @@ export class ChatbotService {
     };
   }
 
-  private async recomendarProdutos(user: AuthUserDto): Promise<ChatbotMessageResponse> {
+  private async recomendarProdutos(
+    user: AuthUserDto,
+  ): Promise<ChatbotMessageResponse> {
     const resposta = await this.residentsService.obterRecomendacoes(user);
 
     if (!resposta.recommendations.length) {
       return {
         intent: 'recomendar_produtos',
-        reply: 'Não encontrei recomendações personalizadas para o seu perfil agora.',
+        reply:
+          'Não encontrei recomendações personalizadas para o seu perfil agora.',
       };
     }
 
     const items = resposta.recommendations
       .slice(0, 3)
-      .map((item) => `#${item.listingId} · score ${Number(item.score).toFixed(2)}`)
+      .map(
+        (item) => `#${item.listingId} · score ${Number(item.score).toFixed(2)}`,
+      )
       .join(' | ');
 
     return {
@@ -344,7 +370,9 @@ export class ChatbotService {
     return (value ?? 'fora_de_escopo').trim().toLowerCase();
   }
 
-  private normalizarEntities(value?: Record<string, unknown>): Record<string, unknown> {
+  private normalizarEntities(
+    value?: Record<string, unknown>,
+  ): Record<string, unknown> {
     return value ?? {};
   }
 
@@ -362,7 +390,15 @@ export class ChatbotService {
       return undefined;
     }
 
-    return String(value).trim();
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return String(value).trim();
+    }
+
+    return undefined;
   }
 
   private loadFaq(): Record<string, unknown> {
