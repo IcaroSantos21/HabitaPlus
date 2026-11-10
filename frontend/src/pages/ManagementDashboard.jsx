@@ -12,10 +12,13 @@ import {
 } from "recharts";
 import Alert from "../components/Alert";
 import Badge from "../components/Badge";
+import Button from "../components/Button";
 import Card from "../components/Card";
 import EmptyState from "../components/EmptyState";
 import Loading from "../components/Loading";
 import dashboardService from "../services/dashboardService";
+import notificationsService from "../services/notificationsService";
+import transactionsService from "../services/transactionsService";
 
 function unwrapObject(payload) {
   if (payload?.data && !Array.isArray(payload.data)) {
@@ -90,7 +93,12 @@ function buildChartData(dashboard, prediction) {
   const historical = history.map((item) => ({
     month: formatMonth(item.month || item.mes || item.competencia),
     historical: Number(
-      item.amount ?? item.total ?? item.valor ?? item.despesa ?? 0,
+      item.amount ??
+        item.total ??
+        item.valor ??
+        item.despesas ??
+        item.despesa ??
+        0,
     ),
     forecast: null,
   }));
@@ -154,7 +162,7 @@ function MetricCard({ title, value, subtitle, accent = "teal" }) {
   );
 }
 
-function ExpenseChart({ data, forecastError, loading }) {
+function ExpenseChart({ data, forecastError, historyError, loading }) {
   return (
     <Card
       title="Despesas e previsão"
@@ -164,6 +172,10 @@ function ExpenseChart({ data, forecastError, loading }) {
         <div className="flex min-h-72 items-center justify-center">
           <Loading label="Carregando histórico e previsão..." />
         </div>
+      ) : historyError ? (
+        <Alert variant="error" title="Histórico financeiro indisponível">
+          {historyError}
+        </Alert>
       ) : forecastError ? (
         <div className="space-y-4">
           <Alert variant="warning" title="Previsão indisponível">
@@ -263,6 +275,23 @@ function ManagementDashboard() {
     data: null,
     error: "",
   });
+  const [monthlyHistory, setMonthlyHistory] = useState({
+    loading: true,
+    data: [],
+    error: "",
+  });
+  const [delinquencyReport, setDelinquencyReport] = useState({
+    data: null,
+    error: "",
+  });
+  const [alerts, setAlerts] = useState([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
+  const [alertsError, setAlertsError] = useState("");
+  const [alertAction, setAlertAction] = useState({
+    loading: false,
+    message: "",
+    error: "",
+  });
 
   useEffect(() => {
     let active = true;
@@ -311,37 +340,169 @@ function ManagementDashboard() {
         }
       });
 
+    const now = new Date();
+    const currentMonth = `${now.getUTCFullYear()}-${String(
+      now.getUTCMonth() + 1,
+    ).padStart(2, "0")}`;
+    const firstMonthDate = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11, 1),
+    );
+    const firstMonth = `${firstMonthDate.getUTCFullYear()}-${String(
+      firstMonthDate.getUTCMonth() + 1,
+    ).padStart(2, "0")}`;
+
+    transactionsService
+      .monthlySummary({ from: firstMonth, to: currentMonth })
+      .then((result) => {
+        if (active) {
+          setMonthlyHistory({
+            loading: false,
+            data: Array.isArray(result) ? result : [],
+            error: "",
+          });
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setMonthlyHistory({
+            loading: false,
+            data: [],
+            error:
+              error?.response?.data?.message ||
+              "Não foi possível carregar o histórico financeiro.",
+          });
+        }
+      });
+
+    dashboardService
+      .getFinanceDelinquency()
+      .then((result) => {
+        if (active) {
+          setDelinquencyReport({ data: unwrapObject(result), error: "" });
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setDelinquencyReport({
+            data: null,
+            error:
+              error?.response?.data?.message ||
+              "Não foi possível carregar os dados de inadimplência.",
+          });
+        }
+      });
+
     return () => {
       active = false;
     };
   }, []);
 
-  const metrics = finance.data?.metrics || finance.data?.indicadores || finance.data || {};
-  const delinquency =
+  useEffect(() => {
+    let active = true;
+    notificationsService
+      .list({ pagina: 1, limite: 5 })
+      .then((result) => {
+        if (active) {
+          setAlerts(Array.isArray(result?.data) ? result.data : []);
+          setAlertsError("");
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setAlertsError(
+            error?.response?.data?.message ||
+              "Não foi possível carregar os alertas recentes.",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setAlertsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function runDailyAlerts() {
+    setAlertAction({ loading: true, message: "", error: "" });
+    try {
+      await notificationsService.runDailyAlerts();
+      const result = await notificationsService.list({
+        pagina: 1,
+        limite: 5,
+      });
+      setAlerts(Array.isArray(result?.data) ? result.data : []);
+      setAlertsError("");
+      setAlertAction({
+        loading: false,
+        message:
+          "Verificação concluída. Os alertas elegíveis foram atualizados.",
+        error: "",
+      });
+    } catch (error) {
+      setAlertAction({
+        loading: false,
+        message: "",
+        error:
+          error?.response?.data?.message ||
+          "Não foi possível executar a verificação de alertas.",
+      });
+    }
+  }
+
+  const metrics =
+    finance.data?.metrics || finance.data?.indicadores || finance.data || {};
+  const delinquencyMetric =
     metrics.delinquency || metrics.inadimplencia || metrics.overdue || {};
-  const revenue = getMetric(metrics, ["revenue", "receita", "totalReceita"]);
-  const expenses = getMetric(metrics, ["expenses", "despesas", "totalDespesas"]);
+  const revenue = getMetric(metrics, [
+    "revenue",
+    "receita",
+    "totalReceita",
+    "receitaMes",
+  ]);
+  const expenses = getMetric(metrics, [
+    "expenses",
+    "despesas",
+    "totalDespesas",
+    "despesaMes",
+  ]);
   const balance = getMetric(metrics, ["balance", "saldo", "saldoMes"]);
   const delinquencyAmount =
-    typeof delinquency === "number"
-      ? delinquency
-      : getMetric(delinquency, ["amount", "valor", "total"]);
+    delinquencyReport.data?.totalEmAtraso ??
+    (typeof delinquencyMetric === "number"
+      ? delinquencyMetric
+      : getMetric(delinquencyMetric, ["amount", "valor", "total"]));
   const delinquencyCount =
-    typeof delinquency === "object"
-      ? getMetric(delinquency, ["count", "quantidade", "totalCobrancas"])
-      : null;
+    delinquencyReport.data?.porUnidade?.reduce(
+      (total, unit) => total + Number(unit.cobrancasAtrasadas || 0),
+      0,
+    ) ??
+    (typeof delinquencyMetric === "object"
+      ? getMetric(delinquencyMetric, ["count", "quantidade", "totalCobrancas"])
+      : null);
   const delinquencyRate =
-    typeof delinquency === "object"
-      ? getMetric(delinquency, ["rate", "percentage", "percentual", "taxa"])
-      : null;
+    delinquencyReport.data?.percentual ??
+    (typeof delinquencyMetric === "object"
+      ? getMetric(delinquencyMetric, [
+          "rate",
+          "percentage",
+          "percentual",
+          "taxa",
+          "inadimplenciaPercentual",
+        ])
+      : null);
 
-  const alertsSource = finance.data?.alerts || finance.data?.alertas || [];
-  const alerts = Array.isArray(alertsSource) ? alertsSource : [];
-
-  const chartData = buildChartData(finance.data, prediction.data);
+  const chartData = buildChartData(
+    { monthlyHistory: monthlyHistory.data },
+    prediction.data,
+  );
 
   const monthLabel = formatMonth(
-    finance.data?.month || finance.data?.mes || finance.data?.competencia,
+    finance.data?.month ||
+      finance.data?.mes ||
+      finance.data?.competencia ||
+      new Date().toISOString().slice(0, 7),
   );
 
   return (
@@ -367,6 +528,11 @@ function ManagementDashboard() {
       {finance.error && (
         <Alert variant="error" title="Não foi possível carregar o painel financeiro">
           {finance.error}
+        </Alert>
+      )}
+      {delinquencyReport.error && (
+        <Alert variant="warning" title="Inadimplência indisponível">
+          {delinquencyReport.error}
         </Alert>
       )}
 
@@ -421,19 +587,40 @@ function ManagementDashboard() {
         <ExpenseChart
           data={chartData}
           forecastError={prediction.error}
-          loading={prediction.loading}
+          historyError={monthlyHistory.error}
+          loading={prediction.loading || monthlyHistory.loading}
         />
 
         <Card
           title="Últimos alertas"
-          description="Avisos recentes da administração"
+          description="Avisos recentes da administração e contratos, cobranças e manutenção"
         >
-          {finance.loading ? (
+          <div className="mb-3 flex justify-end">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={runDailyAlerts}
+              disabled={alertAction.loading}
+            >
+              {alertAction.loading ? "Verificando..." : "Verificar alertas"}
+            </Button>
+          </div>
+          {alertAction.error && (
+            <Alert variant="error" className="mb-3">
+              {alertAction.error}
+            </Alert>
+          )}
+          {alertAction.message && (
+            <Alert variant="success" className="mb-3">
+              {alertAction.message}
+            </Alert>
+          )}
+          {alertsLoading ? (
             <Loading label="Carregando alertas..." />
-          ) : finance.error ? (
+          ) : alertsError ? (
             <EmptyState
               title="Alertas indisponíveis"
-              description="Não foi possível carregar os alertas."
+              description={alertsError}
             />
           ) : alerts.length === 0 ? (
             <EmptyState
@@ -444,32 +631,32 @@ function ManagementDashboard() {
             <ul className="space-y-3">
               {alerts.slice(0, 5).map((item, index) => (
                 <li
-                  key={item.id || `${item.title || item.titulo}-${index}`}
+                  key={item.id || `${item.texto}-${index}`}
                   className="rounded-lg border border-gray-100 p-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-brand-navy">
-                      {item.title || item.titulo || "Alerta"}
+                      {item.tipo || "Alerta"}
                     </p>
                     <Badge
                       variant={
-                        item.type === "error" || item.tipo === "ERRO"
+                        item.tipo === "COBRANCA"
                           ? "error"
-                          : item.type === "warning" || item.tipo === "AVISO"
+                          : item.tipo === "ALERTA"
                             ? "warning"
                             : "info"
                       }
                     >
-                      {item.label || item.tipo || item.type || "Aviso"}
+                      {item.lida ? "Lida" : "Não lida"}
                     </Badge>
                   </div>
                   <p className="mt-1 text-sm leading-5 text-muted">
-                    {item.description || item.descricao || item.message || ""}
+                    {item.texto}
                   </p>
-                  {(item.createdAt || item.criadoEm || item.data) && (
+                  {item.criadaEm && (
                     <p className="mt-2 text-xs text-muted">
                       {new Intl.DateTimeFormat("pt-BR").format(
-                        new Date(item.createdAt || item.criadoEm || item.data),
+                        new Date(item.criadaEm),
                       )}
                     </p>
                   )}

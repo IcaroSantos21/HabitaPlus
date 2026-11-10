@@ -18,6 +18,6 @@ import { StripeWebhookController } from './stripe-webhook.controller';
     CobrancasCheckoutService,
     CobrancasAtrasadasJob,
   ],
-  exports: [CobrancasService],
+  exports: [CobrancasService, CobrancasCheckoutService],
 })
 export class CobrancasModule {}

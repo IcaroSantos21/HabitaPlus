@@ -17,5 +17,6 @@ import { RecommendationsController } from './recommendations.controller';
   ],
   controllers: [ResidentsController, RecommendationsController],
   providers: [ResidentsService],
+  exports: [ResidentsService],
 })
 export class ResidentsModule {}
