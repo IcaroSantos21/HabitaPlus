@@ -49,6 +49,12 @@ export interface RecommendResponse {
   }[];
 }
 
+export interface NluParseResponse {
+  intencao: string;
+  confianca: number;
+  entities: Record<string, unknown>;
+}
+
 @Injectable()
 export class MlClientService {
   private readonly logger = new Logger(MlClientService.name);
@@ -79,6 +85,21 @@ export class MlClientService {
       '/recommend',
       payload,
     );
+  }
+
+  async parse(
+    text: string,
+    userId: number,
+    context?: Record<string, unknown>,
+  ): Promise<NluParseResponse> {
+    return this.callMlService<
+      { texto: string; userId: number; contexto?: Record<string, unknown> },
+      NluParseResponse
+    >('/nlu/parse', {
+      texto: text,
+      userId,
+      contexto: context ?? {},
+    });
   }
 
   private async callMlService<TRequest, TResponse>(

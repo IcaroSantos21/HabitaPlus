@@ -9,5 +9,6 @@ import { PredictionsService } from './predictions.service';
   imports: [MlClientModule, TransacoesModule],
   controllers: [PredictionsController],
   providers: [PredictionsService],
+  exports: [PredictionsService],
 })
 export class PredictionsModule {}
