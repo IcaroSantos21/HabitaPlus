@@ -93,9 +93,7 @@ export class MlClientService {
     );
   }
 
-  async parse(
-    text: string,
-  ): Promise<NluParseResponse> {
+  async parse(text: string): Promise<NluParseResponse> {
     const response = await this.callMlService<
       { text: string },
       MlNluParseResponse
