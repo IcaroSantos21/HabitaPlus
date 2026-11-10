@@ -68,3 +68,34 @@ Ainda não está no Compose. Entra quando o frontend tiver Dockerfile.
 ## Contribuindo
 
 Branches, commits e regras de PR estão em [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Dados para demonstracao
+
+Para recriar os registros de demonstracao localmente, aplique as migrations e
+execute o seed a partir do backend:
+
+```powershell
+cd backend
+npm run migration:run
+npm run seed
+```
+
+O comando e repetivel: remove e recria somente os registros identificados como
+dados demo (usuarios `@demo.habitaplus.local`, unidades do bloco `DEMO` e
+comunicados com prefixo `[DEMO]`). Ele preserva os demais dados do banco e usa
+o dataset `ml-service/data/expenses.csv` para alimentar 36 meses de despesas,
+alinhados aos meses recentes da previsao.
+
+Credenciais locais de demonstracao:
+
+| Perfil        | E-mail                                                                | Senha             |
+| ------------- | --------------------------------------------------------------------- | ----------------- |
+| Administrador | `admin@demo.habitaplus.local`                                         | `HabitaDemo2026!` |
+| Sindico       | `sindico@demo.habitaplus.local`                                       | `HabitaDemo2026!` |
+| Moradores     | `morador01@demo.habitaplus.local` a `morador20@demo.habitaplus.local` | `HabitaDemo2026!` |
+
+Use essas credenciais apenas em ambiente local de demonstracao. O seed se
+recusa a executar quando `NODE_ENV=production`.
+
+No painel do síndico ou administrador, use **Verificar alertas** para executar
+a mesma verificação diária sob demanda; a execução é idempotente no mesmo dia.

@@ -4,10 +4,13 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -15,6 +18,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { PerfilUsuario } from '../../database/entities/enums';
 import { AuthUserDto } from '../auth/dto/auth-response.dto';
 import { FiltrosNotificacaoDto } from './dto/filtros-notificacao.dto';
 import {
@@ -23,6 +28,7 @@ import {
   NotificacaoResponseDto,
   NotificacoesPaginadasResponseDto,
 } from './dto/notificacao-response.dto';
+import { NotificationsDiariasService } from './notifications-diarias.service';
 import { NotificationsService } from './notifications.service';
 
 @ApiTags('notifications')
@@ -30,7 +36,22 @@ import { NotificationsService } from './notifications.service';
 @ApiUnauthorizedResponse({ description: 'Autenticação necessária' })
 @Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly dailyNotificationsService: NotificationsDiariasService,
+  ) {}
+
+  @Post('run-daily')
+  @Roles(PerfilUsuario.SINDICO, PerfilUsuario.ADMIN)
+  @ApiOperation({
+    summary: 'Executa a verificacao diaria de alertas do condominio',
+  })
+  @ApiForbiddenResponse({ description: 'Apenas síndico ou administrador' })
+  @ApiCreatedResponse({ description: 'Verificacao de alertas concluida' })
+  async executarAlertasDiarios(): Promise<{ message: string }> {
+    await this.dailyNotificationsService.run();
+    return { message: 'Verificacao de alertas concluida.' };
+  }
 
   @Get()
   @ApiOperation({ summary: 'Lista as notificações do usuário logado' })

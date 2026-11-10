@@ -55,6 +55,12 @@ export interface NluParseResponse {
   entities: Record<string, unknown>;
 }
 
+interface MlNluParseResponse {
+  intent: string;
+  confidence: number;
+  entities: Record<string, unknown>;
+}
+
 @Injectable()
 export class MlClientService {
   private readonly logger = new Logger(MlClientService.name);
@@ -89,17 +95,17 @@ export class MlClientService {
 
   async parse(
     text: string,
-    userId: number,
-    context?: Record<string, unknown>,
   ): Promise<NluParseResponse> {
-    return this.callMlService<
-      { texto: string; userId: number; contexto?: Record<string, unknown> },
-      NluParseResponse
-    >('/nlu/parse', {
-      texto: text,
-      userId,
-      contexto: context ?? {},
-    });
+    const response = await this.callMlService<
+      { text: string },
+      MlNluParseResponse
+    >('/nlu/parse', { text });
+
+    return {
+      intencao: response.intent,
+      confianca: response.confidence,
+      entities: response.entities,
+    };
   }
 
   private async callMlService<TRequest, TResponse>(

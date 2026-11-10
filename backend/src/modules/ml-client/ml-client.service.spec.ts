@@ -91,4 +91,31 @@ describe('MlClientService', () => {
       }),
     ).rejects.toThrow('ML-service indisponível. Tente novamente em instantes.');
   });
+
+  it('deve adaptar o contrato NLU do ml-service para o chatbot', async () => {
+    const service = new MlClientService(
+      httpService as HttpService,
+      configService as ConfigService<AppConfig, true>,
+    );
+    httpService.post = jest.fn().mockReturnValue(
+      of({
+        data: {
+          intent: 'regras_condominio',
+          confidence: 0.93,
+          entities: {},
+        },
+      }),
+    );
+
+    await expect(service.parse('Quais sao as regras?')).resolves.toEqual({
+      intencao: 'regras_condominio',
+      confianca: 0.93,
+      entities: {},
+    });
+    expect(httpService.post).toHaveBeenCalledWith(
+      'http://ml-service:8000/nlu/parse',
+      { text: 'Quais sao as regras?' },
+      expect.objectContaining({ timeout: 3000 }),
+    );
+  });
 });

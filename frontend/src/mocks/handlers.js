@@ -298,13 +298,6 @@ function listingForbidden() {
 }
 
 
-const mockConversation = {
-  id: "conv_demo",
-  mensagens: [
-    { id: "m1", autor: "assistant", texto: "Olá! Sou o assistente virtual Habita+. Como posso ajudar?" },
-  ],
-};
-
 const mockForecast = {
   predictionId: "pred_demo",
   condominioId: "cond_demo",
@@ -518,15 +511,13 @@ export const handlers = [
   http.get("*/api/v1/notificacoes", ({ request }) => protectedJson(request, paginated(mockNotifications))),
   http.patch("*/api/v1/notificacoes/:id/read", ({ request, params }) => protectedJson(request, { data: { id: params.id, lida: true } })),
 
-  http.post("*/api/v1/chatbot/mensagens", async ({ request }) => {
+  http.post("*/api/chatbot/message", async ({ request }) => {
     const payload = await request.json();
     return protectedJson(request, {
-      conversationId: "conv_demo",
-      userMessage: payload?.texto || payload?.message || "",
-      resposta: "Entendi! Esta é uma resposta demonstrativa do assistente Habita+.",
+      intent: "fora_de_escopo",
+      reply: `Entendi: ${payload?.text || ""}. Esta é uma resposta demonstrativa do assistente Habita+.`,
     });
   }),
-  http.get("*/api/v1/chatbot/conversas/:id", ({ request }) => protectedJson(request, { data: mockConversation })),
 
   http.get("*/api/v1/forecasts/expenses", ({ request }) => protectedJson(request, mockForecast)),
   http.post("*/api/v1/recomendacoes", ({ request }) => protectedJson(request, mockRecommendations)),

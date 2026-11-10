@@ -10,6 +10,11 @@ const dashboardService = {
     const { data } = await api.get("/predictions/expenses", { params });
     return data;
   },
+
+  async getFinanceDelinquency(params = {}) {
+    const { data } = await api.get("/finance/delinquency", { params });
+    return data;
+  },
 };
 
 export default dashboardService;

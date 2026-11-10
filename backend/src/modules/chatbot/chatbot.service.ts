@@ -56,7 +56,7 @@ export class ChatbotService {
     text: string,
     user: AuthUserDto,
   ): Promise<ChatbotMessageResponse> {
-    const parsed = await this.mlClientService.parse(text, user.id);
+    const parsed = await this.mlClientService.parse(text);
     const intent = this.normalizarIntent(parsed.intencao);
     const confianca = Number(parsed.confianca ?? 0);
 

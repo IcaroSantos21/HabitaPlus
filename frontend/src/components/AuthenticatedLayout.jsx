@@ -4,6 +4,7 @@ import Button from "./Button";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import NotificationBell from "./NotificationBell";
+import ChatbotWidget from "./ChatbotWidget";
 import { useAuth } from "../hooks/useAuth";
 import { getHomePath, getUserRole, roleLabel } from "../utils/roles";
 
@@ -117,6 +118,7 @@ function AuthenticatedLayout({ children }) {
           {children}
         </main>
       </div>
+      <ChatbotWidget />
     </div>
   );
 }

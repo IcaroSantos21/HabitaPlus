@@ -17,6 +17,10 @@ const notificationsService = {
     const { data } = await api.patch("/notifications/read-all");
     return data;
   },
+  async runDailyAlerts() {
+    const { data } = await api.post("/notifications/run-daily");
+    return data;
+  },
 };
 
 export default notificationsService;
