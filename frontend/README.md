@@ -41,7 +41,7 @@ Contas de demonstração:
 
 Também é possível cadastrar um novo morador no formulário. As contas cadastradas no modo mock ficam salvas apenas na sessão atual do navegador.
 
-Para testar a API real, altere `VITE_USE_MOCKS=false` no `.env`, confira se o backend está em execução e reinicie o Vite. O cliente de autenticação usa os endpoints atualmente implementados pelo backend (`/api/auth/login`, `/api/auth/register` e `/api/auth/me`). Os demais serviços seguem os caminhos planejados em `docs/api-contracts.md`; parte dos endpoints de domínio ainda depende de implementação no backend.
+Para testar a API real, altere `VITE_USE_MOCKS=false` no `.env`, confira se o backend está em execução e reinicie o Vite. O frontend usa o prefixo `/api` e os serviços de domínio devem seguir as rotas dos controllers atuais do backend.
 
 ## Serviços da API
 
@@ -99,7 +99,7 @@ frontend/
 ## Rotas e perfis
 
 - `/login`: autenticação.
-- `/dev/components`: catálogo de componentes.
+- `/dev/components`: catálogo de componentes (rota de desenvolvimento).
 - `/morador`: área do perfil MORADOR.
 - `/sindico`: área do perfil SINDICO.
 - `/admin`: área do perfil ADMIN.
@@ -133,7 +133,7 @@ A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos ar
 ## Login e cadastro (FE-04)
 
 - `/login`: acesso por e-mail e senha.
-- `/cadastro`: cadastro público de morador com nome, e-mail, senha e confirmação da senha.
+- O cadastro público de morador é acessado pela opção **Cadastre-se** dentro de `/login`.
 - O formulário valida campos obrigatórios, formato de e-mail, tamanho mínimo da senha e igualdade das senhas. Erros retornados pela API são exibidos no formulário.
 - Depois do login ou cadastro, a navegação segue o perfil recebido (`MORADOR`, `SINDICO` ou `ADMIN`). O token é persistido pelo `AuthContext` em `localStorage`, e `/auth/me` restaura a sessão após recarregar a página.
 - O botão de sair permanece no layout autenticado e remove o token local.
@@ -153,3 +153,12 @@ demonstrativos para esses indicadores e gráficos.
 O gráfico de despesas usa Recharts. As dependências `recharts` e `react-is` são
 instaladas com `npm install`; a versão de `react-is` deve acompanhar a versão
 instalada de React.
+
+
+## Chat do assistente (FE-10)
+
+O botão flutuante do assistente fica disponível em todas as rotas enquanto houver uma sessão autenticada. O modo MSW responde com exemplos fixos para consulta de apartamentos, abertura/acompanhamento de chamados e segunda via demonstrativa. A API real é chamada por `POST /api/chatbot/message`; os campos `reply`, `intent` e `data` são tratados pelo widget. A abertura guiada de chamados mantém o contexto entre as mensagens e aceita respostas curtas de local/equipamento. O link de pagamento retornado no modo mock é fictício e não realiza cobrança.
+
+## Layout responsivo (FE-12)
+
+O conteúdo autenticado usa uma grade fluida com largura máxima ampliada, coluna lateral de altura natural e áreas principais com `min-width: 0`. As tabelas com muitos campos mantêm rolagem horizontal dentro do próprio painel, sem ampliar a largura da página.

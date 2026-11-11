@@ -19,6 +19,8 @@ import Loading from "../components/Loading";
 import dashboardService from "../services/dashboardService";
 import notificationsService from "../services/notificationsService";
 import transactionsService from "../services/transactionsService";
+import { useAuth } from "../hooks/useAuth";
+import { getUserRole } from "../utils/roles";
 
 function unwrapObject(payload) {
   if (payload?.data && !Array.isArray(payload.data)) {
@@ -265,6 +267,8 @@ function Chart({ data }) {
 }
 
 function ManagementDashboard() {
+  const { user } = useAuth();
+  const isAdmin = getUserRole(user) === "ADMIN";
   const [finance, setFinance] = useState({
     loading: true,
     data: null,
@@ -506,23 +510,15 @@ function ManagementDashboard() {
   );
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-brand-teal">
-            Habita+ · Painel administrativo
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-brand-navy">
-            Visão geral do condomínio
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            Acompanhe os indicadores financeiros, a previsão de despesas e os
-            alertas mais recentes.
-          </p>
+    <div className={`space-y-6 hp-page hp-page--management${isAdmin ? " hp-page--admin" : " hp-page--syndic"}`}>
+      <header className="hp-management-hero">
+        <div className="hp-management-hero__copy">
+          <p className="hp-page-eyebrow"><span /> HABITA+ · {isAdmin ? "CENTRO DE CONTROLE" : "GESTÃO CONDOMINIAL"}</p>
+          <h1>{isAdmin ? "Painel do administrador" : "Painel do síndico"}</h1>
+          <p>{isAdmin ? "Uma visão completa dos indicadores e da operação do condomínio." : "Acompanhe a saúde financeira, a rotina e os alertas do seu condomínio."}</p>
+          <div className="hp-management-hero__meta"><span>◷ Visão do período</span><span>•</span><span>Referência: {monthLabel}</span></div>
         </div>
-        {monthLabel !== "—" && (
-          <Badge variant="info">Referência: {monthLabel}</Badge>
-        )}
+        <div className="hp-management-hero__art" aria-hidden="true"><span className="hp-management-hero__orb hp-management-hero__orb--one"/><span className="hp-management-hero__orb hp-management-hero__orb--two"/><span className="hp-management-hero__building">⌂</span></div>
       </header>
 
       {finance.error && (
@@ -545,7 +541,7 @@ function ManagementDashboard() {
           ))}
         </div>
       ) : finance.data ? (
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores do mês">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 hp-management-metrics" aria-label="Indicadores do mês">
           <MetricCard
             title="Receita do mês"
             value={formatCurrency(revenue)}
@@ -583,7 +579,7 @@ function ManagementDashboard() {
         />
       )}
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,1fr)]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,1fr)] hp-dashboard-panels">
         <ExpenseChart
           data={chartData}
           forecastError={prediction.error}

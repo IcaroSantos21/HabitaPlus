@@ -60,8 +60,33 @@ export class ChatbotService {
     const intent = this.normalizarIntent(parsed.intencao);
     const confianca = Number(parsed.confianca ?? 0);
 
+    // Respostas curtas como "garagem" e "elevador" podem ser classificadas
+    // como fora de escopo pelo modelo, mas são válidas durante a coleta do chamado.
+    const intentsAlternativasConhecidas = new Set([
+      'consultar_apartamentos',
+      'status_chamado',
+      'segunda_via_boleto',
+      'status_financeiro',
+      'previsao_despesas',
+      'recomendar_produtos',
+      'regras_condominio',
+    ]);
+    const possuiChamadoPendente = this.pendingContext.has(user.id);
+    if (
+      possuiChamadoPendente &&
+      (intent === 'abrir_chamado' ||
+        !intentsAlternativasConhecidas.has(intent) ||
+        confianca < 0.7)
+    ) {
+      return this.abrirChamado(parsed, text, user);
+    }
+
     if (confianca < 0.7 || intent === 'fora_de_escopo') {
       return this.responderNaoEntendi();
+    }
+
+    if (possuiChamadoPendente) {
+      this.pendingContext.delete(user.id);
     }
 
     switch (intent) {
@@ -133,10 +158,15 @@ export class ChatbotService {
     const entities = this.normalizarEntities(payload.entities);
     const existing = this.pendingContext.get(user.id);
     const local = this.valorTexto(
-      entities.local ?? entities.localizacao ?? existing?.local,
+      entities.local ??
+        entities.localizacao ??
+        existing?.local ??
+        this.extrairLocal(textoOriginal),
     );
     const equipamento = this.valorTexto(
-      entities.equipamento ?? existing?.equipamento,
+      entities.equipamento ??
+        existing?.equipamento ??
+        this.extrairEquipamento(textoOriginal),
     );
 
     if (!local) {
@@ -178,9 +208,7 @@ export class ChatbotService {
         areaComum: local,
         categoria: 'manutencao',
         equipamento,
-        descricao:
-          textoOriginal ||
-          `Solicitação de manutenção em ${local} para ${equipamento}`,
+        descricao: `Solicitação de manutenção em ${local} para ${equipamento}.`,
       },
       user,
     );
@@ -383,6 +411,34 @@ export class ChatbotService {
 
     const numero = Number(value);
     return Number.isFinite(numero) ? numero : undefined;
+  }
+
+  private extrairLocal(text: string): string | undefined {
+    const normalized = text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    const match = normalized.match(
+      /\b(piscina|garagem|salao|hall|portaria|academia|jardim|banheiro|corredor|telhado)\b/,
+    );
+    return match?.[1];
+  }
+
+  private extrairEquipamento(text: string): string | undefined {
+    const normalized = text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    const patterns: Array<[RegExp, string]> = [
+      [/\belevador(?:es)?\b/, 'elevador'],
+      [/\bport(?:ao|oes)\b/, 'portao'],
+      [/\bbombas?\b/, 'bomba'],
+      [/\binterfones?\b/, 'interfone'],
+      [/\b(?:iluminacao|lampadas?|luminarias?|sem luz)\b/, 'iluminacao'],
+      [/\bar[- ]condicionado\b/, 'ar-condicionado'],
+      [/\bencanamento\b/, 'encanamento'],
+    ];
+    return patterns.find(([pattern]) => pattern.test(normalized))?.[1];
   }
 
   private valorTexto(value: unknown): string | undefined {

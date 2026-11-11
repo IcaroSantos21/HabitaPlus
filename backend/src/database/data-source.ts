@@ -15,6 +15,7 @@ export default new DataSource({
   port: parseInt(process.env.DB_PORT ?? '5432', 10),
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   database: process.env.DB_NAME,
   entities: [
     path.resolve(__dirname, 'entities', `*.entity.${sourceExtension}`),

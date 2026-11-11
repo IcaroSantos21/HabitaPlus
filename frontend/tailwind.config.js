@@ -9,14 +9,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        "brand-mint": "#AAFFC7",
-        "brand-green": "#67C090",
-        "brand-teal": "#215B63",
-        "brand-navy": "#124170",
+        "brand-mint": "#C9F8E7",
+        "brand-green": "#34C99A",
+        "brand-teal": "#08747A",
+        "brand-navy": "#0B3F5E",
         danger: "#D64545",
-        muted: "#687280",
-        surface: "#8FAFAC",
-        ink: "#172024",
+        muted: "#6D8292",
+        surface: "#F3F7FA",
+        ink: "#163447",
       },
     },
   },

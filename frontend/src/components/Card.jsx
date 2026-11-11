@@ -16,7 +16,7 @@ function Card({
 
   return (
     <section
-      className={`rounded-xl border border-gray-100 bg-white shadow-sm ${paddingStyles[padding] || paddingStyles.md} ${className}`}
+      className={`hp-card rounded-xl border border-gray-100 bg-white shadow-sm ${paddingStyles[padding] || paddingStyles.md} ${className}`}
       {...props}
     >
       {(title || description) && (

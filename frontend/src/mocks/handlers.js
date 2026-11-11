@@ -187,6 +187,9 @@ const mockAnnouncements = [
   { id: "ann_001", titulo: "Limpeza da caixa d'água", descricao: "Serviço programado para sábado.", criadoEm: "2026-10-15" },
 ];
 
+// Mantém o contexto de abertura de chamado durante a conversa simulada.
+const pendingChatSessions = new Map();
+
 const mockMessages = [
   { id: "msg_001", remetente: "Administração", texto: "Bem-vindo ao Habita+.", criadoEm: "2026-10-14T10:00:00Z" },
 ];
@@ -512,10 +515,150 @@ export const handlers = [
   http.patch("*/api/v1/notificacoes/:id/read", ({ request, params }) => protectedJson(request, { data: { id: params.id, lida: true } })),
 
   http.post("*/api/chatbot/message", async ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
+
     const payload = await request.json();
-    return protectedJson(request, {
+    const requestUser = getMockRequestUser(request);
+    if (!requestUser) return unauthorized();
+
+    const originalText = String(payload?.text || "").trim();
+    if (!originalText) {
+      return HttpResponse.json({ message: "Digite uma mensagem para continuar." }, { status: 400 });
+    }
+
+    const normalizedText = originalText
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+
+    const availableUnitsIntent = /apartamento|apartamentos|unidade disponivel|unidades disponiveis/.test(normalizedText);
+    const chargeIntent = /segunda via|boleto|cobranca|pagamento/.test(normalizedText);
+    const ticketStatusIntent = /status|andamento|acompanhar/.test(normalizedText) && /chamado|solicitacao|manutencao/.test(normalizedText);
+    const openTicketIntent = /abrir chamado|novo chamado|registrar chamado|abrir uma solicitacao|manutencao|reparo|problema/.test(normalizedText);
+
+    if (availableUnitsIntent) {
+      const availableUnits = mockUnits.filter((unit) => unit.disponivelLocacao).slice(0, 3);
+      return HttpResponse.json({
+        intent: "consultar_apartamentos",
+        reply: availableUnits.length
+          ? `Encontrei ${availableUnits.length} apartamento(s) disponível(is) para locação.`
+          : "Não encontrei apartamentos disponíveis no momento.",
+        data: { unidades: availableUnits },
+      });
+    }
+
+    if (chargeIntent) {
+      const pendingCharge = mockCharges.find((charge) =>
+        charge._moradorId === requestUser.id && ["PENDENTE", "ATRASADA"].includes(charge.status),
+      );
+      return HttpResponse.json({
+        intent: "segunda_via_boleto",
+        reply: pendingCharge
+          ? `Encontrei uma cobrança demonstrativa de ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(pendingCharge.valor)}. O link abaixo é apenas para apresentação e não realiza uma cobrança real.`
+          : "Você não possui cobranças pendentes na demonstração.",
+        data: pendingCharge
+          ? { cobrancaId: pendingCharge.id, paymentUrl: "https://example.com/habitaplus-checkout-demo" }
+          : {},
+      });
+    }
+
+    if (ticketStatusIntent) {
+      const userTickets = mockMaintenanceTickets
+        .filter((ticket) =>
+          ticket.status !== "ENCERRADO" &&
+          (isTicketManager(requestUser) || ticket.usuario.id === requestUser.id),
+        )
+        .slice(0, 4);
+      return HttpResponse.json({
+        intent: "status_chamado",
+        reply: userTickets.length
+          ? "Estes são os chamados em aberto vinculados à sua conta."
+          : "Você não possui chamados em aberto no momento.",
+        data: { chamados: userTickets },
+      });
+    }
+
+    // Inicia ou continua a coleta de local/equipamento para abrir um chamado.
+    if (openTicketIntent) {
+      const localMatch = normalizedText.match(/\b(piscina|garagem|salao|hall|portaria|academia|jardim|banheiro|corredor|telhado)\b/);
+      const equipmentMatch = normalizedText.match(/\b(elevador|portao|bomba|interfone|iluminacao|lampada|ar condicionado|encanamento)\b/);
+      const local = localMatch?.[1] || null;
+      const equipamento = equipmentMatch?.[1] || null;
+      pendingChatSessions.set(requestUser.id, { local, equipamento });
+
+      if (local && equipamento) {
+        const ticketId = Math.max(1000, ...mockMaintenanceTickets.map((ticket) => Number(ticket.id) || 0)) + 1;
+        const ticket = {
+          id: ticketId,
+          usuario: { id: requestUser.id, nome: requestUser.nome },
+          unidade: null,
+          areaComum: local,
+          categoria: "manutencao",
+          equipamento,
+          descricao: `Solicitação de manutenção em ${local} para ${equipamento}.`,
+          status: "ABERTO",
+          abertoEm: new Date().toISOString(),
+          encerradoEm: null,
+        };
+        mockMaintenanceTickets.unshift(ticket);
+        pendingChatSessions.delete(requestUser.id);
+        return HttpResponse.json({
+          intent: "abrir_chamado",
+          reply: `Solicitação registrada com sucesso! Seu chamado demonstrativo é o nº ${ticketId}.`,
+          data: { chamadoId: ticketId, status: ticket.status },
+        });
+      }
+
+      return HttpResponse.json({
+        intent: "abrir_chamado",
+        reply: local
+          ? `Certo, local: ${local}. Qual equipamento está com problema? (ex.: elevador, portão, bomba ou interfone)`
+          : "Claro! Em qual local está o problema? (ex.: garagem, piscina, salão ou portaria)",
+        data: { require: local ? "equipamento" : "local", pending: true },
+      });
+    }
+
+    const pending = pendingChatSessions.get(requestUser.id);
+    if (pending) {
+      if (!pending.local) {
+        pending.local = normalizedText.slice(0, 80);
+        pendingChatSessions.set(requestUser.id, pending);
+        return HttpResponse.json({
+          intent: "abrir_chamado",
+          reply: `Anotei o local: ${originalText}. Agora informe qual equipamento está com problema (ex.: elevador, portão, bomba ou interfone).`,
+          data: { require: "equipamento", pending: true },
+        });
+      }
+
+      if (!pending.equipamento) {
+        pending.equipamento = normalizedText.slice(0, 80);
+        const ticketId = Math.max(1000, ...mockMaintenanceTickets.map((ticket) => Number(ticket.id) || 0)) + 1;
+        const ticket = {
+          id: ticketId,
+          usuario: { id: requestUser.id, nome: requestUser.nome },
+          unidade: null,
+          areaComum: pending.local,
+          categoria: "manutencao",
+          equipamento: pending.equipamento,
+          descricao: `Solicitação de manutenção em ${pending.local} para ${pending.equipamento}.`,
+          status: "ABERTO",
+          abertoEm: new Date().toISOString(),
+          encerradoEm: null,
+        };
+        mockMaintenanceTickets.unshift(ticket);
+        pendingChatSessions.delete(requestUser.id);
+        return HttpResponse.json({
+          intent: "abrir_chamado",
+          reply: `Solicitação registrada com sucesso! Seu chamado demonstrativo é o nº ${ticketId}.`,
+          data: { chamadoId: ticketId, status: ticket.status },
+        });
+      }
+    }
+
+    return HttpResponse.json({
       intent: "fora_de_escopo",
-      reply: `Entendi: ${payload?.text || ""}. Esta é uma resposta demonstrativa do assistente Habita+.`,
+      reply: "Posso ajudar com apartamentos disponíveis, abertura e acompanhamento de chamados e segunda via do boleto. Escolha uma das sugestões ou escreva sua dúvida.",
+      data: { suggestions: ["consultar_apartamentos", "abrir_chamado", "segunda_via_boleto"] },
     });
   }),
 
@@ -690,6 +833,41 @@ export const handlers = [
     ticket.status = payload.status;
     ticket.encerradoEm = payload.status === "ENCERRADO" ? new Date().toISOString() : null;
     return HttpResponse.json(ticket);
+  }),
+
+  // Comunicados: alinhar os mocks à rota e à paginação do AnnouncementsController.
+  http.get("*/api/announcements", ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
+    const url = new URL(request.url);
+    return HttpResponse.json(ticketPagination(mockAnnouncements, url));
+  }),
+  http.post("*/api/announcements", async ({ request }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json({ message: "Apenas síndico ou administrador podem criar comunicados." }, { status: 403 });
+    }
+    const payload = await request.json();
+    const announcement = {
+      id: `ann_${Date.now()}`,
+      titulo: String(payload?.titulo || "Comunicado"),
+      descricao: String(payload?.descricao || ""),
+      criadoEm: new Date().toISOString(),
+    };
+    mockAnnouncements.unshift(announcement);
+    return HttpResponse.json(announcement, { status: 201 });
+  }),
+  http.patch("*/api/announcements/:id", async ({ request, params }) => {
+    const user = getMockRequestUser(request);
+    if (!user) return unauthorized();
+    if (!isTicketManager(user)) {
+      return HttpResponse.json({ message: "Apenas síndico ou administrador podem atualizar comunicados." }, { status: 403 });
+    }
+    const payload = await request.json();
+    const announcement = mockAnnouncements.find((item) => String(item.id) === String(params.id));
+    if (!announcement) return HttpResponse.json({ message: "Comunicado não encontrado." }, { status: 404 });
+    Object.assign(announcement, payload);
+    return HttpResponse.json(announcement);
   }),
 
   // FE-08: contratos alinhados aos controllers reais de cobranças e transações.

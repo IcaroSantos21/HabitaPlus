@@ -102,14 +102,14 @@ function NotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-white/30 px-3 text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="hp-notification-trigger relative inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-white/30 px-3 text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
-        <span aria-hidden="true" className="text-lg">🔔</span>
-        {count > 0 && <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-5 text-white">{count > 99 ? "99+" : count}</span>}
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="hp-notification-icon" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+        {count > 0 && <span className="hp-notification-count absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-5 text-white">{count > 99 ? "99+" : count}</span>}
       </button>
 
       {open && (
-        <div role="dialog" aria-label="Notificações recentes" className="absolute right-0 z-50 mt-2 w-[min(92vw,24rem)] overflow-hidden rounded-xl border border-gray-200 bg-white text-ink shadow-xl">
+        <div role="dialog" aria-label="Notificações recentes" className="hp-notification-popover absolute right-0 z-50 mt-2 w-[min(92vw,24rem)] overflow-hidden rounded-xl border border-gray-200 bg-white text-ink shadow-xl">
           <div className="flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3">
             <h2 className="font-bold text-brand-navy">Notificações</h2>
             <div className="flex items-center gap-2">
