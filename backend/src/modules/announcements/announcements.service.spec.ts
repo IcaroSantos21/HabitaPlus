@@ -49,7 +49,7 @@ describe('AnnouncementsService', () => {
     });
     expect(notificationsService.notifyMany).toHaveBeenCalledWith(
       [2, 5],
-      TipoNotificacao.ANUNCIO,
+      TipoNotificacao.COMUNICADO,
       'Novo comunicado: Manutenção da piscina',
       8,
     );

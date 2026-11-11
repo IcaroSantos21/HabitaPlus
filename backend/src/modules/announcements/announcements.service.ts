@@ -35,7 +35,7 @@ export class AnnouncementsService {
 
     await this.notificationsService.notifyMany(
       moradores.map(({ id }) => id),
-      TipoNotificacao.ANUNCIO,
+      TipoNotificacao.COMUNICADO,
       `Novo comunicado: ${comunicado.titulo}`,
       comunicado.id,
     );
