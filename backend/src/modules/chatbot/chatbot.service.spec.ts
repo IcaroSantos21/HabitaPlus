@@ -160,6 +160,47 @@ describe('ChatbotService', () => {
     expect(chamadosService.create).not.toHaveBeenCalled();
   });
 
+  it('deve continuar a abertura do chamado quando as respostas curtas forem classificadas fora de escopo', async () => {
+    const service = createService();
+    mlClientService.parse
+      .mockResolvedValueOnce({
+        intencao: 'abrir_chamado',
+        confianca: 0.93,
+        entities: {},
+      })
+      .mockResolvedValueOnce({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      })
+      .mockResolvedValueOnce({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      });
+    chamadosService.create.mockResolvedValue({ id: 88 } as never);
+
+    const inicio = await service.handleMessage('Abrir chamado', usuarioMorador);
+    expect(inicio.reply).toContain('Em qual local');
+
+    const local = await service.handleMessage('garagem', usuarioMorador);
+    expect(local.reply).toContain('Qual equipamento');
+
+    const equipamento = await service.handleMessage('elevador', usuarioMorador);
+    expect(equipamento).toMatchObject({
+      intent: 'abrir_chamado',
+      data: { chamadoId: 88, status: StatusChamado.ABERTO },
+    });
+    expect(chamadosService.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        areaComum: 'garagem',
+        equipamento: 'elevador',
+        categoria: 'manutencao',
+      }),
+      usuarioMorador,
+    );
+  });
+
   it('deve listar chamados abertos do morador', async () => {
     mlClientService.parse.mockResolvedValue({
       intencao: 'status_chamado',

@@ -61,7 +61,7 @@ function Badge({ children, status, variant, className = "" }) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles} ${className}`}
+      className={`hp-badge inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles} ${className}`}
     >
       {text}
     </span>

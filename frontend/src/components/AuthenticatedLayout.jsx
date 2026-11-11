@@ -4,7 +4,6 @@ import Button from "./Button";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import NotificationBell from "./NotificationBell";
-import ChatbotWidget from "./ChatbotWidget";
 import { useAuth } from "../hooks/useAuth";
 import { getHomePath, getUserRole, roleLabel } from "../utils/roles";
 
@@ -54,6 +53,8 @@ function AuthenticatedLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const role = getUserRole(user);
   const links = linksByRole[role] || [];
+  const displayName = user?.nome || user?.name || "Usuário";
+  const initials = displayName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   function handleLogout() {
     logout();
@@ -61,64 +62,61 @@ function AuthenticatedLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip bg-gray-50 text-ink">
+    <div className={`hp-app hp-app--${String(role || "guest").toLowerCase()}`}>
       <Navbar
-        brand="Habita+"
+        brand="Habita"
         links={[]}
         actions={
-          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-            <span className="hidden text-sm text-white sm:inline">
-              {user?.nome || user?.name} · {roleLabel(user)}
-            </span>
+          <>
+            <div className="hp-user-chip">
+              <span className="hp-user-chip__avatar" aria-hidden="true">{initials || "H"}</span>
+              <span className="hp-user-chip__copy">
+                <strong>{displayName}</strong>
+                <small>{roleLabel(user)}</small>
+              </span>
+            </div>
             <NotificationBell />
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleLogout}
-            >
+            <Button variant="secondary" size="sm" onClick={handleLogout} className="hp-logout-button">
               Sair
             </Button>
-          </div>
+          </>
         }
       />
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:gap-6 lg:px-8">
-        <div className="lg:hidden">
+      <div className="hp-app-grid">
+        <div className="hp-mobile-menu-bar">
           <Button
             variant="secondary"
-            className="w-full"
+            className="hp-mobile-menu-trigger"
             onClick={() => setMobileMenuOpen((open) => !open)}
             aria-expanded={mobileMenuOpen}
             aria-controls="authenticated-sidebar"
           >
-            {mobileMenuOpen ? "Ocultar menu" : "Abrir menu"}
+            <span aria-hidden="true">☰</span>{mobileMenuOpen ? "Fechar navegação" : "Abrir navegação"}
           </Button>
         </div>
 
-        <div
-          id="authenticated-sidebar"
-          className={`${mobileMenuOpen ? "block" : "hidden"} lg:block lg:w-64 lg:shrink-0`}
-        >
+        <div id="authenticated-sidebar" className={`hp-sidebar-wrap${mobileMenuOpen ? " is-open" : ""}`}>
           <Sidebar
-            className="max-w-none lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-full"
+            className="hp-sidebar--sticky"
             links={links}
             onNavigate={() => setMobileMenuOpen(false)}
             footer={
-              <Link
-                to={getHomePath(user)}
-                className="block rounded-md px-3 py-2 text-sm text-white/85 hover:bg-white/10"
-              >
-                Voltar à visão geral
+              <Link to={getHomePath(user)} className="hp-sidebar__home-link">
+                <span aria-hidden="true">↗</span> Voltar à visão geral
               </Link>
             }
           />
         </div>
 
-        <main className="min-w-0 w-full flex-1 py-2">
+        <main className="hp-main">
           {children}
+          <footer className="hp-main__footer">
+            <span>Habita+ · Seu condomínio em boas mãos</span>
+            <span>Ambiente seguro e conectado</span>
+          </footer>
         </main>
       </div>
-      <ChatbotWidget />
     </div>
   );
 }

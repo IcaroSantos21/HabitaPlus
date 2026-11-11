@@ -45,6 +45,52 @@ function listingData(value) {
   return Array.isArray(value?.data) ? value.data : Array.isArray(value) ? value : [];
 }
 
+const marketplaceImageBase = "/images/marketplace/";
+
+function getListingImage(listing) {
+  const title = String(listing?.titulo || listing?.title || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  const category = String(listing?.categoria || "").toUpperCase();
+
+  if (title.includes("sofa") || title.includes("poltrona")) return `${marketplaceImageBase}sofa.webp`;
+  if (title.includes("bicicleta") || title.includes("bike")) return `${marketplaceImageBase}bike.webp`;
+  if (title.includes("luminaria") || title.includes("lampada") || title.includes("abajur")) return `${marketplaceImageBase}lamp.webp`;
+  if (title.includes("mesa") || title.includes("cadeira")) return `${marketplaceImageBase}dining.webp`;
+  if (title.includes("monitor") || title.includes("notebook") || title.includes("computador") || title.includes("eletron")) return `${marketplaceImageBase}monitor.svg`;
+  if (title.includes("panela") || title.includes("cozinha") || title.includes("utensilio")) return `${marketplaceImageBase}cookware.svg`;
+
+  const categoryImages = {
+    MOVEIS: "sofa.webp",
+    ESPORTE: "bike.webp",
+    ELETRONICOS: "monitor.svg",
+    UTENSILIOS: "cookware.svg",
+    OUTROS: "generic.svg",
+  };
+
+  return `${marketplaceImageBase}${categoryImages[category] || "generic.svg"}`;
+}
+
+function ListingImage({ listing, className = "" }) {
+  const fallbackImage = getListingImage(listing);
+  const source = listing?.imagemUrl || fallbackImage;
+
+  return (
+    <img
+      src={source}
+      alt={listing?.titulo || "Imagem ilustrativa do anúncio"}
+      loading="lazy"
+      decoding="async"
+      className={className}
+      onError={(event) => {
+        event.currentTarget.onerror = null;
+        event.currentTarget.src = fallbackImage;
+      }}
+    />
+  );
+}
+
 function Marketplace() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -364,38 +410,58 @@ function Marketplace() {
   }
 
   const visibleListings = activeTab === "mine" ? myListings : listings;
+  const resultsTotal = activeTab === "mine" ? myListings.length : (meta.total ?? listings.length);
 
   return (
-    <div className="mx-auto w-full min-w-0 space-y-5">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand-teal">Habita+ Marketplace</p>
-          <h1 className="mt-1 text-2xl font-bold text-brand-navy sm:text-3xl">Produtos e oportunidades</h1>
-          <p className="mt-1 text-sm text-muted">Anuncie, encontre produtos e converse com moradores.</p>
+    <div className="marketplace-page mx-auto w-full min-w-0 space-y-6">
+      <header className="marketplace-hero">
+        <div className="marketplace-hero__copy">
+          <span className="marketplace-hero__eyebrow">HABITA+ <span aria-hidden="true">/</span> COMUNIDADE</span>
+          <h1>Produtos e oportunidades</h1>
+          <p>Descubra boas ofertas, anuncie o que não usa mais e negocie diretamente com os moradores do seu condomínio.</p>
+          <div className="marketplace-hero__trust">
+            <span><i aria-hidden="true" /> Feito para a comunidade</span>
+            <span><i aria-hidden="true" /> Negociação entre vizinhos</span>
+          </div>
         </div>
-        <Button onClick={openCreateForm} className="w-full sm:w-auto">+ Criar anúncio</Button>
+        <div className="marketplace-hero__actions">
+          <span className="marketplace-hero__community">Seu condomínio, novas possibilidades</span>
+          <Button onClick={openCreateForm} variant="secondary" className="marketplace-hero__button">+ Criar anúncio</Button>
+        </div>
+        <div className="marketplace-hero__art" aria-hidden="true">
+          <span className="marketplace-hero__orb marketplace-hero__orb--one" />
+          <span className="marketplace-hero__orb marketplace-hero__orb--two" />
+          <span className="marketplace-hero__tile">H<span>+</span></span>
+        </div>
       </header>
 
       {actionError && <Alert variant="error" title="Ação não concluída">{actionError}</Alert>}
       {categoryError && <Alert variant="warning">{categoryError}</Alert>}
 
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
-        <button type="button" onClick={() => { setActiveTab("feed"); setPage(1); }} aria-pressed={activeTab === "feed"} className={`rounded-lg px-4 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-teal ${activeTab === "feed" ? "bg-brand-teal text-white" : "bg-white text-brand-navy hover:bg-gray-100"}`}>Feed</button>
-        <button type="button" onClick={() => setActiveTab("mine")} aria-pressed={activeTab === "mine"} className={`rounded-lg px-4 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-teal ${activeTab === "mine" ? "bg-brand-teal text-white" : "bg-white text-brand-navy hover:bg-gray-100"}`}>Meus anúncios</button>
-        <Link to="/messages" className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-gray-100">Caixa de entrada</Link>
+      <div className="marketplace-tabs">
+        <button type="button" onClick={() => { setActiveTab("feed"); setPage(1); }} aria-pressed={activeTab === "feed"} className={`marketplace-tab ${activeTab === "feed" ? "is-active" : ""}`}>Explorar anúncios</button>
+        <button type="button" onClick={() => setActiveTab("mine")} aria-pressed={activeTab === "mine"} className={`marketplace-tab ${activeTab === "mine" ? "is-active" : ""}`}>Meus anúncios</button>
+        <Link to="/messages" className="marketplace-tab">Caixa de entrada</Link>
       </div>
 
       {activeTab === "feed" && (
-        <Card className="min-w-0">
-          <form onSubmit={applyFilters} className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
-            <div className="sm:col-span-2 lg:col-span-2">
+        <Card className="marketplace-filter-card min-w-0">
+          <div className="marketplace-filter-heading">
+            <div>
+              <p className="marketplace-filter-eyebrow">ENCONTRE O QUE PROCURA</p>
+              <h2>Buscar no marketplace</h2>
+            </div>
+            <span>Filtros rápidos</span>
+          </div>
+          <form onSubmit={applyFilters} className="marketplace-filter-grid grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
+            <div className="sm:col-span-2 xl:col-span-2">
               <Input label="Buscar anúncio" value={filters.q} onChange={(event) => setFilters((current) => ({ ...current, q: event.target.value }))} placeholder="Ex.: bicicleta, mesa..." />
             </div>
             <Select label="Categoria" value={filters.categoria} onChange={(event) => setFilters((current) => ({ ...current, categoria: event.target.value }))} options={categoryOptions} placeholder="Todas" />
             <Select label="Status" value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))} options={[{ value: "DISPONIVEL", label: "Disponível" }, { value: "VENDIDO", label: "Vendido" }]} placeholder="Todos" />
             <Input label="Preço mínimo" type="number" min="0" step="0.01" value={filters.precoMin} onChange={(event) => setFilters((current) => ({ ...current, precoMin: event.target.value }))} placeholder="R$ 0" />
             <Input label="Preço máximo" type="number" min="0" step="0.01" value={filters.precoMax} onChange={(event) => setFilters((current) => ({ ...current, precoMax: event.target.value }))} placeholder="Sem limite" />
-            <div className="sm:col-span-2 lg:col-span-6 flex flex-wrap justify-end gap-2">
+            <div className="sm:col-span-2 xl:col-span-6 flex flex-wrap justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => { const clean = { q: "", categoria: "", precoMin: "", precoMax: "", status: "" }; setFilters(clean); setAppliedFilters({}); setPage(1); }}>Limpar</Button>
               <Button type="submit">Aplicar filtros</Button>
             </div>
@@ -404,12 +470,16 @@ function Marketplace() {
       )}
 
       {isResident && activeTab === "feed" && recommended.length > 0 && (
-        <section className="space-y-3" aria-labelledby="recommended-title">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-teal">Seleção personalizada</p>
-            <h2 id="recommended-title" className="text-xl font-bold text-brand-navy">Recomendados para você</h2>
+        <section className="marketplace-section space-y-4" aria-labelledby="recommended-title">
+          <div className="marketplace-section-heading">
+            <div>
+              <p className="marketplace-section-eyebrow">SELEÇÃO PERSONALIZADA</p>
+              <h2 id="recommended-title">Recomendados para você</h2>
+              <p>Oportunidades que combinam com o seu perfil.</p>
+            </div>
+            <span className="marketplace-section-mark" aria-hidden="true">✦</span>
           </div>
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="marketplace-card-grid grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {recommended.map((item) => {
               const listing = { id: item.listingId, ...item.anuncio, vendedor: item.anuncio.vendedor || {} };
               return <ListingCard key={item.listingId} listing={listing} currentUserId={currentUserId} onOpen={() => openDetails(item.listingId)} onEdit={openEditForm} onSold={markAsSold} onRemove={removeListing} />;
@@ -418,17 +488,20 @@ function Marketplace() {
         </section>
       )}
 
-      <section className="min-w-0 space-y-3" aria-live="polite">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-bold text-brand-navy">{activeTab === "mine" ? "Meus anúncios" : "Feed de anúncios"}</h2>
-          {!loading && <span className="text-sm text-muted">{activeTab === "mine" ? myListings.length : meta.total ?? listings.length} resultado(s)</span>}
+      <section className="marketplace-section min-w-0 space-y-4" aria-live="polite">
+        <div className="marketplace-section-heading marketplace-section-heading--compact">
+          <div>
+            <p className="marketplace-section-eyebrow">{activeTab === "mine" ? "SUA VITRINE" : "NOVIDADES DA COMUNIDADE"}</p>
+            <h2>{activeTab === "mine" ? "Meus anúncios" : "Feed de anúncios"}</h2>
+          </div>
+          {!loading && <span className="marketplace-results-count">{resultsTotal} {resultsTotal === 1 ? "anúncio" : "anúncios"}</span>}
         </div>
         {loading ? <div className="py-8 text-center"><Loading label="Carregando anúncios..." /></div> : listError ? (
           <Alert variant="error" title="Não foi possível carregar">{listError}<div className="mt-3"><Button size="sm" variant="secondary" onClick={() => setReloadKey((value) => value + 1)}>Tentar novamente</Button></div></Alert>
         ) : visibleListings.length === 0 ? (
           <EmptyState title={activeTab === "mine" ? "Você ainda não publicou anúncios" : "Nenhum anúncio encontrado"} description={activeTab === "mine" ? "Crie seu primeiro anúncio para compartilhar com os moradores." : "Ajuste os filtros ou volte mais tarde para ver novas ofertas."} action={activeTab === "mine" ? <Button onClick={openCreateForm}>Criar anúncio</Button> : undefined} />
         ) : (
-          <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="marketplace-card-grid grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {visibleListings.map((listing) => <ListingCard key={listing.id} listing={listing} currentUserId={currentUserId} onOpen={() => openDetails(listing.id)} onEdit={openEditForm} onSold={markAsSold} onRemove={removeListing} />)}
           </div>
         )}
@@ -462,7 +535,7 @@ function Marketplace() {
         {detailLoading ? <div className="py-8 text-center"><Loading label="Abrindo anúncio..." /></div> : detailError ? <Alert variant="error">{detailError}</Alert> : detail && (
           <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-2">
             <div className="min-w-0 space-y-3">
-              {detail.imagemUrl ? <img src={detail.imagemUrl} alt={detail.titulo} className="max-h-72 w-full rounded-xl bg-gray-100 object-cover" /> : <div className="flex h-48 items-center justify-center rounded-xl bg-gray-100 text-5xl" aria-hidden="true">▧</div>}
+              <ListingImage listing={detail} className="marketplace-detail-image w-full rounded-2xl bg-gray-100 object-cover" />
               <div className="flex flex-wrap items-center gap-2">
                 <Badge status={detail.status}>{detail.status === "VENDIDO" ? "Vendido" : "Disponível"}</Badge>
                 <Badge variant="info">{categoryLabels[detail.categoria] || detail.categoria}</Badge>
@@ -521,26 +594,38 @@ function Marketplace() {
 
 function ListingCard({ listing, currentUserId, onOpen, onEdit, onSold, onRemove }) {
   const isOwner = Number(listing?.vendedor?.id) === currentUserId;
-  const category = categoryLabels[listing.categoria] || listing.categoria;
+  const category = categoryLabels[listing.categoria] || listing.categoria || "Outros";
+  const isSold = listing.status === "VENDIDO";
+
   return (
-    <Card padding="none" className="flex min-w-0 flex-col overflow-hidden">
-      <button type="button" onClick={onOpen} className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-teal" aria-label={`Abrir anúncio ${listing.titulo}`}>
-        {listing.imagemUrl ? <img src={listing.imagemUrl} alt={listing.titulo} loading="lazy" className="h-44 w-full bg-gray-100 object-cover" /> : <div className="flex h-44 items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-5xl text-gray-400" aria-hidden="true">▧</div>}
-        <div className="min-w-0 space-y-2 p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge status={listing.status}>{listing.status === "VENDIDO" ? "Vendido" : "Disponível"}</Badge>
-            <span className="text-xs text-muted">{category}</span>
+    <Card padding="none" className="marketplace-product-card group flex min-w-0 flex-col overflow-hidden">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="marketplace-product-card__trigger block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-brand-teal"
+        aria-label={`Abrir anúncio ${listing.titulo}`}
+      >
+        <div className="marketplace-product-card__media">
+          <ListingImage listing={listing} className="marketplace-product-card__image" />
+          <span className={`marketplace-product-card__status ${isSold ? "is-sold" : ""}`}>
+            {isSold ? "Vendido" : "Disponível"}
+          </span>
+          <span className="marketplace-product-card__view">Ver detalhes <span aria-hidden="true">↗</span></span>
+        </div>
+        <div className="marketplace-product-card__body">
+          <span className="marketplace-product-card__category">{category}</span>
+          <h3 className="marketplace-product-card__title">{listing.titulo}</h3>
+          <p className="marketplace-product-card__description">{listing.descricao}</p>
+          <div className="marketplace-product-card__meta">
+            <p className="marketplace-product-card__price">{priceLabel(listing.preco)}</p>
+            <p className="marketplace-product-card__seller">Por {listing.vendedor?.nome || "Morador"}</p>
           </div>
-          <h3 className="break-words font-bold text-brand-navy">{listing.titulo}</h3>
-          <p className="line-clamp-2 min-h-10 break-words text-sm text-muted">{listing.descricao}</p>
-          <p className="text-lg font-bold text-brand-teal">{priceLabel(listing.preco)}</p>
-          <p className="truncate text-xs text-muted">Por {listing.vendedor?.nome || "Morador"}</p>
         </div>
       </button>
       {isOwner && (
-        <div className="mt-auto flex flex-wrap gap-2 border-t border-gray-100 p-3">
+        <div className="marketplace-product-card__owner-actions mt-auto flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" onClick={() => onEdit(listing)}>Editar</Button>
-          {listing.status !== "VENDIDO" && <Button size="sm" onClick={() => onSold(listing)}>Marcar vendido</Button>}
+          {!isSold && <Button size="sm" onClick={() => onSold(listing)}>Marcar vendido</Button>}
           <Button size="sm" variant="danger" onClick={() => onRemove(listing)}>Remover</Button>
         </div>
       )}

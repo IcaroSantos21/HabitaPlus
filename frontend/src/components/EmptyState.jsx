@@ -1,6 +1,6 @@
 function EmptyState({ icon = "⌕", title = "Nada por aqui", description = "Não há informações para exibir no momento.", action, className = "" }) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white px-6 py-10 text-center ${className}`}>
+    <div className={`hp-empty-state flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white px-6 py-10 text-center ${className}`}>
       <div aria-hidden="true" className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-mint/50 text-2xl text-brand-teal">
         {icon}
       </div>

@@ -1,5 +1,5 @@
 const baseStyles =
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2";
+  "hp-button inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2";
 
 const variantStyles = {
   primary: "bg-brand-teal text-white hover:bg-brand-navy",
