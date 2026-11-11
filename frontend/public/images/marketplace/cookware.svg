@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="90" y1="20" x2="1090" y2="740" gradientUnits="userSpaceOnUse"><stop stop-color="#F6F8F7"/><stop offset="1" stop-color="#DCE9E6"/></linearGradient>
+    <linearGradient id="steel" x1="260" y1="270" x2="880" y2="630" gradientUnits="userSpaceOnUse"><stop stop-color="#F9FBFC"/><stop offset=".32" stop-color="#BBC8CE"/><stop offset=".58" stop-color="#F4F7F8"/><stop offset="1" stop-color="#83939B"/></linearGradient>
+    <linearGradient id="lid" x1="300" y1="200" x2="780" y2="390" gradientUnits="userSpaceOnUse"><stop stop-color="#F8FAFB"/><stop offset=".5" stop-color="#AAB7BE"/><stop offset="1" stop-color="#E8EEF0"/></linearGradient>
+    <filter id="shadow" x="100" y="160" width="1000" height="590" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+  <rect width="1200" height="750" rx="28" fill="url(#bg)"/>
+  <circle cx="970" cy="130" r="155" fill="#B7E7D7" opacity=".48"/>
+  <circle cx="230" cy="120" r="100" fill="#fff" opacity=".6"/>
+  <path d="M0 555h1200v195H0z" fill="#D8C5AB"/>
+  <path d="M0 555h1200" stroke="#F5EBDD" stroke-width="16"/>
+  <ellipse cx="620" cy="640" rx="430" ry="48" fill="#334155" opacity=".18" filter="url(#shadow)"/>
+  <!-- large stock pot -->
+  <path d="M430 360h360l-24 210c-4 38-34 66-72 66H526c-38 0-68-28-72-66l-24-210Z" fill="url(#steel)" stroke="#7E8E96" stroke-width="8"/>
+  <path d="M410 358h400v32H410z" fill="#87969D"/>
+  <path d="M470 355c6-62 63-102 140-102s134 40 140 102H470Z" fill="url(#lid)" stroke="#82939C" stroke-width="7"/>
+  <ellipse cx="610" cy="250" rx="47" ry="12" fill="#7D8C93"/>
+  <rect x="588" y="218" width="44" height="30" rx="13" fill="#596A72"/>
+  <path d="M430 405h-74c-24 0-41 18-41 40s17 40 41 40h81M790 405h74c24 0 41 18 41 40s-17 40-41 40h-81" stroke="#8B9BA2" stroke-width="18" stroke-linecap="round"/>
+  <!-- small saucepan -->
+  <path d="M170 440h245l-16 126c-4 29-26 50-55 50H241c-29 0-51-21-55-50l-16-126Z" fill="url(#steel)" stroke="#7E8E96" stroke-width="7"/>
+  <path d="M150 440h285v24H150z" fill="#85959D"/>
+  <path d="M185 438c5-41 49-68 108-68s103 27 108 68H185Z" fill="url(#lid)" stroke="#82939C" stroke-width="6"/>
+  <ellipse cx="293" cy="369" rx="34" ry="9" fill="#73838B"/><rect x="276" y="345" width="34" height="24" rx="10" fill="#5F7078"/>
+  <path d="M170 480h-61" stroke="#86969D" stroke-width="14" stroke-linecap="round"/>
+  <!-- medium pot -->
+  <path d="M770 470h245l-14 108c-4 27-26 46-53 46h-111c-27 0-49-19-53-46l-14-108Z" fill="url(#steel)" stroke="#7E8E96" stroke-width="7"/>
+  <path d="M755 468h275v23H755z" fill="#85959D"/>
+  <path d="M790 467c5-42 46-67 103-67s98 25 103 67H790Z" fill="url(#lid)" stroke="#82939C" stroke-width="6"/>
+  <ellipse cx="893" cy="399" rx="31" ry="8" fill="#73838B"/><rect x="878" y="377" width="30" height="22" rx="10" fill="#5F7078"/>
+  <path d="M770 502h-48M1015 502h48" stroke="#87969D" stroke-width="13" stroke-linecap="round"/>
+  <g opacity=".42" stroke="#fff" stroke-width="8"><path d="M475 415v160M510 420v160M815 505v88M845 505v88"/></g>
+</svg>

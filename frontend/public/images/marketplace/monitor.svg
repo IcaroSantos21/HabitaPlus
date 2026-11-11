@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="65" y1="20" x2="1110" y2="740" gradientUnits="userSpaceOnUse"><stop stop-color="#EAF4F8"/><stop offset="1" stop-color="#D8E7EE"/></linearGradient>
+    <linearGradient id="screen" x1="350" y1="170" x2="880" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#7DD3FC"/><stop offset=".48" stop-color="#2563A8"/><stop offset="1" stop-color="#173F70"/></linearGradient>
+    <linearGradient id="desk" x1="170" y1="570" x2="1060" y2="725" gradientUnits="userSpaceOnUse"><stop stop-color="#C99C6C"/><stop offset="1" stop-color="#966A48"/></linearGradient>
+    <filter id="shadow" x="180" y="110" width="850" height="600" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="1200" height="750" rx="28" fill="url(#bg)"/>
+  <circle cx="1010" cy="140" r="155" fill="#B7E8DF" opacity=".52"/>
+  <circle cx="180" cy="150" r="110" fill="#fff" opacity=".48"/>
+  <rect x="110" y="590" width="980" height="40" rx="20" fill="#36576A" opacity=".18" filter="url(#shadow)"/>
+  <path d="M0 610H1200V750H0z" fill="url(#desk)"/>
+  <path d="M0 610H1200" stroke="#E5C9A8" stroke-width="10"/>
+  <rect x="320" y="145" width="560" height="355" rx="26" fill="#1E293B"/>
+  <rect x="339" y="164" width="522" height="317" rx="12" fill="url(#screen)"/>
+  <path d="M340 393C436 322 490 292 572 317c77 23 138-12 289-145v309H340V393Z" fill="#8EE4D3" opacity=".56"/>
+  <path d="M340 435c112-98 167-111 254-77 83 32 153 2 267-89v212H340v-46Z" fill="#DFF7F2" opacity=".4"/>
+  <circle cx="600" cy="488" r="4" fill="#64748B"/>
+  <path d="M570 500h60l34 76H536l34-76Z" fill="#475569"/>
+  <rect x="480" y="574" width="240" height="16" rx="8" fill="#334155"/>
+  <path d="M190 610h820" stroke="#F3D8B9" stroke-width="4" opacity=".7"/>
+  <rect x="868" y="540" width="120" height="13" rx="6.5" fill="#6B4C36" opacity=".55"/>
+  <rect x="205" y="538" width="90" height="14" rx="7" fill="#6B4C36" opacity=".4"/>
+  <rect x="910" y="475" width="14" height="64" rx="7" fill="#315D4B"/>
+  <path d="M916 480c-54-34-41-80-3-98 24 35 30 64 3 98Z" fill="#5DAE87"/>
+  <path d="M918 480c52-40 67-75 36-105-32 25-49 59-36 105Z" fill="#3F9874"/>
+  <path d="M916 480c-13-60-4-91 26-113 21 35 10 79-26 113Z" fill="#85C9A6"/>
+  <path d="M885 545h75l-12 65h-51l-12-65Z" fill="#F6F3EB"/>
+  <path d="M885 545h75l-5 16h-65l-5-16Z" fill="#D7E7E2"/>
+</svg>

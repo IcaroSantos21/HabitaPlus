@@ -1,7 +1,7 @@
 function Table({ columns = [], data = [], rowKey = "id", emptyMessage = "Nenhum registro encontrado.", className = "" }) {
   return (
-    <div className={`w-full overflow-x-auto rounded-lg border border-gray-100 ${className}`}>
-      <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+    <div className={`hp-table-wrap w-full overflow-x-auto rounded-xl border border-gray-100 ${className}`}>
+      <table className="hp-table w-full min-w-[640px] border-collapse text-left text-sm">
         <thead className="bg-gray-50 text-xs uppercase tracking-wide text-muted">
           <tr>
             {columns.map((column) => (
