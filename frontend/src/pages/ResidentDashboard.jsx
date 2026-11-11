@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Alert from "../components/Alert";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
@@ -54,6 +54,7 @@ function sortNewest(items, dateKeys) {
 
 function ResidentDashboard() {
   const { user } = useAuth();
+  const location = useLocation();
   const [state, setState] = useState({
     loading: true,
     charges: [],
@@ -66,6 +67,14 @@ function ResidentDashboard() {
     message: "",
     error: "",
   });
+
+  useEffect(() => {
+    if (location.hash !== "#comunicados") return;
+    document.getElementById("comunicados")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [location.hash]);
 
   useEffect(() => {
     let active = true;
@@ -123,7 +132,7 @@ function ResidentDashboard() {
     [state.tickets],
   );
   const latestAnnouncements = useMemo(
-    () => sortNewest(state.announcements, ["criadoEm", "createdAt", "data"]).slice(0, 3),
+    () => sortNewest(state.announcements, ["criadaEm", "criadoEm", "createdAt", "data"]).slice(0, 3),
     [state.announcements],
   );
   const nextCharge = pendingCharges[0];
@@ -320,7 +329,8 @@ function ResidentDashboard() {
         </Card>
       </section>
 
-      <Card
+      <section id="comunicados" className="scroll-mt-6">
+        <Card
         title="Últimos anúncios"
         description="Fique por dentro dos comunicados do condomínio"
       >
@@ -346,16 +356,17 @@ function ResidentDashboard() {
                   {announcement.titulo || announcement.title || "Comunicado"}
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  {announcement.descricao || announcement.description || ""}
+                  {announcement.conteudo || announcement.descricao || announcement.description || ""}
                 </p>
                 <p className="mt-3 text-xs text-muted">
-                  {announcement.criadoEm || announcement.createdAt || announcement.data || ""}
+                  {announcement.criadaEm || announcement.criadoEm || announcement.createdAt || announcement.data || ""}
                 </p>
               </article>
             ))}
           </div>
         )}
-      </Card>
+        </Card>
+      </section>
 
       {import.meta.env.VITE_USE_MOCKS === "true" && (
         <p className="text-xs text-muted">

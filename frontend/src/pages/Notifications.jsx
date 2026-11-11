@@ -7,17 +7,7 @@ import Card from "../components/Card";
 import EmptyState from "../components/EmptyState";
 import Loading from "../components/Loading";
 import notificationsService from "../services/notificationsService";
-
-function targetFor(notification) {
-  if (notification.tipo === "ANUNCIO" || notification.tipo === "MENSAGEM") {
-    return notification.refId ? `/marketplace?anuncio=${notification.refId}` : "/messages";
-  }
-  if (notification.tipo === "COBRANCA") return "/charges";
-  if (notification.tipo === "ALERTA") {
-    return String(notification.texto || "").toLocaleLowerCase("pt-BR").includes("contrato de locação") ? "/rentals" : "/tickets";
-  }
-  return "/marketplace";
-}
+import { getNotificationTarget } from "../utils/notificationTarget";
 
 function Notifications() {
   const navigate = useNavigate();
@@ -59,7 +49,7 @@ function Notifications() {
         return;
       }
     }
-    navigate(targetFor(item));
+    navigate(getNotificationTarget(item));
   }
 
   async function markAll() {

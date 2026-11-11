@@ -125,8 +125,11 @@ A imagem Docker do frontend e o fallback do Nginx permanecem configurados nos ar
 
 ## Ajustes complementares da FE-03
 
-- O serviço `src/services/nluService.js` chama `POST /api/v1/nlu/parse`.
-- Com `VITE_USE_MOCKS=true`, o MSW oferece uma resposta demonstrativa para interpretação de texto.
+- O serviço `src/services/nluService.js` chama `POST /api/nlu/parse` no backend NestJS; o backend encaminha a interpretação ao ML-service sem expor a URL interna ao navegador.
+- A previsão de despesas usa `GET /api/predictions/expenses`, rota publicada pelo módulo de previsões do backend.
+- Recomendações personalizadas usam `GET /api/recommendations/me`, conforme o `RecommendationsController`.
+- Comunicados usam `GET/POST/PATCH /api/announcements`; a paginação deve usar `pagina` e `limite`.
+- Com `VITE_USE_MOCKS=true`, o MSW simula os mesmos contratos e caminhos do backend.
 - A rota de locações é restrita a síndico e administrador, como no menu autenticado. O menu de síndico também apresenta o assistente virtual, cuja rota é acessível aos perfis autenticados.
 
 

@@ -184,7 +184,7 @@ const mockCharges = [
 ];
 
 const mockAnnouncements = [
-  { id: "ann_001", titulo: "Limpeza da caixa d'água", descricao: "Serviço programado para sábado.", criadoEm: "2026-10-15" },
+  { id: "ann_001", titulo: "Limpeza da caixa d'água", conteudo: "Serviço programado para sábado.", criadaEm: "2026-10-15T09:00:00.000Z" },
 ];
 
 // Mantém o contexto de abertura de chamado durante a conversa simulada.
@@ -268,6 +268,7 @@ let mockMarketplaceNotifications = [
   { id: 9203, usuarioId: 1, tipo: "COBRANCA", texto: "Sua cobrança de novembro está disponível.", refId: 701, lida: true, criadaEm: "2026-11-07T10:00:00.000Z" },
   { id: 9204, usuarioId: 2, tipo: "MENSAGEM", texto: "Nova mensagem de Marina Morador sobre Sofá retrátil de 3 lugares", refId: 801, lida: false, criadaEm: "2026-11-08T13:00:00.000Z" },
   { id: 9205, usuarioId: 1, tipo: "ALERTA", texto: "Há um chamado de manutenção aguardando acompanhamento.", refId: 1001, lida: false, criadaEm: "2026-11-06T09:00:00.000Z" },
+  { id: 9206, usuarioId: 1, tipo: "COMUNICADO", texto: "Novo comunicado: Limpeza da caixa d'água", refId: "ann_001", lida: false, criadaEm: "2026-11-09T09:00:00.000Z" },
 ];
 
 function listingOwner(listing) {
@@ -300,17 +301,6 @@ function listingForbidden() {
   return HttpResponse.json({ message: "Você não tem permissão para modificar este anúncio." }, { status: 403 });
 }
 
-
-const mockForecast = {
-  predictionId: "pred_demo",
-  condominioId: "cond_demo",
-  mesDesejado: "2026-11",
-  predicaoTotal: 4900,
-  moeda: "BRL",
-  predictions: [{ category: "ENERGY", predictedAmount: 4900 }],
-  versaoModelo: "expenses-v1",
-  geradoEm: "2026-10-20T16:30:00Z",
-};
 
 const mockRecommendations = {
   recommendations: [
@@ -504,10 +494,6 @@ export const handlers = [
   http.post("*/api/v1/cobrancas", async ({ request }) => protectedJson(request, { data: await request.json() })),
   http.post("*/api/v1/cobrancas/:id/pagamentos", async ({ request, params }) => protectedJson(request, { data: { cobrancaId: params.id, status: "PENDENTE", ...(await request.json()) } })),
 
-  http.get("*/api/v1/announcements", ({ request }) => protectedJson(request, paginated(mockAnnouncements))),
-  http.post("*/api/v1/announcements", async ({ request }) => protectedJson(request, { data: await request.json() })),
-  http.patch("*/api/v1/announcements/:id", async ({ request, params }) => protectedJson(request, { data: { id: params.id, ...(await request.json()) } })),
-
   http.get("*/api/v1/mensagens", ({ request }) => protectedJson(request, paginated(mockMessages))),
   http.post("*/api/v1/mensagens", async ({ request }) => protectedJson(request, { data: await request.json() })),
 
@@ -662,50 +648,30 @@ export const handlers = [
     });
   }),
 
-  http.get("*/api/v1/forecasts/expenses", ({ request }) => protectedJson(request, mockForecast)),
   http.post("*/api/v1/recomendacoes", ({ request }) => protectedJson(request, mockRecommendations)),
-  http.post("*/api/v1/nlu/parse", async ({ request }) => {
-    if (!isAuthorized(request)) {
-      return unauthorized();
-    }
+  http.post("*/api/nlu/parse", async ({ request }) => {
+    if (!isAuthorized(request)) return unauthorized();
 
     const payload = await request.json();
     const texto = String(payload?.texto || "").trim();
-
     if (!texto) {
-      return HttpResponse.json(
-        { message: "O campo texto é obrigatório." },
-        { status: 400 },
-      );
+      return HttpResponse.json({ message: "O campo texto é obrigatório." }, { status: 400 });
     }
 
     const normalizedText = texto.toLocaleLowerCase("pt-BR");
     const isChargeQuestion = /taxa|cobrança|cobranca|boleto|pagamento/.test(normalizedText);
     const isTicketQuestion = /chamado|manutenção|manutencao|reparo|problema/.test(normalizedText);
-    const intent = isChargeQuestion
-      ? "CONSULT_CHARGE"
-      : isTicketQuestion
-        ? "CONSULT_TICKET"
-        : "GENERAL_QUERY";
-    const operation = isChargeQuestion
-      ? "LIST_CHARGES"
-      : isTicketQuestion
-        ? "LIST_TICKETS"
-        : "GENERAL_ASSISTANCE";
-
     return HttpResponse.json({
-      intencao: intent,
+      intencao: isChargeQuestion ? "CONSULT_CHARGE" : isTicketQuestion ? "CONSULT_TICKET" : "GENERAL_QUERY",
       confianca: 0.9,
       entities: {
-        unitId: payload?.contexto?.unitId || null,
-        period: null,
+        unidade: null,
+        bloco: null,
+        equipamento: null,
+        quartos: null,
+        valor_max: null,
+        data: null,
       },
-      precisaAutenticacao: true,
-      acaoSugerida: {
-        type: "CALL_API",
-        operation,
-      },
-      versaoModelo: "nlu-mock-v1",
     });
   }),
 
@@ -851,10 +817,21 @@ export const handlers = [
     const announcement = {
       id: `ann_${Date.now()}`,
       titulo: String(payload?.titulo || "Comunicado"),
-      descricao: String(payload?.descricao || ""),
+      conteudo: String(payload?.conteudo || payload?.descricao || ""),
+      descricao: String(payload?.descricao || payload?.conteudo || ""),
+      criadaEm: new Date().toISOString(),
       criadoEm: new Date().toISOString(),
     };
     mockAnnouncements.unshift(announcement);
+
+    getAllUsers()
+      .filter((recipient) => String(recipient.perfil).toUpperCase() === "MORADOR")
+      .forEach((recipient) => appendMockNotification(
+        recipient.id,
+        "COMUNICADO",
+        `Novo comunicado: ${announcement.titulo}`,
+        announcement.id,
+      ));
     return HttpResponse.json(announcement, { status: 201 });
   }),
   http.patch("*/api/announcements/:id", async ({ request, params }) => {
@@ -1190,7 +1167,7 @@ export const handlers = [
     mockListings.splice(index, 1);
     return HttpResponse.json({ message: "Anúncio removido com sucesso." });
   }),
-  http.get("*/api/residents/me/recommendations", ({ request }) => {
+  http.get("*/api/recommendations/me", ({ request }) => {
     if (!isAuthorized(request)) return unauthorized();
     const user = getMockRequestUser(request);
     const recommendations = mockListings
