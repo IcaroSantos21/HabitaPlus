@@ -818,9 +818,12 @@ export const handlers = [
       id: `ann_${Date.now()}`,
       titulo: String(payload?.titulo || "Comunicado"),
       conteudo: String(payload?.conteudo || payload?.descricao || ""),
+      descricao: String(payload?.descricao || payload?.conteudo || ""),
       criadaEm: new Date().toISOString(),
+      criadoEm: new Date().toISOString(),
     };
     mockAnnouncements.unshift(announcement);
+
     getAllUsers()
       .filter((recipient) => String(recipient.perfil).toUpperCase() === "MORADOR")
       .forEach((recipient) => appendMockNotification(
