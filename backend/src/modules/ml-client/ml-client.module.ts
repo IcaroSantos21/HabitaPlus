@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppConfig } from '../../config/configuration';
 import { MlClientService } from './ml-client.service';
+import { NluController } from './nlu.controller';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MlClientService } from './ml-client.service';
       },
     }),
   ],
+  controllers: [NluController],
   providers: [MlClientService],
   exports: [MlClientService],
 })

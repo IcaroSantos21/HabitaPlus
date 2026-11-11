@@ -2,7 +2,7 @@ import api from "./api";
 
 const recommendationsService = {
   async get() {
-    const { data } = await api.get("/residents/me/recommendations");
+    const { data } = await api.get("/recommendations/me");
     return data;
   },
 };

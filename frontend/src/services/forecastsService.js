@@ -2,7 +2,7 @@ import api from "./api";
 
 const forecastsService = {
   async getExpenses(params = {}) {
-    const { data } = await api.get("/v1/forecasts/expenses", { params });
+    const { data } = await api.get("/predictions/expenses", { params });
     return data;
   },
 };

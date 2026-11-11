@@ -1,5 +1,6 @@
 export enum TipoNotificacao {
   ANUNCIO = 'ANUNCIO',
+  COMUNICADO = 'COMUNICADO',
   MENSAGEM = 'MENSAGEM',
   COBRANCA = 'COBRANCA',
   ALERTA = 'ALERTA',

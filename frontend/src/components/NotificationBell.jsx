@@ -1,18 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import notificationsService from "../services/notificationsService";
-
-function notificationTarget(notification) {
-  const id = notification?.refId;
-  if (notification?.tipo === "ANUNCIO" || notification?.tipo === "MENSAGEM") {
-    return id ? `/marketplace?anuncio=${id}` : "/messages";
-  }
-  if (notification?.tipo === "COBRANCA") return "/charges";
-  if (notification?.tipo === "ALERTA") {
-    return String(notification?.texto || "").toLocaleLowerCase("pt-BR").includes("contrato de locação") ? "/rentals" : "/tickets";
-  }
-  return "/notifications";
-}
+import { getNotificationTarget } from "../utils/notificationTarget";
 
 function dateLabel(value) {
   if (!value) return "Agora";
@@ -81,7 +70,7 @@ function NotificationBell() {
       }
     }
     setOpen(false);
-    navigate(notificationTarget(notification));
+    navigate(getNotificationTarget(notification));
   }
 
   async function markAll() {

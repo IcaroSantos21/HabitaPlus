@@ -141,7 +141,7 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
   "vencimento": "2026-11-10"
 }
 
-# Exemplo de resposta 
+# Exemplo de resposta
 
     {
   "data": {
@@ -187,7 +187,11 @@ Cobrir: auth, unidades, locação, chamados, transações, cobranças, anúncios
 
 Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), unidadeId, pagina e limite.
 
-# Anúncios, mensagens e notificações
+# Contratos legados (não utilizados pelos controllers atuais)
+
+> As rotas `/api/v1/...` desta seção representam uma proposta anterior e não estão expostas pelo backend atual. Para os contratos em uso, consulte as seções de comunicados, notificações, marketplace e previsões mais abaixo neste documento.
+
+# Anúncios, mensagens e notificações — proposta legada
 
   # Méto              Rota              	         Acesso                           Finalidade
     GET	      /api/v1/announcements         	Moradores e administração	        Listar anúncios
@@ -198,7 +202,7 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
     GET	      /api/v1/notificacoes         	Próprio usuário	                    Listar notificações
     PATCH	  /api/v1/notificacoes/{id}/read	Destinatário	                    Marcar como lida
 
-# Chatbot, previsões e recomendações
+# Chatbot, previsões e recomendações — proposta legada
   # Método	          Rota	                           Acesso 	                         Finalidade
     POST	/api/v1/chatbot/mensagens	         Usuário autenticado	            Enviar mensagem ao chatbot
     GET	    /api/v1/chatbot/conversas/{id}	  Participante autorizado	            Consultar conversa
@@ -211,7 +215,7 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
 
   # Contrato 1 — POST /predict/expenses
 
-   # Recebe 
+   # Recebe
 
       {
       "condominioId": "cond_001",
@@ -271,7 +275,7 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
     "limite": 3
   }
 
-   # Devolve 
+   # Devolve
 
     {
     "recommendations": [
@@ -297,7 +301,7 @@ Filtros da listagem: competencia (YYYY-MM), status (PENDENTE, PAGA, ATRASADA), u
 
   # Contrato 3 - POST /nlu/parse
 
-   # Recebe 
+   # Recebe
 
     {
     "texto": "Quero saber o valor da taxa do meu apartamento",
@@ -408,6 +412,15 @@ Percentual = valor em atraso (status ATRASADA) / valor total cobrado, de 0 a 100
 }
 
 Erros: 400 (vendedor sem destinatarioId/usuarioId), 403 (destinatário ou conversa que não é sua), 404 (anúncio ou mensagem inexistente). Sem WebSocket: o front atualiza por polling. Cada envio gera uma notificação MENSAGEM (refId = id do anúncio).
+
+# Previsões, NLU e recomendações (rotas atuais do NestJS)
+
+  # Método   Rota                                      Acesso                 Finalidade
+    GET      /api/predictions/expenses                 Síndico/administrador  Consultar previsão de despesas
+    POST     /api/nlu/parse                             Usuário autenticado   Encaminhar texto ao ML-service para NLU
+    GET      /api/recommendations/me                    Usuário autenticado   Consultar recomendações personalizadas
+
+O endpoint de NLU é um proxy autenticado no NestJS. O navegador não chama diretamente a URL interna do ML-service; o backend encaminha o texto para `POST /nlu/parse` no serviço Python.
 
 # Comunicados do condomínio (implementado no backend)
 

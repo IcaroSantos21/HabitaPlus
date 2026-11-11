@@ -490,7 +490,7 @@ async function populateDemoData(
   );
   await notificationsService.notifyMany(
     result.moradores.map(({ id }) => id),
-    TipoNotificacao.ANUNCIO,
+    TipoNotificacao.COMUNICADO,
     `Novo comunicado: ${result.comunicados[0].titulo}`,
     result.comunicados[0].id,
   );
