@@ -90,6 +90,8 @@ export class ChatbotService {
     }
 
     switch (intent) {
+      case 'saudacao':
+        return this.responderSaudacao();
       case 'consultar_apartamentos':
         return this.consultarApartamentos(parsed);
       case 'abrir_chamado':
@@ -118,9 +120,18 @@ export class ChatbotService {
     const quartos = this.lerNumero(
       entities.quartos ?? entities.quartos_minimos,
     );
-    const valorMax = this.lerNumero(entities.valor ?? entities.valor_maximo);
+    // O ml-service devolve `valorMax` (camelCase); as demais chaves ficam como
+    // compatibilidade com versões anteriores do contrato.
+    const valorMax = this.lerNumero(
+      entities.valorMax ??
+        entities.valor_max ??
+        entities.valor ??
+        entities.valor_maximo,
+    );
+    const bloco = this.valorTexto(entities.bloco);
 
     const unidades = await this.unitsService.listAvailableUnits({
+      bloco,
       quartos: quartos ?? undefined,
       valorMax: valorMax ?? undefined,
     });
@@ -348,7 +359,8 @@ export class ChatbotService {
     const items = resposta.recommendations
       .slice(0, 3)
       .map(
-        (item) => `#${item.listingId} · score ${Number(item.score).toFixed(2)}`,
+        (item) =>
+          `${item.anuncio.titulo} (R$ ${item.anuncio.preco.toFixed(2)})`,
       )
       .join(' | ');
 
@@ -374,6 +386,14 @@ export class ChatbotService {
         versao: faq.versao ?? 'v1',
         regras: regras.slice(0, 3),
       },
+    };
+  }
+
+  private responderSaudacao(): ChatbotMessageResponse {
+    return {
+      intent: 'saudacao',
+      reply:
+        'Olá! Sou o assistente Habita+. Posso ajudar com apartamentos disponíveis, chamados, cobranças, regras do condomínio e recomendações do marketplace.',
     };
   }
 

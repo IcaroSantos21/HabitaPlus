@@ -103,10 +103,11 @@ describe('ChatbotService', () => {
   });
 
   it('deve consultar apartamentos disponíveis com filtros extraídos', async () => {
+    // Contrato real do ml-service: a chave é `valorMax` (camelCase).
     mlClientService.parse.mockResolvedValue({
       intencao: 'consultar_apartamentos',
       confianca: 0.95,
-      entities: { quartos: 2, valor: 2500 },
+      entities: { quartos: 2, valorMax: 2500, bloco: 'A' },
     });
     unitsService.listAvailableUnits.mockResolvedValue([
       {
@@ -133,9 +134,26 @@ describe('ChatbotService', () => {
     expect(response.reply).toContain('apartamentos');
 
     expect(unitsService.listAvailableUnits).toHaveBeenCalledWith({
+      bloco: 'A',
       quartos: 2,
       valorMax: 2500,
     });
+  });
+
+  it('deve responder à saudação sem cair em fora de escopo', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'saudacao',
+      confianca: 0.99,
+      entities: {},
+    });
+
+    const response = await createService().handleMessage(
+      'oi, tudo bem?',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('saudacao');
+    expect(response.reply).toContain('Habita+');
   });
 
   it('deve pedir o local quando o chamado ainda não tem local informado', async () => {
