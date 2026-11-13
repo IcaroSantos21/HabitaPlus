@@ -278,7 +278,7 @@ def generate_tickets() -> pd.DataFrame:
             }))
     df = pd.concat(parts).sort_values(
         ["aberto_em", "equipamento", "bloco", "horas_resolucao"], kind="stable")
-    df = df.reset_index(drop=True)
+    df = df[df["aberto_em"] <= TICKETS_END].reset_index(drop=True)
     # só os recentes podem estar abertos
     recent = df.aberto_em > TICKETS_END - pd.Timedelta(days=7)
     df["status"] = "resolvido"
