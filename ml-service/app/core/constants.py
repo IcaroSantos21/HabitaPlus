@@ -24,7 +24,7 @@ CATEGORIES: tuple[str, ...] = get_args(Category)
 
 # Define regras mínimas usadas pela previsão e pela classificação.
 MIN_HISTORY_MONTHS = 3
-CONFIDENCE_THRESHOLD = 0.5
+CONFIDENCE_THRESHOLD = 0.7
 
 # Valor de `cluster` na resposta de /recommend quando o morador não tem histórico (cold start).
 NO_CLUSTER = -1

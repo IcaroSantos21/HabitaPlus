@@ -55,21 +55,24 @@ def test_expenses_have_every_category_for_every_month(generated: dict[str, Path]
     rows = read_csv(generated["expenses"])
     months = gd.month_labels()
 
-    assert len(months) == 36
+    assert len(months) == len(gd.MONTHS)
     assert {row["categoria"] for row in rows} == set(gd.EXPENSE_SPECS)
-    assert len(rows) == 36 * len(gd.EXPENSE_SPECS)
+    assert len(rows) == len(gd.MONTHS) * len(gd.EXPENSE_SPECS)
     for category in gd.EXPENSE_SPECS:
-        assert [r["month"] for r in rows if r["categoria"] == category] == months
+        assert [r["month"]
+                for r in rows if r["categoria"] == category] == months
     assert all(float(row["valor"]) > 0 for row in rows)
 
 
 def test_expenses_total_is_the_sum_of_categories(generated: dict[str, Path]) -> None:
     by_month: dict[str, float] = {}
     for row in read_csv(generated["expenses"]):
-        by_month[row["month"]] = by_month.get(row["month"], 0.0) + float(row["valor"])
+        by_month[row["month"]] = by_month.get(
+            row["month"], 0.0) + float(row["valor"])
 
     for row in read_csv(generated["expenses_total"]):
-        assert float(row["total"]) == pytest.approx(by_month[row["month"]], abs=0.02)
+        assert float(row["total"]) == pytest.approx(
+            by_month[row["month"]], abs=0.02)
 
 
 def test_expenses_have_upward_trend(generated: dict[str, Path]) -> None:
@@ -79,7 +82,8 @@ def test_expenses_have_upward_trend(generated: dict[str, Path]) -> None:
 
 
 def test_energy_is_seasonal_with_summer_peak(generated: dict[str, Path]) -> None:
-    rows = [r for r in read_csv(generated["expenses"]) if r["categoria"] == "energia"]
+    rows = [r for r in read_csv(generated["expenses"])
+            if r["categoria"] == "energia"]
     february = [float(r["valor"]) for r in rows if r["month"].endswith("-02")]
     july = [float(r["valor"]) for r in rows if r["month"].endswith("-07")]
 
@@ -139,7 +143,8 @@ def test_profiles_have_cold_start_residents_with_zero_activity(
 
     assert len(cold) == gd.N_COLD_START
     for row in cold:
-        assert all(int(v) == 0 for k, v in row.items() if k not in ("resident_id", "grupo_latente"))
+        assert all(int(v) == 0 for k, v in row.items()
+                   if k not in ("resident_id", "grupo_latente"))
 
 
 def _normalized_views(rows: list[dict[str, str]]) -> list[list[float]]:
@@ -179,7 +184,7 @@ def test_intents_cover_all_intents_with_enough_examples(generated: dict[str, Pat
     counts = Counter(row["intent"] for row in rows)
 
     assert set(counts) == set(INTENTS)
-    assert all(counts[intent] >= 25 for intent in INTENTS)
+    assert all(counts[intent] >= gd.MIN_PER_INTENT for intent in INTENTS)
     assert all(row["text"].strip() for row in rows)
 
 
@@ -200,7 +205,8 @@ def test_base_id_never_crosses_intents(generated: dict[str, Path]) -> None:
 
 
 def test_intents_include_every_writing_variation(generated: dict[str, Path]) -> None:
-    variants = Counter(row["variant"] for row in read_csv(generated["intents"]))
+    variants = Counter(row["variant"]
+                       for row in read_csv(generated["intents"]))
 
     assert set(variants) == {"original", *gd.VARIANT_KINDS}
     assert all(count > 20 for count in variants.values())
@@ -236,7 +242,8 @@ def test_tickets_concentrate_on_the_equipment_that_breaks_often(
 ) -> None:
     rows = read_csv(generated["tickets"])
     by_equipment = Counter(r["equipamento"] for r in rows)
-    elevator_by_block = Counter(r["bloco"] for r in rows if r["equipamento"] == "elevador")
+    elevator_by_block = Counter(r["bloco"]
+                                for r in rows if r["equipamento"] == "elevador")
 
     assert by_equipment.most_common(1)[0][0] == "elevador"
     assert by_equipment["elevador"] > 2 * by_equipment["bomba"]
@@ -247,11 +254,13 @@ def test_tickets_concentrate_on_the_equipment_that_breaks_often(
 
 
 def test_strip_accents() -> None:
-    assert gd.strip_accents("você está no portão, ação") == "voce esta no portao, acao"
+    assert gd.strip_accents(
+        "você está no portão, ação") == "voce esta no portao, acao"
 
 
 def test_make_informal_lowercases_abbreviates_and_drops_punctuation() -> None:
-    assert gd.make_informal("Você pode abrir o chamado, por favor?") == "vc pode abrir o chamado pfv"
+    assert gd.make_informal(
+        "Você pode abrir o chamado, por favor?") == "vc pode abrir o chamado pfv"
 
 
 def test_add_typo_changes_one_word_and_is_deterministic() -> None:

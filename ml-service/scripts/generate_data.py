@@ -24,7 +24,8 @@ from scripts.intent_templates import INTENT_TEMPLATES  # noqa: E402
 logger = logging.getLogger(__name__)
 SEED = 42
 DEFAULT_OUT_DIR = ROOT / "data"
-MONTHS = pd.period_range("2023-11", periods=36, freq="M")  # o modelo prevê 2026-11
+# mais meses para treino/validação mais robustos
+MONTHS = pd.period_range("2023-11", periods=60, freq="M")
 
 
 def month_labels() -> list[str]:
@@ -61,16 +62,19 @@ SHOCKS = (  # (mês, categoria, extra em R$, motivo)
 def generate_expenses() -> pd.DataFrame:
     """Colunas month, categoria, valor: tendência x sazonalidade x ruído + choques."""
     rng = np.random.default_rng(SEED + 1)
-    t, month, year = np.arange(len(MONTHS)), MONTHS.month.to_numpy(), MONTHS.year.to_numpy()
+    t, month, year = np.arange(
+        len(MONTHS)), MONTHS.month.to_numpy(), MONTHS.year.to_numpy()
     frames = []
     for category, s in EXPENSE_SPECS.items():
-        season = 1 + s.season_amp * np.cos(2 * np.pi * (month - s.peak_month) / 12)
+        season = 1 + s.season_amp * \
+            np.cos(2 * np.pi * (month - s.peak_month) / 12)
         value = (
             s.base * (1 + s.trend) ** t * season
             * (1 + s.annual_raise) ** (year - year[0])
             * (1 + rng.normal(0, s.noise_sd, len(MONTHS)))
         )
-        frames.append(pd.DataFrame({"month": month_labels(), "categoria": category, "valor": value}))
+        frames.append(pd.DataFrame(
+            {"month": month_labels(), "categoria": category, "valor": value}))
     df = pd.concat(frames)
     for m, category, extra, _ in SHOCKS:
         df.loc[(df.month == m) & (df.categoria == category), "valor"] += extra
@@ -81,7 +85,7 @@ def generate_expenses() -> pd.DataFrame:
 
 
 # --- Perfis de interesse -----------------------------------------------------
-N_RESIDENTS, N_COLD_START, MIXED_PROB = 240, 8, 0.08
+N_RESIDENTS, N_COLD_START, MIXED_PROB = 420, 14, 0.08
 COLD_START_GROUP = "sem_historico"
 GROUP_RATES = pd.DataFrame(  # taxa média de visualizações, colunas = CATEGORIES
     {
@@ -92,8 +96,10 @@ GROUP_RATES = pd.DataFrame(  # taxa média de visualizações, colunas = CATEGOR
     },
     index=list(CATEGORIES),
 ).T
-GROUP_SHARES = {"montando_casa": 0.30, "tech": 0.25, "ativos": 0.25, "diversos": 0.20}
-PROFILE_BLOCKS = {"visualizacoes": 1.0, "anunciadas": 0.12, "conversas": 0.25}  # fator da taxa
+GROUP_SHARES = {"montando_casa": 0.30,
+                "tech": 0.25, "ativos": 0.25, "diversos": 0.20}
+PROFILE_BLOCKS = {"visualizacoes": 1.0,
+                  "anunciadas": 0.12, "conversas": 0.25}  # fator da taxa
 
 
 def profile_columns() -> list[str]:
@@ -112,24 +118,29 @@ def generate_profiles() -> pd.DataFrame:
     rates = GROUP_RATES.loc[groups].to_numpy()
     partners = rng.permutation(groups)  # grupo "vizinho" de cada morador
     other = GROUP_RATES.loc[partners].to_numpy()
-    mixed = (rng.random(n) < MIXED_PROB) & (groups != partners)  # misto só com outro grupo
+    mixed = (rng.random(n) < MIXED_PROB) & (
+        groups != partners)  # misto só com outro grupo
     rates = np.where(mixed[:, None], 0.6 * rates + 0.4 * other, rates)
-    rates = rates * rng.lognormal(0, 0.35, n)[:, None]  # engajamento por morador
+    # engajamento por morador
+    rates = rates * rng.lognormal(0, 0.35, n)[:, None]
 
     data = {f"{b}_{c}": rng.poisson(rates[:, i] * f) for b, f in PROFILE_BLOCKS.items()
             for i, c in enumerate(CATEGORIES)}
     active = pd.DataFrame(data).assign(grupo_latente=groups)
     if (active[[f"visualizacoes_{c}" for c in CATEGORIES]].sum(axis=1) == 0).any():
-        raise ValueError("Morador ativo sem nenhuma visualização: troque a SEED.")
+        raise ValueError(
+            "Morador ativo sem nenhuma visualização: troque a SEED.")
 
-    cold = pd.DataFrame(0, index=range(N_COLD_START), columns=list(data)).assign(grupo_latente=COLD_START_GROUP)
-    df = pd.concat([active, cold]).sample(frac=1, random_state=SEED).reset_index(drop=True)
+    cold = pd.DataFrame(0, index=range(N_COLD_START), columns=list(
+        data)).assign(grupo_latente=COLD_START_GROUP)
+    df = pd.concat([active, cold]).sample(
+        frac=1, random_state=SEED).reset_index(drop=True)
     df.insert(0, "resident_id", range(1, len(df) + 1))
     return df[profile_columns()]
 
 
 # --- Frases do chatbot -------------------------------------------------------
-MIN_PER_INTENT = 25
+MIN_PER_INTENT = 100
 VARIANT_KINDS = ("sem_acento", "informal", "erro_digitacao")
 EQUIPMENTS = {  # id -> (como se fala, artigo + nome, "de" + artigo + nome)
     "elevador": ("elevador", "o elevador", "do elevador"),
@@ -150,7 +161,8 @@ SLOT_CHOICES = {
     "cat": ["móveis", "eletrônicos", "utensílios", "esporte", "artigos esportivos"],
 }
 INFORMAL = [(r"\bvocê\b", "vc"), (r"\bpara\b", "pra"), (r"\bpor favor\b", "pfv"), (r"\bnão\b", "n"),
-            (r"\bestá\b", "tá"), (r"\bestão\b", "tão"), (r"\bapartamentos\b", "aptos"),
+            (r"\bestá\b", "tá"), (r"\bestão\b",
+                                  "tão"), (r"\bapartamentos\b", "aptos"),
             (r"\bapartamento\b", "apto"), (r"\bquero\b", "qro"), (r"\btudo\b", "td"),
             (r"\bo que\b", "oq"), (r"\bcondomínio\b", "cond")]
 
@@ -171,7 +183,8 @@ def make_informal(text: str) -> str:
 def add_typo(text: str, rng: random.Random) -> str:
     """Erro leve (troca, omissão ou repetição de letra) em uma palavra com 5+ letras."""
     words = text.split(" ")
-    candidates = [i for i, w in enumerate(words) if sum(c.isalpha() for c in w) >= 5]
+    candidates = [i for i, w in enumerate(
+        words) if sum(c.isalpha() for c in w) >= 5]
     if not candidates:
         return text
     i = rng.choice(candidates)
@@ -201,26 +214,34 @@ def generate_intents() -> pd.DataFrame:
     rows, seen = [], {}
     for intent in INTENTS:
         for index, template in enumerate(INTENT_TEMPLATES[intent]):
-            for _ in range(2 if "{" in template else 1):
+            for _ in range(4 if "{" in template else 3):
                 original = _fill(template, rng)
-                variants = {"sem_acento": strip_accents, "informal": make_informal,
-                            "erro_digitacao": lambda t: add_typo(t, rng)}
+                variants = {
+                    "sem_acento": strip_accents,
+                    "informal": make_informal,
+                    "erro_digitacao": lambda t: add_typo(t, rng),
+                }
                 candidates = [("original", original)] + [
-                    (kind, variants[kind](original)) for kind in rng.sample(VARIANT_KINDS, 2)]
+                    (kind, variants[kind](original)) for kind in VARIANT_KINDS
+                ]
                 for variant, text in candidates:
                     if seen.setdefault(text, intent) != intent:
-                        raise ValueError(f"Frase repetida em duas intenções: {text!r}")
+                        raise ValueError(
+                            f"Frase repetida em duas intenções: {text!r}")
                     if (text, intent) not in {(r[0], r[1]) for r in rows}:
-                        rows.append((text, intent, f"{intent}-{index:02d}", variant))
+                        rows.append(
+                            (text, intent, f"{intent}-{index:02d}", variant))
     df = pd.DataFrame(rows, columns=["text", "intent", "base_id", "variant"])
     if (df.intent.value_counts() < MIN_PER_INTENT).any():
-        raise ValueError(f"Alguma intenção ficou com menos de {MIN_PER_INTENT} frases.")
+        raise ValueError(
+            f"Alguma intenção ficou com menos de {MIN_PER_INTENT} frases.")
     return df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
 
 # --- Chamados ----------------------------------------------------------------
 TICKETS_END = pd.Timestamp("2026-10-31")
-TICKET_COLUMNS = ["ticket_id", "aberto_em", "equipamento", "bloco", "status", "horas_resolucao"]
+TICKET_COLUMNS = ["ticket_id", "aberto_em",
+                  "equipamento", "bloco", "status", "horas_resolucao"]
 # equipamento: (chamados/mês, desgaste/mês, amp. sazonal, mês do pico, mediana h, share A,B,C,D)
 TICKET_SPECS = {
     "elevador": (6.0, 0.012, 0.0, 1, 48, (0.22, 0.38, 0.18, 0.22)),
@@ -244,7 +265,8 @@ def generate_tickets() -> pd.DataFrame:
             days = rng.integers(1, MONTHS.days_in_month.to_numpy()[idx] + 1)
             parts.append(pd.DataFrame({
                 "aberto_em": [
-                    MONTHS[int(i)].to_timestamp() + pd.Timedelta(days=int(d) - 1)
+                    MONTHS[int(i)].to_timestamp() +
+                    pd.Timedelta(days=int(d) - 1)
                     for i, d in zip(idx, days)
                 ],
                 "equipamento": equipment,
@@ -254,11 +276,14 @@ def generate_tickets() -> pd.DataFrame:
                     rng.lognormal(np.log(median), 0.6, len(idx)).round(1),
                 ),
             }))
-    df = pd.concat(parts).sort_values(["aberto_em", "equipamento", "bloco", "horas_resolucao"], kind="stable")
+    df = pd.concat(parts).sort_values(
+        ["aberto_em", "equipamento", "bloco", "horas_resolucao"], kind="stable")
     df = df.reset_index(drop=True)
-    recent = df.aberto_em > TICKETS_END - pd.Timedelta(days=7)  # só os recentes podem estar abertos
+    # só os recentes podem estar abertos
+    recent = df.aberto_em > TICKETS_END - pd.Timedelta(days=7)
     df["status"] = "resolvido"
-    df.loc[recent, "status"] = rng.choice(["resolvido", "em_andamento", "aberto"], recent.sum(), p=[0.40, 0.35, 0.25])
+    df.loc[recent, "status"] = rng.choice(
+        ["resolvido", "em_andamento", "aberto"], recent.sum(), p=[0.40, 0.35, 0.25])
     df.loc[df.status != "resolvido", "horas_resolucao"] = np.nan
     df["aberto_em"] = df.aberto_em.dt.strftime("%Y-%m-%d")
     df.insert(0, "ticket_id", range(1, len(df) + 1))
@@ -270,7 +295,8 @@ def generate_all(out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, Path]:
     """Gera todos os CSVs em ``out_dir`` e devolve nome -> caminho."""
     out_dir.mkdir(parents=True, exist_ok=True)
     expenses = generate_expenses()
-    total = expenses.groupby("month", sort=True)["valor"].sum().round(2).reset_index(name="total")
+    total = expenses.groupby("month", sort=True)[
+        "valor"].sum().round(2).reset_index(name="total")
     tables = {
         "expenses": expenses, "expenses_total": total, "resident_profiles": generate_profiles(),
         "intents": generate_intents(), "tickets": generate_tickets(),
@@ -285,7 +311,8 @@ def generate_all(out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, Path]:
 def main(argv: list[str] | None = None) -> None:
     """Ponto de entrada da linha de comando."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    parser = argparse.ArgumentParser(description="Gera o dataset sintético do ml-service.")
+    parser = argparse.ArgumentParser(
+        description="Gera o dataset sintético do ml-service.")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     for name, path in generate_all(parser.parse_args(argv).out_dir).items():
         logger.info("%s -> %s", name, path)

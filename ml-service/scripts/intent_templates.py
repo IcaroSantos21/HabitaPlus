@@ -351,6 +351,10 @@ _EXTRA_TEMPLATES: dict[str, tuple[str, ...]] = {
         "o chamado do apto {unidade} foi finalizado?",
         "qual a posição do meu pedido de manutenção?",
         "mostra o histórico dos meus chamados",
+        "já atualizaram o status do meu pedido?",
+        "preciso acompanhar o reparo do bloco {bloco}",
+        "como está a manutenção do chamado do apto {unidade}?",
+        "qual o andamento do meu protocolo {protocolo}?",
     ),
     "segunda_via_boleto": (
         "preciso de outro boleto, o meu venceu",
@@ -367,6 +371,10 @@ _EXTRA_TEMPLATES: dict[str, tuple[str, ...]] = {
         "emite uma nova via do boleto vencido",
         "perdi a cobrança de {mes}, pode mandar de novo?",
         "boleto da taxa condominial, segunda via",
+        "me manda a segunda via do boleto de {mes} por favor",
+        "quero o boleto do condomínio para pagar hoje",
+        "pode me enviar a cobrança em pdf?",
+        "preciso do boleto da taxa condominial do apartamento {unidade}",
     ),
     "status_financeiro": (
         "minha situação financeira está regular?",
@@ -383,6 +391,10 @@ _EXTRA_TEMPLATES: dict[str, tuple[str, ...]] = {
         "meu nome está sujo com o condomínio?",
         "qual o valor pendente da minha unidade?",
         "consulta de débitos do condomínio",
+        "tem alguma conta em aberto no meu nome?",
+        "qual o saldo devedor do condomínio neste mês?",
+        "meu pagamento da taxa de {mes} já foi processado?",
+        "estou com atraso na administradora?",
     ),
     "previsao_despesas": (
         "quanto o condomínio vai gastar com água em {mes_futuro}?",

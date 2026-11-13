@@ -27,6 +27,7 @@ class Entities(CamelModel):
     bloco: str | None = None
     equipamento: str | None = None
     quartos: int | None = None
+    valor_min: float | None = None
     valor_max: float | None = None
     data: str | None = None
 

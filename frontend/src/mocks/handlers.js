@@ -518,18 +518,37 @@ export const handlers = [
       .toLocaleLowerCase("pt-BR");
 
     const availableUnitsIntent = /apartamento|apartamentos|unidade disponivel|unidades disponiveis/.test(normalizedText);
-    const chargeIntent = /segunda via|boleto|cobranca|pagamento/.test(normalizedText);
+    const chargeIntent = /segunda via|boleto|cobranca|cobranca|pagamento/.test(normalizedText);
+    const financeStatusIntent = /situacao financeira|status financeiro|minhas cobrancas|minhas cobrancas|valor pendente|total pendente/.test(normalizedText);
+    const rulesIntent = /regra|regras|condominio|regulamento|proibido|permitido/.test(normalizedText);
+    const recommendationIntent = /recomendar|recomendacao|produto|anuncio|oferta|mercado/.test(normalizedText);
     const ticketStatusIntent = /status|andamento|acompanhar/.test(normalizedText) && /chamado|solicitacao|manutencao/.test(normalizedText);
     const openTicketIntent = /abrir chamado|novo chamado|registrar chamado|abrir uma solicitacao|manutencao|reparo|problema/.test(normalizedText);
 
     if (availableUnitsIntent) {
-      const availableUnits = mockUnits.filter((unit) => unit.disponivelLocacao).slice(0, 3);
+      const roomMatches = [...normalizedText.matchAll(/(\d+)\s*(?:quartos?|dormitorios?|qtos?|qts?)/g)].map((match) => Number(match[1]));
+      const roomValues = [...new Set(roomMatches)];
+      const desiredRooms = roomValues.length ? roomValues : null;
+      const blockMatches = [...normalizedText.matchAll(/\b(?:bloco|bl)\.?\s*([a-d])\b/g)].map((match) => match[1].toUpperCase());
+      const desiredBlocks = [...new Set(blockMatches)];
+      const minPriceMatch = normalizedText.match(/(?:acima de|mais de|superior a|maior que|a partir de)\s*(?:r\$\s*)?(\d+(?:[.,]\d+)?)(?:\s*(?:mil|reais|real))?/);
+      const maxPriceMatch = normalizedText.match(/(?:ate|até|maximo|no maximo|no máximo)\s*(?:r\$\s*)?(\d+(?:[.,]\d+)?)(?:\s*(?:mil|reais|real))?/);
+      const valorMin = minPriceMatch ? Number(String(minPriceMatch[1]).replace(".", "").replace(",", ".")) * (/mil/.test(normalizedText) ? 1000 : 1) : null;
+      const valorMax = maxPriceMatch ? Number(String(maxPriceMatch[1]).replace(".", "").replace(",", ".")) * (/mil/.test(normalizedText) ? 1000 : 1) : null;
+      const availableUnits = mockUnits.filter((unit) => {
+        if (!unit.disponivelLocacao) return false;
+        if (desiredBlocks.length && !desiredBlocks.includes(unit.bloco.toUpperCase())) return false;
+        if (desiredRooms !== null && !desiredRooms.includes(Number(unit.quartos))) return false;
+        if (valorMin !== null && Number(unit.valorAluguelSugerido) < valorMin) return false;
+        if (valorMax !== null && Number(unit.valorAluguelSugerido) > valorMax) return false;
+        return true;
+      });
       return HttpResponse.json({
         intent: "consultar_apartamentos",
         reply: availableUnits.length
-          ? `Encontrei ${availableUnits.length} apartamento(s) disponível(is) para locação.`
-          : "Não encontrei apartamentos disponíveis no momento.",
-        data: { unidades: availableUnits },
+          ? `Encontrei ${availableUnits.length} apartamento(s) disponível(is) para locação. ${availableUnits.slice(0, 5).map((unit) => `Bloco ${unit.bloco} ${unit.numero} · ${unit.quartos} quartos · R$ ${Number(unit.valorAluguelSugerido).toFixed(2)}`).join(" | ")}`
+          : "Não encontrei apartamentos disponíveis com esses filtros no momento.",
+        data: { unidades: availableUnits.slice(0, 5) },
       });
     }
 
@@ -545,6 +564,41 @@ export const handlers = [
         data: pendingCharge
           ? { cobrancaId: pendingCharge.id, paymentUrl: "https://example.com/habitaplus-checkout-demo" }
           : {},
+      });
+    }
+
+    if (financeStatusIntent) {
+      const pendingCharges = mockCharges.filter((charge) =>
+        charge._moradorId === requestUser.id && ["PENDENTE", "ATRASADA"].includes(charge.status),
+      );
+      const total = pendingCharges.reduce((sum, charge) => sum + Number(charge.valor || 0), 0);
+      return HttpResponse.json({
+        intent: "status_financeiro",
+        reply: pendingCharges.length
+          ? `Você tem ${pendingCharges.length} cobrança(s) pendente(s), totalizando ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(total)}.`
+          : "Você não possui cobranças pendentes no momento.",
+        data: { cobrancas: pendingCharges, totalPendente: total },
+      });
+    }
+
+    if (rulesIntent) {
+      const rules = [
+        { titulo: "Horários de silêncio", texto: "O uso de som em volumes altos só é permitido até as 22h, exceto em eventos previamente autorizados." },
+        { titulo: "Animais de estimação", texto: "Animais devem ser mantidos em áreas comuns com coleira e responsabilidade do morador." },
+        { titulo: "Lixo e reciclagem", texto: "A separação correta deve seguir os horários e pontos de coleta do condomínio." },
+      ];
+      return HttpResponse.json({
+        intent: "regras_condominio",
+        reply: "As principais regras do condomínio são: silêncio, uso de áreas comuns e separação de resíduos.",
+        data: { versao: "v1", regras: rules },
+      });
+    }
+
+    if (recommendationIntent) {
+      return HttpResponse.json({
+        intent: "recomendar_produtos",
+        reply: "Posso recomendar produtos e serviços para o seu perfil, como limpeza, manutenção e itens de convivência.",
+        data: { recommendations: [{ titulo: "Serviço de manutenção preventiva", preco: 199.9 }] },
       });
     }
 
@@ -661,8 +715,18 @@ export const handlers = [
     const normalizedText = texto.toLocaleLowerCase("pt-BR");
     const isChargeQuestion = /taxa|cobrança|cobranca|boleto|pagamento/.test(normalizedText);
     const isTicketQuestion = /chamado|manutenção|manutencao|reparo|problema/.test(normalizedText);
+    const isRulesQuestion = /regra|regras|condominio|regulamento/.test(normalizedText);
+    const isApartmentQuestion = /apartamento|apartamentos|quartos|bloco/.test(normalizedText);
     return HttpResponse.json({
-      intencao: isChargeQuestion ? "CONSULT_CHARGE" : isTicketQuestion ? "CONSULT_TICKET" : "GENERAL_QUERY",
+      intencao: isChargeQuestion
+        ? "segunda_via_boleto"
+        : isTicketQuestion
+          ? "status_chamado"
+          : isRulesQuestion
+            ? "regras_condominio"
+            : isApartmentQuestion
+              ? "consultar_apartamentos"
+              : "fora_de_escopo",
       confianca: 0.9,
       entities: {
         unidade: null,
