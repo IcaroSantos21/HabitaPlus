@@ -170,7 +170,10 @@ export class ChatbotService {
       };
     }
 
-    const unidadesParaMostrar = this.embaralharUnidades(unidades, textoOriginal);
+    const unidadesParaMostrar = this.embaralharUnidades(
+      unidades,
+      textoOriginal,
+    );
     const resumo = unidadesParaMostrar
       .map(
         (unidade) =>
@@ -447,35 +450,114 @@ export class ChatbotService {
       return 'status_chamado';
     }
 
-    if (this.contemQualquer(mensagem, ['segunda via', 'boleto', 'fatura', 'cobranca', 'cobrança', 'pagar'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'segunda via',
+        'boleto',
+        'fatura',
+        'cobranca',
+        'cobrança',
+        'pagar',
+      ])
+    ) {
       return 'segunda_via_boleto';
     }
 
-    if (this.contemQualquer(mensagem, ['situacao financeira', 'status financeiro', 'minhas cobrancas', 'minhas cobranças', 'valor pendente', 'total pendente'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'situacao financeira',
+        'status financeiro',
+        'minhas cobrancas',
+        'minhas cobranças',
+        'valor pendente',
+        'total pendente',
+      ])
+    ) {
       return 'status_financeiro';
     }
 
-    if (this.contemQualquer(mensagem, ['previsao', 'despesa', 'despesas', 'proximo mes', 'próximo mês'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'previsao',
+        'despesa',
+        'despesas',
+        'proximo mes',
+        'próximo mês',
+      ])
+    ) {
       return 'previsao_despesas';
     }
 
-    if (this.contemQualquer(mensagem, ['recomendar', 'produto', 'oferta', 'mercado', 'anuncio', 'anúncio'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'recomendar',
+        'produto',
+        'oferta',
+        'mercado',
+        'anuncio',
+        'anúncio',
+      ])
+    ) {
       return 'recomendar_produtos';
     }
 
-    if (this.contemQualquer(mensagem, ['regra', 'condominio', 'regulamento', 'proibido', 'permitido'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'regra',
+        'condominio',
+        'regulamento',
+        'proibido',
+        'permitido',
+      ])
+    ) {
       return 'regras_condominio';
     }
 
-    if (this.contemQualquer(mensagem, ['apartamento', 'imovel', 'imóvel', 'quartos', 'bloco', 'aluguel', 'valor maximo', 'valor máximo', 'disponibilidade'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'apartamento',
+        'imovel',
+        'imóvel',
+        'quartos',
+        'bloco',
+        'aluguel',
+        'valor maximo',
+        'valor máximo',
+        'disponibilidade',
+      ])
+    ) {
       return 'consultar_apartamentos';
     }
 
-    if (this.contemQualquer(mensagem, ['chamado', 'manutencao', 'manutenção', 'reparo', 'quebra', 'elevador', 'portao', 'portão', 'piscina', 'garagem'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'chamado',
+        'manutencao',
+        'manutenção',
+        'reparo',
+        'quebra',
+        'elevador',
+        'portao',
+        'portão',
+        'piscina',
+        'garagem',
+      ])
+    ) {
       return 'abrir_chamado';
     }
 
-    if (this.contemQualquer(mensagem, ['oi', 'ola', 'olá', 'bom dia', 'boa tarde', 'boa noite', 'tudo bem', 'hey'])) {
+    if (
+      this.contemQualquer(mensagem, [
+        'oi',
+        'ola',
+        'olá',
+        'bom dia',
+        'boa tarde',
+        'boa noite',
+        'tudo bem',
+        'hey',
+      ])
+    ) {
       return 'saudacao';
     }
 
@@ -504,8 +586,11 @@ export class ChatbotService {
     }
 
     const valor = Number(match[1].replace('.', '').replace(',', '.'));
-    const multiplicaMil = /mil\b/.test(texto) || /\d{1,3}(?:\.\d{3})+/.test(match[1]);
-    return Number.isFinite(valor) ? valor * (multiplicaMil ? 1000 : 1) : undefined;
+    const multiplicaMil =
+      /mil\b/.test(texto) || /\d{1,3}(?:\.\d{3})+/.test(match[1]);
+    return Number.isFinite(valor)
+      ? valor * (multiplicaMil ? 1000 : 1)
+      : undefined;
   }
 
   private extrairListaTexto(value: unknown): string[] | undefined {
@@ -519,11 +604,13 @@ export class ChatbotService {
         ? value.split(/[;,|]/)
         : [value];
 
-    const lista = [...new Set(
-      valores
-        .map((item) => this.valorTexto(item))
-        .filter((item): item is string => Boolean(item)),
-    )].map((item) => item.trim());
+    const lista = [
+      ...new Set(
+        valores
+          .map((item) => this.valorTexto(item))
+          .filter((item): item is string => Boolean(item)),
+      ),
+    ].map((item) => item.trim());
 
     return lista.length ? lista : undefined;
   }
@@ -539,20 +626,23 @@ export class ChatbotService {
         ? value.split(/[;,|]/)
         : [value];
 
-    const lista = [...new Set(
-      valores
-        .map((item) => this.lerNumero(item))
-        .filter((item): item is number => item !== undefined),
-    )];
+    const lista = [
+      ...new Set(
+        valores
+          .map((item) => this.lerNumero(item))
+          .filter((item): item is number => item !== undefined),
+      ),
+    ];
 
     return lista.length ? lista : undefined;
   }
 
   private embaralharUnidades<T>(unidades: T[], textoOriginal = ''): T[] {
     const lista = [...unidades];
-    const pediuOutros = /(?:mostre|mostrar|traga|quero)\s+(?:outro(?:s)?|outras?|mais op(?:c|ç)ões?|outra op(?:c|ç)ão|novas op(?:c|ç)ões?)/i.test(
-      textoOriginal,
-    );
+    const pediuOutros =
+      /(?:mostre|mostrar|traga|quero)\s+(?:outro(?:s)?|outras?|mais op(?:c|ç)ões?|outra op(?:c|ç)ão|novas op(?:c|ç)ões?)/i.test(
+        textoOriginal,
+      );
 
     if (lista.length <= 1 && !pediuOutros) {
       return lista;

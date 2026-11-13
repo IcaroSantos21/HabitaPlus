@@ -187,10 +187,38 @@ describe('ChatbotService', () => {
       entities: {},
     });
     unitsService.listAvailableUnits.mockResolvedValue([
-      { id: 1, bloco: 'A', numero: '101', quartos: 2, valorAluguelSugerido: 2200, disponivelLocacao: true },
-      { id: 2, bloco: 'A', numero: '102', quartos: 2, valorAluguelSugerido: 2300, disponivelLocacao: true },
-      { id: 3, bloco: 'B', numero: '201', quartos: 3, valorAluguelSugerido: 2600, disponivelLocacao: true },
-      { id: 4, bloco: 'B', numero: '202', quartos: 3, valorAluguelSugerido: 2700, disponivelLocacao: true },
+      {
+        id: 1,
+        bloco: 'A',
+        numero: '101',
+        quartos: 2,
+        valorAluguelSugerido: 2200,
+        disponivelLocacao: true,
+      },
+      {
+        id: 2,
+        bloco: 'A',
+        numero: '102',
+        quartos: 2,
+        valorAluguelSugerido: 2300,
+        disponivelLocacao: true,
+      },
+      {
+        id: 3,
+        bloco: 'B',
+        numero: '201',
+        quartos: 3,
+        valorAluguelSugerido: 2600,
+        disponivelLocacao: true,
+      },
+      {
+        id: 4,
+        bloco: 'B',
+        numero: '202',
+        quartos: 3,
+        valorAluguelSugerido: 2700,
+        disponivelLocacao: true,
+      },
     ]);
 
     const response = await createService().handleMessage(
@@ -200,9 +228,16 @@ describe('ChatbotService', () => {
 
     expect(response.intent).toBe('consultar_apartamentos');
     expect(response.data).toMatchObject({
-      unidades: [expect.objectContaining({ id: 2 }), expect.anything(), expect.anything(), expect.anything()],
+      unidades: [
+        expect.objectContaining({ id: 2 }),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      ],
     });
-    expect((response.data as { unidades: Array<{ id: number }> }).unidades[0].id).toBe(2);
+    expect(
+      (response.data as { unidades: Array<{ id: number }> }).unidades[0].id,
+    ).toBe(2);
     expect(response.reply).toContain('apartamentos');
     jest.restoreAllMocks();
   });
