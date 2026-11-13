@@ -31,13 +31,15 @@ _UNIT = re.compile(
     rf"(\d{{1,4}})\b{_NOT_A_COUNT}"
 )
 _BLOCK = re.compile(rf"\b(?:bloco|bl)\.?\s*([{BLOCK_LETTERS}])\b")
-_BEDROOMS = re.compile(rf"\b(\d{{1,2}}|{_WORDS})\s*(?:quartos?|dormitorios?|qtos?|qts?)\b")
+_BEDROOMS = re.compile(
+    rf"\b(\d{{1,2}}|{_WORDS})\s*(?:quartos?|dormitorios?|qtos?|qts?)\b")
 # Valores em ordem de prioridade: "R$ 2.500", "2 mil", "1500 reais", "até 2000".
 _MONEY = (
     re.compile(rf"\br\$\s*({_NUMBER})(?:\s*(mil)\b)?"),
     re.compile(rf"\b({_NUMBER}|{_WORDS})\s*(mil)\b"),
     re.compile(rf"\b({_NUMBER})\s*(?:reais|real)\b"),
-    re.compile(rf"\b(?:ate|abaixo de|no maximo)\s+({_NUMBER})\b(?!\s*(?:quartos?|dormitorios?|qtos?|qts?|/|h\b|horas?))"),
+    re.compile(
+        rf"\b(?:ate|abaixo de|no maximo)\s+({_NUMBER})\b(?!\s*(?:quartos?|dormitorios?|qtos?|qts?|/|h\b|horas?))"),
 )
 _DATES = (
     re.compile(r"\b(?:depois de amanha|amanha|hoje)\b"),
@@ -45,7 +47,8 @@ _DATES = (
     re.compile(rf"\b\d{{1,2}}\s+de\s+(?:{_MONTHS})\b"),
     re.compile(r"\b\d{1,2}/\d{1,2}(?:/\d{2,4})?\b"),
     # "segunda via do boleto" não é segunda-feira.
-    re.compile(r"\b(?:segunda(?!\s+via\b)|terca|quarta|quinta|sexta)(?:-feira)?\b|\b(?:sabado|domingo)\b"),
+    re.compile(
+        r"\b(?:segunda(?!\s+via\b)|terca|quarta|quinta|sexta)(?:-feira)?\b|\b(?:sabado|domingo)\b"),
 )
 
 
@@ -88,9 +91,27 @@ def _to_float(token: str) -> float:
     return float(token.replace(".", "").replace(",", "."))
 
 
+def extract_min_value(text: str) -> float | None:
+    """Valor mínimo em reais: "acima de 2 mil", "mais de R$ 1500"."""
+    normalized = normalize_text(text)
+    if re.search(r"(?:acima de|mais de|superior a|maior que|a partir de)\s*(?:r\$\s*)?\d", normalized):
+        match = re.search(
+            r"(?:acima de|mais de|superior a|maior que|a partir de)\s*(?:r\$\s*)?(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?|(?:um|dois|tres|quatro|cinco|seis|sete|oito|nove|dez))(?:\s*(mil|reais|real))?",
+            normalized,
+        )
+        if match:
+            value = _to_float(match.group(1))
+            if match.group(2) == "mil" or "." in match.group(1):
+                value *= 1000
+            return round(value, 2)
+    return None
+
+
 def extract_max_value(text: str) -> float | None:
     """Valor em reais: "R$ 2.500", "até 2 mil", "1500 reais", "R$ 2,5 mil". O valor citado é o teto."""
     normalized = normalize_text(text)
+    if re.search(r"(?:acima de|mais de|superior a|maior que|a partir de)\s*(?:r\$\s*)?\d", normalized):
+        return None
     for pattern in _MONEY:
         match = pattern.search(normalized)
         if match:
@@ -107,7 +128,8 @@ def extract_date(text: str) -> str | None:
     Não vira data ISO: resolver "amanhã" exige a data de hoje, que é papel do back.
     """
     normalized = normalize_text(text)
-    found = [(m.start(), m.group(0)) for p in _DATES if (m := p.search(normalized))]
+    found = [(m.start(), m.group(0))
+             for p in _DATES if (m := p.search(normalized))]
     return min(found)[1] if found else None
 
 
@@ -121,6 +143,7 @@ class RegexEntityExtractor:
             bloco=extract_block(text),
             equipamento=extract_equipment(text),
             quartos=extract_bedrooms(text),
+            valor_min=extract_min_value(text),
             valor_max=extract_max_value(text),
             data=extract_date(text),
         )

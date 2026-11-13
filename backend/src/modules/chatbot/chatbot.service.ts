@@ -58,6 +58,7 @@ export class ChatbotService {
   ): Promise<ChatbotMessageResponse> {
     const parsed = await this.mlClientService.parse(text);
     const intent = this.normalizarIntent(parsed.intencao);
+    const intentCorreto = this.resolverIntentPorTexto(text, intent);
     const confianca = Number(parsed.confianca ?? 0);
 
     // Respostas curtas como "garagem" e "elevador" podem ser classificadas
@@ -74,14 +75,14 @@ export class ChatbotService {
     const possuiChamadoPendente = this.pendingContext.has(user.id);
     if (
       possuiChamadoPendente &&
-      (intent === 'abrir_chamado' ||
-        !intentsAlternativasConhecidas.has(intent) ||
+      (intentCorreto === 'abrir_chamado' ||
+        !intentsAlternativasConhecidas.has(intentCorreto) ||
         confianca < 0.7)
     ) {
       return this.abrirChamado(parsed, text, user);
     }
 
-    if (confianca < 0.7 || intent === 'fora_de_escopo') {
+    if (intentCorreto === 'fora_de_escopo') {
       return this.responderNaoEntendi();
     }
 
@@ -89,11 +90,11 @@ export class ChatbotService {
       this.pendingContext.delete(user.id);
     }
 
-    switch (intent) {
+    switch (intentCorreto) {
       case 'saudacao':
         return this.responderSaudacao();
       case 'consultar_apartamentos':
-        return this.consultarApartamentos(parsed);
+        return this.consultarApartamentos(parsed, text);
       case 'abrir_chamado':
         return this.abrirChamado(parsed, text, user);
       case 'status_chamado':
@@ -115,10 +116,19 @@ export class ChatbotService {
 
   private async consultarApartamentos(
     payload: NluParseResponse,
+    textoOriginal = '',
   ): Promise<ChatbotMessageResponse> {
     const entities = this.normalizarEntities(payload.entities);
-    const quartos = this.lerNumero(
-      entities.quartos ?? entities.quartos_minimos,
+    const blocos = this.extrairListaTexto(entities.blocos ?? entities.bloco);
+    const quartosLista = this.extrairListaNumeros(
+      entities.quartos ?? entities.quartosLista ?? entities.quartos_minimos,
+    );
+    const quartos = quartosLista?.length === 1 ? quartosLista[0] : undefined;
+    const valorMin = this.lerNumero(
+      entities.valorMin ??
+        entities.valor_min ??
+        entities.valorMinimo ??
+        this.extrairValorMinimo(textoOriginal),
     );
     // O ml-service devolve `valorMax` (camelCase); as demais chaves ficam como
     // compatibilidade com versões anteriores do contrato.
@@ -128,13 +138,29 @@ export class ChatbotService {
         entities.valor ??
         entities.valor_maximo,
     );
-    const bloco = this.valorTexto(entities.bloco);
+    const bloco = blocos?.length === 1 ? blocos[0] : undefined;
 
-    const unidades = await this.unitsService.listAvailableUnits({
-      bloco,
-      quartos: quartos ?? undefined,
-      valorMax: valorMax ?? undefined,
-    });
+    const filtros: Record<string, unknown> = {};
+    if (bloco) {
+      filtros.bloco = bloco;
+    }
+    if (blocos && blocos.length > 1) {
+      filtros.blocos = blocos;
+    }
+    if (quartos !== undefined) {
+      filtros.quartos = quartos;
+    }
+    if (quartosLista && quartosLista.length > 1) {
+      filtros.quartosLista = quartosLista;
+    }
+    if (valorMin !== undefined) {
+      filtros.valorMin = valorMin;
+    }
+    if (valorMax !== undefined) {
+      filtros.valorMax = valorMax;
+    }
+
+    const unidades = await this.unitsService.listAvailableUnits(filtros);
 
     if (!unidades.length) {
       return {
@@ -144,8 +170,11 @@ export class ChatbotService {
       };
     }
 
-    const resumo = unidades
-      .slice(0, 3)
+    const unidadesParaMostrar = this.embaralharUnidades(
+      unidades,
+      textoOriginal,
+    );
+    const resumo = unidadesParaMostrar
       .map(
         (unidade) =>
           `Bloco ${unidade.bloco} ${unidade.numero} · ${unidade.quartos} quartos · R$ ${Number(unidade.valorAluguelSugerido).toFixed(2)}`,
@@ -156,7 +185,7 @@ export class ChatbotService {
       intent: 'consultar_apartamentos',
       reply: `Encontrei os seguintes apartamentos: ${resumo}.`,
       data: {
-        unidades: unidades.slice(0, 3),
+        unidades: unidadesParaMostrar,
       },
     };
   }
@@ -412,6 +441,219 @@ export class ChatbotService {
         ],
       },
     };
+  }
+
+  private resolverIntentPorTexto(texto: string, intent: string): string {
+    const mensagem = this.normalizarTexto(texto);
+
+    if (this.contemQualquer(mensagem, ['status do chamado', 'meu chamado'])) {
+      return 'status_chamado';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'segunda via',
+        'boleto',
+        'fatura',
+        'cobranca',
+        'cobrança',
+        'pagar',
+      ])
+    ) {
+      return 'segunda_via_boleto';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'situacao financeira',
+        'status financeiro',
+        'minhas cobrancas',
+        'minhas cobranças',
+        'valor pendente',
+        'total pendente',
+      ])
+    ) {
+      return 'status_financeiro';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'previsao',
+        'despesa',
+        'despesas',
+        'proximo mes',
+        'próximo mês',
+      ])
+    ) {
+      return 'previsao_despesas';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'recomendar',
+        'produto',
+        'oferta',
+        'mercado',
+        'anuncio',
+        'anúncio',
+      ])
+    ) {
+      return 'recomendar_produtos';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'regra',
+        'condominio',
+        'regulamento',
+        'proibido',
+        'permitido',
+      ])
+    ) {
+      return 'regras_condominio';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'apartamento',
+        'imovel',
+        'imóvel',
+        'quartos',
+        'bloco',
+        'aluguel',
+        'valor maximo',
+        'valor máximo',
+        'disponibilidade',
+      ])
+    ) {
+      return 'consultar_apartamentos';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'chamado',
+        'manutencao',
+        'manutenção',
+        'reparo',
+        'quebra',
+        'elevador',
+        'portao',
+        'portão',
+        'piscina',
+        'garagem',
+      ])
+    ) {
+      return 'abrir_chamado';
+    }
+
+    if (
+      this.contemQualquer(mensagem, [
+        'oi',
+        'ola',
+        'olá',
+        'bom dia',
+        'boa tarde',
+        'boa noite',
+        'tudo bem',
+        'hey',
+      ])
+    ) {
+      return 'saudacao';
+    }
+
+    return intent;
+  }
+
+  private contemQualquer(texto: string, termos: string[]): boolean {
+    return termos.some((termo) => texto.includes(termo));
+  }
+
+  private normalizarTexto(texto: string): string {
+    return texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
+  private extrairValorMinimo(textoOriginal: string): number | undefined {
+    const texto = this.normalizarTexto(textoOriginal);
+    const match = texto.match(
+      /(?:acima de|mais de|superior a|maior que|a partir de)\s*(?:r\$\s*)?(\d{1,3}(?:\.\d{3})*|\d+)(?:\s*(?:mil|reais|real))?/,
+    );
+
+    if (!match) {
+      return undefined;
+    }
+
+    const valor = Number(match[1].replace('.', '').replace(',', '.'));
+    const multiplicaMil =
+      /mil\b/.test(texto) || /\d{1,3}(?:\.\d{3})+/.test(match[1]);
+    return Number.isFinite(valor)
+      ? valor * (multiplicaMil ? 1000 : 1)
+      : undefined;
+  }
+
+  private extrairListaTexto(value: unknown): string[] | undefined {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+
+    const valores = Array.isArray(value)
+      ? value
+      : typeof value === 'string'
+        ? value.split(/[;,|]/)
+        : [value];
+
+    const lista = [
+      ...new Set(
+        valores
+          .map((item) => this.valorTexto(item))
+          .filter((item): item is string => Boolean(item)),
+      ),
+    ].map((item) => item.trim());
+
+    return lista.length ? lista : undefined;
+  }
+
+  private extrairListaNumeros(value: unknown): number[] | undefined {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+
+    const valores = Array.isArray(value)
+      ? value
+      : typeof value === 'string'
+        ? value.split(/[;,|]/)
+        : [value];
+
+    const lista = [
+      ...new Set(
+        valores
+          .map((item) => this.lerNumero(item))
+          .filter((item): item is number => item !== undefined),
+      ),
+    ];
+
+    return lista.length ? lista : undefined;
+  }
+
+  private embaralharUnidades<T>(unidades: T[], textoOriginal = ''): T[] {
+    const lista = [...unidades];
+    const pediuOutros =
+      /(?:mostre|mostrar|traga|quero)\s+(?:outro(?:s)?|outras?|mais op(?:c|ç)ões?|outra op(?:c|ç)ão|novas op(?:c|ç)ões?)/i.test(
+        textoOriginal,
+      );
+
+    if (lista.length <= 1 && !pediuOutros) {
+      return lista;
+    }
+
+    for (let indice = lista.length - 1; indice > 0; indice -= 1) {
+      const sorteio = Math.floor(Math.random() * (indice + 1));
+      [lista[indice], lista[sorteio]] = [lista[sorteio], lista[indice]];
+    }
+
+    return lista.slice(0, 5);
   }
 
   private normalizarIntent(value?: string): string {

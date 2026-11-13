@@ -135,13 +135,17 @@ export const unitRentalHandlers = [
   http.get("*/api/units/available", ({ request }) => {
     if (!isAuthorized(request)) return unauthorized();
     const url = new URL(request.url);
-    const block = url.searchParams.get("bloco");
-    const rooms = url.searchParams.get("quartos");
+    const block = url.searchParams.get("bloco") || url.searchParams.get("blocos");
+    const rooms = url.searchParams.get("quartos") || url.searchParams.get("quartosLista");
+    const minPrice = url.searchParams.get("valorMin");
     const maxPrice = url.searchParams.get("valorMax");
+    const blocks = block ? block.split(",").map((item) => item.trim().toLowerCase()).filter(Boolean) : [];
+    const roomValues = rooms ? rooms.split(",").map((item) => Number(item.trim())).filter((item) => Number.isFinite(item)) : [];
     const available = mockUnits.filter((unit) => {
       if (!unit.disponivelLocacao) return false;
-      if (block && unit.bloco.toLowerCase() !== block.toLowerCase()) return false;
-      if (rooms && Number(unit.quartos) !== Number(rooms)) return false;
+      if (blocks.length && !blocks.includes(unit.bloco.toLowerCase())) return false;
+      if (roomValues.length && !roomValues.includes(Number(unit.quartos))) return false;
+      if (minPrice && Number(unit.valorAluguelSugerido) < Number(minPrice)) return false;
       if (maxPrice && Number(unit.valorAluguelSugerido) > Number(maxPrice)) return false;
       return true;
     });

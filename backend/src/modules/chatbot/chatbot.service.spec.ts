@@ -140,6 +140,108 @@ describe('ChatbotService', () => {
     });
   });
 
+  it('deve respeitar filtros de valor mínimo em buscas de apartamentos', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'consultar_apartamentos',
+      confianca: 0.95,
+      entities: { valorMin: 2000 },
+    });
+    unitsService.listAvailableUnits.mockResolvedValue([
+      {
+        id: 2,
+        bloco: 'A',
+        numero: '202',
+        quartos: 2,
+        areaM2: 72,
+        valorAluguelSugerido: 2300,
+        disponivelLocacao: true,
+      },
+      {
+        id: 3,
+        bloco: 'B',
+        numero: '303',
+        quartos: 3,
+        areaM2: 90,
+        valorAluguelSugerido: 2600,
+        disponivelLocacao: true,
+      },
+    ]);
+
+    const response = await createService().handleMessage(
+      'Quero apartamentos acima de 2000 reais',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('consultar_apartamentos');
+    expect(unitsService.listAvailableUnits).toHaveBeenCalledWith({
+      valorMin: 2000,
+    });
+    expect(response.reply).toContain('apartamentos');
+  });
+
+  it('deve mostrar outras opções aleatórias quando o usuário pedir outros apartamentos', async () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'consultar_apartamentos',
+      confianca: 0.96,
+      entities: {},
+    });
+    unitsService.listAvailableUnits.mockResolvedValue([
+      {
+        id: 1,
+        bloco: 'A',
+        numero: '101',
+        quartos: 2,
+        valorAluguelSugerido: 2200,
+        disponivelLocacao: true,
+      },
+      {
+        id: 2,
+        bloco: 'A',
+        numero: '102',
+        quartos: 2,
+        valorAluguelSugerido: 2300,
+        disponivelLocacao: true,
+      },
+      {
+        id: 3,
+        bloco: 'B',
+        numero: '201',
+        quartos: 3,
+        valorAluguelSugerido: 2600,
+        disponivelLocacao: true,
+      },
+      {
+        id: 4,
+        bloco: 'B',
+        numero: '202',
+        quartos: 3,
+        valorAluguelSugerido: 2700,
+        disponivelLocacao: true,
+      },
+    ]);
+
+    const response = await createService().handleMessage(
+      'mostre outros apartamentos',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('consultar_apartamentos');
+    expect(response.data).toMatchObject({
+      unidades: [
+        expect.objectContaining({ id: 2 }),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      ],
+    });
+    expect(
+      (response.data as { unidades: Array<{ id: number }> }).unidades[0].id,
+    ).toBe(2);
+    expect(response.reply).toContain('apartamentos');
+    jest.restoreAllMocks();
+  });
+
   it('deve responder à saudação sem cair em fora de escopo', async () => {
     mlClientService.parse.mockResolvedValue({
       intencao: 'saudacao',
@@ -363,6 +465,31 @@ describe('ChatbotService', () => {
       intent: 'regras_condominio',
     });
     expect(response.reply).toContain('regras');
+  });
+
+  it('deve priorizar o pedido de boleto e cobrança em vez de regras do condomínio', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'regras_condominio',
+      confianca: 0.82,
+      entities: {},
+    });
+    cobrancasService.buscarMinhas.mockResolvedValue({
+      data: [{ id: 44, valor: 650, status: StatusCobranca.PENDENTE }],
+      meta: { pagina: 1, limite: 10, total: 1, totalPaginas: 1 },
+    });
+    cobrancasCheckoutService.criarCheckout.mockResolvedValue({
+      url: 'https://checkout.example/pay/44',
+    });
+
+    const response = await createService().handleMessage(
+      'Quero ver a minha cobrança e a segunda via do boleto',
+      usuarioMorador,
+    );
+
+    expect(response).toMatchObject({
+      intent: 'segunda_via_boleto',
+    });
+    expect(response.reply).toContain('boleto');
   });
 
   it('deve responder não entendi quando a intenção é fora de escopo', async () => {

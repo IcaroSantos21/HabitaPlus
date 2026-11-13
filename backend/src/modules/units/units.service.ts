@@ -176,22 +176,43 @@ export class UnitsService {
 
   async listAvailableUnits(filters: {
     bloco?: string;
+    blocos?: string[];
     quartos?: number;
+    quartosLista?: number[];
+    valorMin?: number;
     valorMax?: number;
   }) {
     const query = this.unitsRepository
       .createQueryBuilder('unidade')
       .where('unidade.disponivelLocacao = :disponivel', { disponivel: true });
 
-    if (filters.bloco) {
-      query.andWhere('LOWER(unidade.bloco) = LOWER(:bloco)', {
-        bloco: filters.bloco,
+    const blocos = filters.blocos?.length
+      ? filters.blocos
+      : filters.bloco
+        ? [filters.bloco]
+        : [];
+
+    const quartosLista = filters.quartosLista?.length
+      ? filters.quartosLista
+      : filters.quartos !== undefined
+        ? [filters.quartos]
+        : [];
+
+    if (blocos.length) {
+      query.andWhere('LOWER(unidade.bloco) IN (:...blocos)', {
+        blocos: blocos.map((bloco) => bloco.toLowerCase()),
       });
     }
 
-    if (filters.quartos) {
-      query.andWhere('unidade.quartos = :quartos', {
-        quartos: filters.quartos,
+    if (quartosLista.length) {
+      query.andWhere('unidade.quartos IN (:...quartosLista)', {
+        quartosLista,
+      });
+    }
+
+    if (filters.valorMin !== undefined) {
+      query.andWhere('unidade.valorAluguelSugerido >= :valorMin', {
+        valorMin: filters.valorMin,
       });
     }
 
