@@ -1,5 +1,9 @@
 # Habita+
 
+<p align="center">
+  <img src="docs/img/logo-habita.png" alt="Logo do Habita+" width="260" />
+</p>
+
 [![Status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)](https://github.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-24+-brightgreen)](https://nodejs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11.x-red)](https://nestjs.com/)
@@ -13,7 +17,10 @@ O Habita+ centraliza processos essenciais de um condomínio em uma plataforma mo
 
 ## Demonstração
 
-![Dashboard de gestão condominial](docs/img/ml-expenses-real-vs-predicted.png)
+<p align="center">
+  <img src="docs/img/tela-de-login.jpeg" alt="Tela de login do Habita+" width="900" />
+</p>
+
 
 ## Funcionalidades
 
