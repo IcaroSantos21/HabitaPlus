@@ -29,6 +29,8 @@ interface ChatConversationContext {
   local?: string;
   equipamento?: string;
   descricao?: string;
+  // Dado que o bot acabou de perguntar: a próxima resposta curta preenche esse campo.
+  aguardando?: 'local' | 'equipamento';
 }
 
 interface FaqEntry {
@@ -56,6 +58,16 @@ export class ChatbotService {
     text: string,
     user: AuthUserDto,
   ): Promise<ChatbotMessageResponse> {
+    if (this.pendingContext.has(user.id) && this.querCancelar(text)) {
+      this.pendingContext.delete(user.id);
+      return {
+        intent: 'abrir_chamado',
+        reply:
+          'Tudo bem, cancelei a abertura do chamado. Posso ajudar com mais alguma coisa?',
+        data: { cancelado: true },
+      };
+    }
+
     const parsed = await this.mlClientService.parse(text);
     const intent = this.normalizarIntent(parsed.intencao);
     const intentCorreto = this.resolverIntentPorTexto(text, intent);
@@ -197,28 +209,40 @@ export class ChatbotService {
   ): Promise<ChatbotMessageResponse> {
     const entities = this.normalizarEntities(payload.entities);
     const existing = this.pendingContext.get(user.id);
-    const local = this.valorTexto(
+    let local = this.valorTexto(
       entities.local ??
         entities.localizacao ??
         existing?.local ??
         this.extrairLocal(textoOriginal),
     );
-    const equipamento = this.valorTexto(
+    let equipamento = this.valorTexto(
       entities.equipamento ??
         existing?.equipamento ??
         this.extrairEquipamento(textoOriginal),
     );
+
+    // Se o bot acabou de perguntar o dado e o NLU não reconheceu (ex.: "gerador",
+    // que não está na lista de equipamentos), a própria resposta é o valor.
+    if (!local && existing?.aguardando === 'local') {
+      local = this.lerRespostaLivre(textoOriginal);
+    }
+    if (local && !equipamento && existing?.aguardando === 'equipamento') {
+      equipamento = this.lerRespostaLivre(textoOriginal);
+    }
 
     if (!local) {
       this.pendingContext.set(user.id, {
         intent: 'abrir_chamado',
         equipamento: equipamento ?? existing?.equipamento,
         descricao: textoOriginal,
+        aguardando: 'local',
       });
       return {
         intent: 'abrir_chamado',
         reply:
-          'Em qual local? Posso registrar o chamado para piscina, garagem, salão, ou outra área comum.',
+          existing?.aguardando === 'local'
+            ? 'Não consegui entender o local. Diga só o nome da área, como piscina, garagem ou salão. Se preferir, digite "cancelar".'
+            : 'Em qual local? Posso registrar o chamado para piscina, garagem, salão, ou outra área comum.',
         data: {
           require: 'local',
           pending: true,
@@ -231,11 +255,14 @@ export class ChatbotService {
         intent: 'abrir_chamado',
         local,
         descricao: textoOriginal,
+        aguardando: 'equipamento',
       });
       return {
         intent: 'abrir_chamado',
         reply:
-          'Qual equipamento está com problema? Ex.: elevador, ar-condicionado, portão, energia.',
+          existing?.aguardando === 'equipamento'
+            ? 'Não consegui entender o equipamento. Diga só o nome dele, como gerador ou elevador. Se preferir, digite "cancelar".'
+            : 'Qual equipamento está com problema? Ex.: elevador, ar-condicionado, portão, energia. Se for outro, é só me dizer o nome.',
         data: {
           require: 'equipamento',
           pending: true,
@@ -673,6 +700,26 @@ export class ChatbotService {
 
     const numero = Number(value);
     return Number.isFinite(numero) ? numero : undefined;
+  }
+
+  private querCancelar(texto: string): boolean {
+    return /^(?:cancelar?|cancela|deixa pra la|esquece|desisti|nao quero mais)\b/.test(
+      this.normalizarTexto(texto.trim()),
+    );
+  }
+
+  // Resposta curta a uma pergunta do bot: o texto digitado é o próprio valor do campo.
+  private lerRespostaLivre(texto: string): string | undefined {
+    const limpo = texto
+      .trim()
+      .replace(/[.!?,;:]+$/g, '')
+      .replace(/^(?:o|a|os|as|um|uma|do|da|no|na)\s+/i, '')
+      .trim();
+    const palavras = limpo.split(/\s+/).filter(Boolean);
+    if (!limpo || limpo.length > 60 || palavras.length > 5) {
+      return undefined;
+    }
+    return limpo.toLowerCase();
   }
 
   private extrairLocal(text: string): string | undefined {

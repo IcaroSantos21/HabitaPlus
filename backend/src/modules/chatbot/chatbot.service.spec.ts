@@ -321,6 +321,79 @@ describe('ChatbotService', () => {
     );
   });
 
+  it('deve aceitar como equipamento uma resposta que não está na lista conhecida', async () => {
+    const service = createService();
+    mlClientService.parse
+      .mockResolvedValueOnce({
+        intencao: 'abrir_chamado',
+        confianca: 0.93,
+        entities: {},
+      })
+      .mockResolvedValue({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      });
+    chamadosService.create.mockResolvedValue({ id: 91 } as never);
+
+    await service.handleMessage('Abrir chamado', usuarioMorador);
+    const local = await service.handleMessage('piscina', usuarioMorador);
+    expect(local.reply).toContain('Qual equipamento');
+
+    const equipamento = await service.handleMessage('gerador', usuarioMorador);
+
+    expect(equipamento).toMatchObject({
+      intent: 'abrir_chamado',
+      data: { chamadoId: 91, status: StatusChamado.ABERTO },
+    });
+    expect(chamadosService.create).toHaveBeenCalledWith(
+      expect.objectContaining({ areaComum: 'piscina', equipamento: 'gerador' }),
+      usuarioMorador,
+    );
+  });
+
+  it('deve pedir de novo com uma dica quando a resposta for longa demais para ser um equipamento', async () => {
+    const service = createService();
+    mlClientService.parse
+      .mockResolvedValueOnce({
+        intencao: 'abrir_chamado',
+        confianca: 0.93,
+        entities: { local: 'garagem' },
+      })
+      .mockResolvedValue({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      });
+
+    const inicio = await service.handleMessage('Abrir chamado', usuarioMorador);
+    expect(inicio.reply).toContain('Qual equipamento');
+
+    const resposta = await service.handleMessage(
+      'não sei direito o que é aquela coisa grande que faz barulho no fundo',
+      usuarioMorador,
+    );
+
+    expect(resposta.reply).toContain('Não consegui entender o equipamento');
+    expect(chamadosService.create).not.toHaveBeenCalled();
+  });
+
+  it('deve cancelar a abertura do chamado quando o morador pedir', async () => {
+    const service = createService();
+    mlClientService.parse.mockResolvedValueOnce({
+      intencao: 'abrir_chamado',
+      confianca: 0.93,
+      entities: {},
+    });
+
+    await service.handleMessage('Abrir chamado', usuarioMorador);
+    const resposta = await service.handleMessage('cancelar', usuarioMorador);
+
+    expect(resposta.reply).toContain('cancelei');
+    expect(mlClientService.parse).toHaveBeenCalledTimes(1);
+    expect(chamadosService.create).not.toHaveBeenCalled();
+  });
+
   it('deve listar chamados abertos do morador', async () => {
     mlClientService.parse.mockResolvedValue({
       intencao: 'status_chamado',
