@@ -58,14 +58,14 @@ function getListingImage(listing) {
   if (title.includes("bicicleta") || title.includes("bike")) return `${marketplaceImageBase}bike.webp`;
   if (title.includes("luminaria") || title.includes("lampada") || title.includes("abajur")) return `${marketplaceImageBase}lamp.webp`;
   if (title.includes("mesa") || title.includes("cadeira")) return `${marketplaceImageBase}dining.webp`;
-  if (title.includes("monitor") || title.includes("notebook") || title.includes("computador") || title.includes("eletron")) return `${marketplaceImageBase}monitor.svg`;
-  if (title.includes("panela") || title.includes("cozinha") || title.includes("utensilio")) return `${marketplaceImageBase}cookware.svg`;
+  if (title.includes("monitor") || title.includes("notebook") || title.includes("computador") || title.includes("eletron")) return `${marketplaceImageBase}monitor.webp`;
+  if (title.includes("panela") || title.includes("cozinha") || title.includes("utensilio")) return `${marketplaceImageBase}cookware.webp`;
 
   const categoryImages = {
     MOVEIS: "sofa.webp",
     ESPORTE: "bike.webp",
-    ELETRONICOS: "monitor.svg",
-    UTENSILIOS: "cookware.svg",
+    ELETRONICOS: "monitor.webp",
+    UTENSILIOS: "cookware.webp",
     OUTROS: "generic.svg",
   };
 
@@ -429,9 +429,8 @@ function Marketplace() {
           <Button onClick={openCreateForm} variant="secondary" className="marketplace-hero__button">+ Criar anúncio</Button>
         </div>
         <div className="marketplace-hero__art" aria-hidden="true">
-          <span className="marketplace-hero__orb marketplace-hero__orb--one" />
-          <span className="marketplace-hero__orb marketplace-hero__orb--two" />
-          <span className="marketplace-hero__tile">H<span>+</span></span>
+          <img className="marketplace-hero__photo marketplace-hero__photo--feature" src="/images/marketplace/sofa.webp" alt="" />
+          <img className="marketplace-hero__photo marketplace-hero__photo--detail" src="/images/marketplace/bike.webp" alt="" />
         </div>
       </header>
 
