@@ -1104,8 +1104,9 @@ main:not(.hp-login-page) > div > header > p:first-child,
 .hp-main > div > header > p:first-child { color: #16847c; font-size: .65rem; font-weight: 850; letter-spacing: .14em; }
 .hp-main > div > header > p:not(:first-child) { margin-top: .55rem; color: #718696; font-size: .83rem; line-height: 1.6; }
 .hp-main section[aria-label] { min-width: 0; }
-.hp-main .recharts-wrapper { max-width: 100%; }
-.hp-main .recharts-cartesian-grid line { stroke: #e7eef1; }
+.hp-main .recharts-wrapper,
+.recharts-wrapper,
+.recharts-surface { max-width: none; }.hp-main .recharts-cartesian-grid line { stroke: #e7eef1; }
 .hp-main .recharts-text { fill: #718797; font-size: 11px; }
 .hp-main .recharts-default-tooltip { border: 1px solid #dce8ed !important; border-radius: .75rem !important; box-shadow: 0 8px 22px rgba(14,54,73,.12) !important; }
 .hp-main .recharts-legend-item-text { color: #526d7f !important; font-size: .7rem; }
