@@ -50,11 +50,13 @@ export class UnitsController {
   listAvailable(
     @Query('bloco') bloco?: string,
     @Query('quartos') quartos?: string,
+    @Query('valorMin') valorMin?: string,
     @Query('valorMax') valorMax?: string,
   ) {
     return this.unitsService.listAvailableUnits({
       bloco,
       quartos: quartos ? Number(quartos) : undefined,
+      valorMin: valorMin !== undefined ? Number(valorMin) : undefined,
       valorMax: valorMax !== undefined ? Number(valorMax) : undefined,
     });
   }

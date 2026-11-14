@@ -6,6 +6,7 @@ import pytest
 
 from app.core.config import RECOMMENDER_MODEL_PATH
 from app.services.recommender_features import FEATURE_NAMES
+from scripts import generate_data as gd
 from scripts import train_recommender as tr
 
 
@@ -23,7 +24,8 @@ def test_k_is_the_one_with_the_highest_silhouette(result: tr.TrainingResult) -> 
 
 
 def test_clusters_are_well_separated(result: tr.TrainingResult) -> None:
-    assert result.silhouette >= 0.5  # acima de 0,5 a estrutura de grupos é considerada razoável
+    # acima de 0,5 a estrutura de grupos é considerada razoável
+    assert result.silhouette >= 0.5
 
 
 def test_elbow_agrees_with_silhouette_on_k(result: tr.TrainingResult) -> None:
@@ -43,14 +45,15 @@ def test_elbow_index_finds_the_bend() -> None:
 
 
 def test_cold_start_residents_are_left_out_of_the_fit(result: tr.TrainingResult) -> None:
-    assert result.n_cold_start == 8
-    assert result.n_residents == 232
-    assert sum(result.cluster_sizes.values()) == 232
+    assert result.n_cold_start == gd.N_COLD_START
+    assert result.n_residents == gd.N_RESIDENTS - gd.N_COLD_START
+    assert sum(result.cluster_sizes.values()) == result.n_residents
 
 
 def test_clusters_recover_the_latent_groups(result: tr.TrainingResult) -> None:
     assert result.adjusted_rand > 0.8
-    assert result.holdout_adjusted_rand > 0.6  # moradores fora do ajuste (47): amostra pequena
+    # moradores fora do ajuste (47): amostra pequena
+    assert result.holdout_adjusted_rand > 0.6
 
 
 def test_each_centroid_is_a_distribution_over_categories(result: tr.TrainingResult) -> None:
@@ -59,7 +62,8 @@ def test_each_centroid_is_a_distribution_over_categories(result: tr.TrainingResu
 
 
 def test_pipeline_normalizes_inside_the_pipeline(result: tr.TrainingResult) -> None:
-    assert [name for name, _ in result.pipeline.steps] == ["normalizer", "kmeans"]
+    assert [name for name, _ in result.pipeline.steps] == [
+        "normalizer", "kmeans"]
 
 
 def test_training_is_reproducible() -> None:
@@ -69,8 +73,10 @@ def test_training_is_reproducible() -> None:
     assert first.selection.best_k == second.selection.best_k
     assert first.selection.elbow_k == second.selection.elbow_k
     for k in tr.K_RANGE:
-        assert first.selection.inertia[k] == pytest.approx(second.selection.inertia[k])
-        assert first.selection.silhouette[k] == pytest.approx(second.selection.silhouette[k])
+        assert first.selection.inertia[k] == pytest.approx(
+            second.selection.inertia[k])
+        assert first.selection.silhouette[k] == pytest.approx(
+            second.selection.silhouette[k])
     assert np.allclose(first.centroids, second.centroids)
 
 
@@ -81,7 +87,8 @@ def test_committed_artifact_matches_a_fresh_training(result: tr.TrainingResult) 
     assert artifact["silhouette"] == pytest.approx(result.silhouette)
     assert artifact["feature_names"] == list(FEATURE_NAMES)
     centers = artifact["pipeline"].named_steps["kmeans"].cluster_centers_
-    assert np.allclose(centers, result.pipeline.named_steps["kmeans"].cluster_centers_)
+    assert np.allclose(
+        centers, result.pipeline.named_steps["kmeans"].cluster_centers_)
 
 
 def test_save_artifact_roundtrip(result: tr.TrainingResult, tmp_path: Path) -> None:

@@ -1,101 +1,364 @@
-# Habita+ - Gestão Condominial
-## Subindo o sistema com Docker
+# Habita+
 
-Pré-requisito: Docker com Compose v2.
+<p align="center">
+  <img src="docs/img/logo-habita.png" alt="Logo do Habita+" width="260" />
+</p>
+
+[![Status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)](https://github.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-24+-brightgreen)](https://nodejs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.x-red)](https://nestjs.com/)
+[![React](https://img.shields.io/badge/React-19.x-61DAFB)](https://react.dev/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB)](https://python.org/)
+[![License](https://img.shields.io/badge/license-UNLICENSED-lightgrey)](LICENSE)
+
+Sistema inteligente de gestão condominial para síndicos, administradores e moradores, com automações financeiras, manutenção, comunicação e previsões de consumo.
+
+O Habita+ centraliza processos essenciais de um condomínio em uma plataforma moderna, ajudando a reduzir retrabalho, melhorar a comunicação e facilitar a tomada de decisão com suporte de inteligência artificial.
+
+## Demonstração
+
+<p align="center">
+  <img src="docs/img/tela-de-login.jpeg" alt="Tela de login do Habita+" width="900" />
+</p>
+
+
+## Funcionalidades
+
+- Gestão de moradores, unidades e blocos
+- Cobranças, pagamentos e integração com Stripe
+- Tickets de manutenção e acompanhamento de chamados
+- Comunicação interna e avisos para o condomínio
+- Marketplace interno para serviços e parceiros
+- Dashboard com indicadores de desempenho e saúde financeira
+- Inteligência artificial para previsões e classificação de dados
+- Autenticação com JWT e controle de acesso por perfil
+- Arquitetura pronta para Docker e Kubernetes
+
+## Pré-requisitos e dependências
+
+Antes de rodar o projeto, certifique-se de ter instalado:
+
+- Node.js 24+
+- npm
+- Python 3.11+
+- Docker e Docker Compose v2
+- Kubernetes CLI (`kubectl`) para a opção de deploy em cluster
+- Stripe CLI para testes de webhook local
+- PostgreSQL local ou um banco externo acessível
+
+## Como instalar e rodar
+
+### 1) Clone o repositório
 
 ```bash
-cp .env.example .env    # ajuste a senha do banco
+git clone <url-do-repositorio>
+cd habita-plus
+```
+
+### 2) Configure as variáveis de ambiente
+
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Exemplo de `.env` na raiz:
+
+```env
+DB_USER=habita
+DB_PASSWORD=sua_senha_forte
+DB_NAME=habitaplus
+DB_PORT=5432
+DB_SSL=false
+JWT_SECRET=sua_chave_secreta
+JWT_EXPIRES_IN_SECONDS=3600
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUCCESS_URL=http://localhost:5173/success
+STRIPE_CANCEL_URL=http://localhost:5173/cancel
+BACKEND_PORT=3000
+ML_PORT=8000
+CORS_ORIGIN=http://localhost:5173
+```
+
+Exemplo de `backend/.env`:
+
+```env
+NODE_ENV=development
+PORT=3000
+CORS_ORIGIN=http://localhost:5173
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=habita
+DB_PASSWORD=sua_senha_forte
+DB_NAME=habitaplus
+DB_SSL=false
+JWT_SECRET=sua_chave_secreta
+JWT_EXPIRES_IN_SECONDS=3600
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUCCESS_URL=http://localhost:5173/success
+STRIPE_CANCEL_URL=http://localhost:5173/cancel
+```
+
+Exemplo de `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_USE_MOCKS=false
+```
+
+---
+
+## Opção A: rodar com Docker
+
+A stack principal do projeto inclui PostgreSQL, backend e ML service via Docker Compose. O frontend é executado localmente em desenvolvimento, a menos que você queira rodá-lo em um container separado.
+
+### Subir os serviços
+
+```bash
 docker compose up --build
 ```
 
-Na primeira vez o build leva alguns minutos. Depois disso, `docker compose up` sobe tudo.
+Se o banco estiver vazio, rode as migrations e o seed do backend:
 
-| Serviço | Endereço | Verificação |
-|---|---|---|
-| Backend | http://localhost:3000/api | `/api/health` (Swagger em `/docs`) |
-| ml-service | http://localhost:8000 | `/health` |
-| Postgres | `127.0.0.1:5432` (só acessível da própria máquina) | healthcheck do Compose |
+```bash
+docker compose exec backend npm run migration:run
+docker compose exec backend npm run seed
+```
+
+### Verificar os serviços
+
+- Backend: http://localhost:3000/api
+- Swagger: http://localhost:3000/docs
+- Healthcheck do backend: http://localhost:3000/api/health
+- ML Service: http://localhost:8000/health
+- PostgreSQL: localhost:5432
 
 ### Comandos úteis
 
 ```bash
-docker compose ps                  # estado e healthcheck de cada serviço
-docker compose logs -f backend     # acompanhar logs de um serviço
-docker compose up -d postgres      # subir só o banco (para rodar o backend fora do Docker)
-docker compose down                # para tudo e mantém os dados do banco
-docker compose down -v             # para tudo e APAGA o volume do Postgres
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f ml-service
+docker compose down
+docker compose down -v
 ```
 
-### Variáveis de ambiente
+> `docker compose down` mantém os dados do banco; `docker compose down -v` remove o volume do PostgreSQL.
 
-As variáveis vêm do `.env` da raiz (modelo em `.env.example`).
+### Frontend em container (opcional)
 
-| Variável | Para que serve | Padrão |
-|---|---|---|
-| `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Credenciais e nome do banco (obrigatórias) | sem padrão |
-| `DB_PORT` | Porta do Postgres exposta na sua máquina | `5432` |
-| `BACKEND_PORT` | Porta do backend na sua máquina | `3000` |
-| `ML_PORT` | Porta do ml-service na sua máquina | `8000` |
-| `CORS_ORIGIN` | Origem liberada no backend | `http://localhost:5173` |
+```bash
+docker build -t habitaplus-frontend ./frontend
+docker run --rm -p 80:80 habitaplus-frontend
+```
 
-Se faltar uma variável obrigatória, o `docker compose` para com uma mensagem dizendo qual.
+Acesse em:
 
-### Rodando o backend fora do Docker
+```text
+http://localhost:80
+```
 
-Para desenvolver com `npm run start:dev`, suba só o banco. O backend usa o `.env`
-da raiz do repositório, assim como o Docker Compose:
+---
+
+## Opção B: rodar sem Docker
+
+Este é o fluxo recomendado para desenvolvimento local e testes com Stripe.
+
+### 1. Subir o PostgreSQL local
 
 ```bash
 docker compose up -d postgres
+```
+
+### 2. Instalar e rodar o backend
+
+```bash
 cd backend
+npm install
+npm run migration:run
+npm run seed
 npm run start:dev
 ```
 
-Antes de iniciar, configure no `.env` da raiz as credenciais do banco, `JWT_SECRET`
-e as chaves Stripe de teste (`STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`).
-Consulte [`docs/stripe-teste.md`](docs/stripe-teste.md) para obter as chaves.
+O backend ficará disponível em:
 
-### Dados e migrations
+```text
+http://localhost:3000
+```
 
-Os dados do Postgres ficam no volume `pgdata` e sobrevivem a `docker compose down`. Para recomeçar com o banco vazio, use `docker compose down -v`.
+### 3. Rodar o ML service
 
-O schema vem de migrations (o `synchronize` fica desligado), e elas **não rodam sozinhas na subida**. Veja como executá-las em `backend/README.md`.
+```bash
+cd ml-service
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-### Frontend
+O serviço de ML ficará em:
 
-Ainda não está no Compose. Entra quando o frontend tiver Dockerfile.
+```text
+http://localhost:8000
+```
 
-## Contribuindo
+### 4. Rodar o frontend
 
-Branches, commits e regras de PR estão em [CONTRIBUTING.md](CONTRIBUTING.md).
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Dados para demonstracao
+Acesse:
 
-Para recriar os registros de demonstracao localmente, aplique as migrations e
-execute o seed a partir do backend:
+```text
+http://localhost:5173
+```
 
-```powershell
+### 5. Configurar webhook do Stripe
+
+Em outro terminal:
+
+```bash
+stripe login
+stripe listen --events checkout.session.completed --forward-to localhost:3000/api/webhooks/stripe
+```
+
+Copie o valor exibido, como `whsec_...`, para a variável `STRIPE_WEBHOOK_SECRET` no arquivo `.env`.
+
+---
+
+## Opção C: rodar com Kubernetes
+
+Existe um manifesto de exemplo em `k8s/habitaplus.yaml` para deployment em cluster Kubernetes, incluindo backend, ML service e frontend.
+
+### 1. Build das imagens
+
+```bash
+docker build -t habitaplus-backend:1.0 ./backend
+docker build -t habitaplus-ml:1.0 ./ml-service
+docker build -t habitaplus-frontend:1.0 ./frontend
+```
+
+Se estiver usando `k3d`:
+
+```bash
+k3d cluster create habitaplus --agents 1
+k3d image import habitaplus-backend:1.0 habitaplus-ml:1.0 habitaplus-frontend:1.0 -c habitaplus
+```
+
+### 2. Criar o Secret com valores sensíveis
+
+```bash
+kubectl create secret generic habita-secrets \
+  --from-literal=DB_HOST='seu-host-do-banco' \
+  --from-literal=DB_PORT='5432' \
+  --from-literal=DB_USER='habita' \
+  --from-literal=DB_PASSWORD='sua_senha' \
+  --from-literal=DB_NAME='habitaplus' \
+  --from-literal=JWT_SECRET='sua_chave_jwt' \
+  --from-literal=STRIPE_SECRET_KEY='sk_test_...' \
+  --from-literal=STRIPE_WEBHOOK_SECRET='whsec_...'
+```
+
+### 3. Aplicar os manifestos
+
+```bash
+kubectl apply -f k8s/habitaplus.yaml
+```
+
+### 4. Verificar a implantação
+
+```bash
+kubectl get pods,svc,ingress
+kubectl logs deploy/backend
+kubectl logs deploy/ml-service
+```
+
+Em um cluster local, normalmente o acesso é pelo endereço:
+
+```text
+http://localhost:8080
+```
+
+Se preferir, use `port-forward`:
+
+```bash
+kubectl port-forward svc/frontend 8080:80
+kubectl port-forward svc/backend 3000:3000
+```
+
+---
+
+## Dados de demonstração
+
+Ao rodar o backend com o seed, o projeto cria usuários e registros de exemplo. Os principais acessos são:
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Administrador | `admin@demo.habitaplus.local` | `HabitaDemo2026!` |
+| Síndico | `sindico@demo.habitaplus.local` | `HabitaDemo2026!` |
+| Morador | `morador01@demo.habitaplus.local` | `HabitaDemo2026!` |
+
+Para recriar os dados de demonstração:
+
+```bash
 cd backend
 npm run migration:run
 npm run seed
 ```
 
-O comando e repetivel: remove e recria somente os registros identificados como
-dados demo (usuarios `@demo.habitaplus.local`, unidades do bloco `DEMO` e
-comunicados com prefixo `[DEMO]`). Ele preserva os demais dados do banco e usa
-o dataset `ml-service/data/expenses.csv` para alimentar 36 meses de despesas,
-alinhados aos meses recentes da previsao.
+## Solução de problemas comuns
 
-Credenciais locais de demonstracao:
+### Backend não inicia
 
-| Perfil        | E-mail                                                                | Senha             |
-| ------------- | --------------------------------------------------------------------- | ----------------- |
-| Administrador | `admin@demo.habitaplus.local`                                         | `HabitaDemo2026!` |
-| Sindico       | `sindico@demo.habitaplus.local`                                       | `HabitaDemo2026!` |
-| Moradores     | `morador01@demo.habitaplus.local` a `morador20@demo.habitaplus.local` | `HabitaDemo2026!` |
+Verifique se o arquivo `.env` está preenchido corretamente e se o PostgreSQL está acessível.
 
-Use essas credenciais apenas em ambiente local de demonstracao. O seed se
-recusa a executar quando `NODE_ENV=production`.
+```bash
+cat .env
+cat backend/.env
+docker compose ps
+```
 
-No painel do síndico ou administrador, use **Verificar alertas** para executar
-a mesma verificação diária sob demanda; a execução é idempotente no mesmo dia.
+### Stripe não responde no webhook
+
+```bash
+stripe listen --events checkout.session.completed --forward-to localhost:3000/api/webhooks/stripe
+```
+
+### Frontend não conecta com a API
+
+Confirme a variável:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+## Documentação complementar
+
+- [docs/rodar-local.md](docs/rodar-local.md)
+- [docs/stripe-teste.md](docs/stripe-teste.md)
+- [backend/README.md](backend/README.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Resumo rápido
+
+```bash
+# Docker
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+docker compose up --build
+
+# Local
+cd backend && npm install && npm run migration:run && npm run seed && npm run start:dev
+cd ml-service && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+cd frontend && npm install && npm run dev
+
+# Kubernetes
+kubectl apply -f k8s/habitaplus.yaml
+```

@@ -110,6 +110,7 @@ function buildChartData(dashboard, prediction) {
     : [];
 
   const predictedValue =
+    prediction?.predictedTotal ??
     prediction?.predicaoTotal ??
     prediction?.predictedAmount ??
     prediction?.total ??

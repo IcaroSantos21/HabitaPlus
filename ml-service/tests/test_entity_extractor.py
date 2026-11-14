@@ -91,7 +91,8 @@ def test_extract_equipment_positive(text: str, expected: str) -> None:
 
 @pytest.mark.parametrize(
     "text",
-    ["quero abrir um chamado", "a portaria está fechada", "qual a conta de luz?", "bombom de chocolate"],
+    ["quero abrir um chamado", "a portaria está fechada",
+        "qual a conta de luz?", "bombom de chocolate"],
 )
 def test_extract_equipment_negative(text: str) -> None:
     assert ee.extract_equipment(text) is None
@@ -118,7 +119,8 @@ def test_extract_bedrooms_positive(text: str, expected: int) -> None:
 
 @pytest.mark.parametrize(
     "text",
-    ["tem apartamento vago?", "o quarto andar", "quartos disponíveis", "apto 302", "dia 2"],
+    ["tem apartamento vago?", "o quarto andar",
+        "quartos disponíveis", "apto 302", "dia 2"],
 )
 def test_extract_bedrooms_negative(text: str) -> None:
     assert ee.extract_bedrooms(text) is None
@@ -201,9 +203,11 @@ def test_extract_date_negative(text: str) -> None:
 
 
 def test_extractor_returns_only_what_was_found() -> None:
-    entities = ee.RegexEntityExtractor().extract("quero abrir chamado do elevador do bloco B")
+    entities = ee.RegexEntityExtractor().extract(
+        "quero abrir chamado do elevador do bloco B")
 
-    assert entities.model_dump(exclude_none=True) == {"equipamento": "elevador", "bloco": "B"}
+    assert entities.model_dump(exclude_none=True) == {
+        "equipamento": "elevador", "bloco": "B"}
 
 
 def test_extractor_finds_several_entities_in_one_sentence() -> None:
@@ -214,5 +218,14 @@ def test_extractor_finds_several_entities_in_one_sentence() -> None:
     }
 
 
+def test_extractor_finds_min_value_for_above_threshold_queries() -> None:
+    text = "quero apartamentos acima de 2 mil"
+
+    assert ee.RegexEntityExtractor().extract(text).model_dump(exclude_none=True) == {
+        "valor_min": 2000.0,
+    }
+
+
 def test_extractor_gives_nothing_for_a_greeting() -> None:
-    assert ee.RegexEntityExtractor().extract("oi").model_dump(exclude_none=True) == {}
+    assert ee.RegexEntityExtractor().extract(
+        "oi").model_dump(exclude_none=True) == {}

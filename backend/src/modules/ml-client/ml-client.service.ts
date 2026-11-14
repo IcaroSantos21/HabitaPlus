@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import {
+  BadGatewayException,
   Injectable,
   Logger,
   ServiceUnavailableException,
@@ -129,6 +130,23 @@ export class MlClientService {
         return response.data;
       } catch (error) {
         ultimaFalha = error;
+
+        // 4xx é problema do contrato (ex.: 422 de validação): repetir não ajuda.
+        const resposta = (
+          error as { response?: { status?: number; data?: unknown } }
+        )?.response;
+        if (
+          resposta?.status &&
+          resposta.status >= 400 &&
+          resposta.status < 500
+        ) {
+          this.logger.error(
+            `[ml-client] ${path} recusado pelo ml-service (HTTP ${resposta.status}): ${JSON.stringify(resposta.data)}`,
+          );
+          throw new BadGatewayException(
+            'O serviço de inteligência recusou a requisição. Verifique os dados enviados.',
+          );
+        }
       }
     }
 

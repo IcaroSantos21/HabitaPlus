@@ -103,10 +103,11 @@ describe('ChatbotService', () => {
   });
 
   it('deve consultar apartamentos disponíveis com filtros extraídos', async () => {
+    // Contrato real do ml-service: a chave é `valorMax` (camelCase).
     mlClientService.parse.mockResolvedValue({
       intencao: 'consultar_apartamentos',
       confianca: 0.95,
-      entities: { quartos: 2, valor: 2500 },
+      entities: { quartos: 2, valorMax: 2500, bloco: 'A' },
     });
     unitsService.listAvailableUnits.mockResolvedValue([
       {
@@ -133,9 +134,128 @@ describe('ChatbotService', () => {
     expect(response.reply).toContain('apartamentos');
 
     expect(unitsService.listAvailableUnits).toHaveBeenCalledWith({
+      bloco: 'A',
       quartos: 2,
       valorMax: 2500,
     });
+  });
+
+  it('deve respeitar filtros de valor mínimo em buscas de apartamentos', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'consultar_apartamentos',
+      confianca: 0.95,
+      entities: { valorMin: 2000 },
+    });
+    unitsService.listAvailableUnits.mockResolvedValue([
+      {
+        id: 2,
+        bloco: 'A',
+        numero: '202',
+        quartos: 2,
+        areaM2: 72,
+        valorAluguelSugerido: 2300,
+        disponivelLocacao: true,
+      },
+      {
+        id: 3,
+        bloco: 'B',
+        numero: '303',
+        quartos: 3,
+        areaM2: 90,
+        valorAluguelSugerido: 2600,
+        disponivelLocacao: true,
+      },
+    ]);
+
+    const response = await createService().handleMessage(
+      'Quero apartamentos acima de 2000 reais',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('consultar_apartamentos');
+    expect(unitsService.listAvailableUnits).toHaveBeenCalledWith({
+      valorMin: 2000,
+    });
+    expect(response.reply).toContain('apartamentos');
+  });
+
+  it('deve mostrar outras opções aleatórias quando o usuário pedir outros apartamentos', async () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.1);
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'consultar_apartamentos',
+      confianca: 0.96,
+      entities: {},
+    });
+    unitsService.listAvailableUnits.mockResolvedValue([
+      {
+        id: 1,
+        bloco: 'A',
+        numero: '101',
+        quartos: 2,
+        valorAluguelSugerido: 2200,
+        disponivelLocacao: true,
+      },
+      {
+        id: 2,
+        bloco: 'A',
+        numero: '102',
+        quartos: 2,
+        valorAluguelSugerido: 2300,
+        disponivelLocacao: true,
+      },
+      {
+        id: 3,
+        bloco: 'B',
+        numero: '201',
+        quartos: 3,
+        valorAluguelSugerido: 2600,
+        disponivelLocacao: true,
+      },
+      {
+        id: 4,
+        bloco: 'B',
+        numero: '202',
+        quartos: 3,
+        valorAluguelSugerido: 2700,
+        disponivelLocacao: true,
+      },
+    ]);
+
+    const response = await createService().handleMessage(
+      'mostre outros apartamentos',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('consultar_apartamentos');
+    expect(response.data).toMatchObject({
+      unidades: [
+        expect.objectContaining({ id: 2 }),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      ],
+    });
+    expect(
+      (response.data as { unidades: Array<{ id: number }> }).unidades[0].id,
+    ).toBe(2);
+    expect(response.reply).toContain('apartamentos');
+    jest.restoreAllMocks();
+  });
+
+  it('deve responder à saudação sem cair em fora de escopo', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'saudacao',
+      confianca: 0.99,
+      entities: {},
+    });
+
+    const response = await createService().handleMessage(
+      'oi, tudo bem?',
+      usuarioMorador,
+    );
+
+    expect(response.intent).toBe('saudacao');
+    expect(response.reply).toContain('Habita+');
   });
 
   it('deve pedir o local quando o chamado ainda não tem local informado', async () => {
@@ -199,6 +319,79 @@ describe('ChatbotService', () => {
       }),
       usuarioMorador,
     );
+  });
+
+  it('deve aceitar como equipamento uma resposta que não está na lista conhecida', async () => {
+    const service = createService();
+    mlClientService.parse
+      .mockResolvedValueOnce({
+        intencao: 'abrir_chamado',
+        confianca: 0.93,
+        entities: {},
+      })
+      .mockResolvedValue({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      });
+    chamadosService.create.mockResolvedValue({ id: 91 } as never);
+
+    await service.handleMessage('Abrir chamado', usuarioMorador);
+    const local = await service.handleMessage('piscina', usuarioMorador);
+    expect(local.reply).toContain('Qual equipamento');
+
+    const equipamento = await service.handleMessage('gerador', usuarioMorador);
+
+    expect(equipamento).toMatchObject({
+      intent: 'abrir_chamado',
+      data: { chamadoId: 91, status: StatusChamado.ABERTO },
+    });
+    expect(chamadosService.create).toHaveBeenCalledWith(
+      expect.objectContaining({ areaComum: 'piscina', equipamento: 'gerador' }),
+      usuarioMorador,
+    );
+  });
+
+  it('deve pedir de novo com uma dica quando a resposta for longa demais para ser um equipamento', async () => {
+    const service = createService();
+    mlClientService.parse
+      .mockResolvedValueOnce({
+        intencao: 'abrir_chamado',
+        confianca: 0.93,
+        entities: { local: 'garagem' },
+      })
+      .mockResolvedValue({
+        intencao: 'fora_de_escopo',
+        confianca: 0.2,
+        entities: {},
+      });
+
+    const inicio = await service.handleMessage('Abrir chamado', usuarioMorador);
+    expect(inicio.reply).toContain('Qual equipamento');
+
+    const resposta = await service.handleMessage(
+      'não sei direito o que é aquela coisa grande que faz barulho no fundo',
+      usuarioMorador,
+    );
+
+    expect(resposta.reply).toContain('Não consegui entender o equipamento');
+    expect(chamadosService.create).not.toHaveBeenCalled();
+  });
+
+  it('deve cancelar a abertura do chamado quando o morador pedir', async () => {
+    const service = createService();
+    mlClientService.parse.mockResolvedValueOnce({
+      intencao: 'abrir_chamado',
+      confianca: 0.93,
+      entities: {},
+    });
+
+    await service.handleMessage('Abrir chamado', usuarioMorador);
+    const resposta = await service.handleMessage('cancelar', usuarioMorador);
+
+    expect(resposta.reply).toContain('cancelei');
+    expect(mlClientService.parse).toHaveBeenCalledTimes(1);
+    expect(chamadosService.create).not.toHaveBeenCalled();
   });
 
   it('deve listar chamados abertos do morador', async () => {
@@ -345,6 +538,31 @@ describe('ChatbotService', () => {
       intent: 'regras_condominio',
     });
     expect(response.reply).toContain('regras');
+  });
+
+  it('deve priorizar o pedido de boleto e cobrança em vez de regras do condomínio', async () => {
+    mlClientService.parse.mockResolvedValue({
+      intencao: 'regras_condominio',
+      confianca: 0.82,
+      entities: {},
+    });
+    cobrancasService.buscarMinhas.mockResolvedValue({
+      data: [{ id: 44, valor: 650, status: StatusCobranca.PENDENTE }],
+      meta: { pagina: 1, limite: 10, total: 1, totalPaginas: 1 },
+    });
+    cobrancasCheckoutService.criarCheckout.mockResolvedValue({
+      url: 'https://checkout.example/pay/44',
+    });
+
+    const response = await createService().handleMessage(
+      'Quero ver a minha cobrança e a segunda via do boleto',
+      usuarioMorador,
+    );
+
+    expect(response).toMatchObject({
+      intent: 'segunda_via_boleto',
+    });
+    expect(response.reply).toContain('boleto');
   });
 
   it('deve responder não entendi quando a intenção é fora de escopo', async () => {

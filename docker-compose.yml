@@ -29,17 +29,22 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
+        environment:
       NODE_ENV: production
       PORT: 3000
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
       DB_HOST: postgres
-      DB_PORT: 5432          # porta interna; a do host é só o mapeamento do postgres
+      DB_PORT: 5432
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+      DB_SSL: ${DB_SSL:-false}
       JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no .env}
       JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:?Defina STRIPE_SECRET_KEY no .env}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:?Defina STRIPE_WEBHOOK_SECRET no .env}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-http://localhost:5173/success}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-http://localhost:5173/cancel}
       ML_SERVICE_URL: http://ml-service:8000
     ports:
       - "${BACKEND_PORT:-3000}:3000"
