@@ -56,20 +56,29 @@ function getListingImage(listing) {
 
   if (title.includes("sofa") || title.includes("poltrona")) return `${marketplaceImageBase}sofa.webp`;
   if (title.includes("bicicleta") || title.includes("bike")) return `${marketplaceImageBase}bike.webp`;
+  if (title.includes("patins") || title.includes("skate")) return `${marketplaceImageBase}roller-skates.jpg`;
+  if (title.includes("planta") || title.includes("flor") || title.includes("jardim")) return `${marketplaceImageBase}plants.jpg`;
   if (title.includes("luminaria") || title.includes("lampada") || title.includes("abajur")) return `${marketplaceImageBase}lamp.webp`;
+  if (title.includes("estante") || title.includes("prateleira") || title.includes("livreiro")) return `${marketplaceImageBase}bookshelf.jpg`;
+  if (title.includes("liquidificador") || title.includes("batedeira")) return `${marketplaceImageBase}blender.jpg`;
+  if (title.includes("fone") || title.includes("headphone") || title.includes("audio")) return `${marketplaceImageBase}headphones.jpg`;
+  if (title.includes("halter") || title.includes("peso")) return `${marketplaceImageBase}dumbbells.jpg`;
+  if (title.includes("cadeira") && (title.includes("escritorio") || title.includes("gamer"))) return `${marketplaceImageBase}office-chair.jpg`;
+  if (title.includes("microondas")) return `${marketplaceImageBase}microwave.jpg`;
+  if (title.includes("tapete")) return `${marketplaceImageBase}rug.jpg`;
   if (title.includes("mesa") || title.includes("cadeira")) return `${marketplaceImageBase}dining.webp`;
-  if (title.includes("monitor") || title.includes("notebook") || title.includes("computador") || title.includes("eletron")) return `${marketplaceImageBase}monitor.svg`;
-  if (title.includes("panela") || title.includes("cozinha") || title.includes("utensilio")) return `${marketplaceImageBase}cookware.svg`;
+  if (title.includes("monitor") || title.includes("notebook") || title.includes("computador") || title.includes("eletron")) return `${marketplaceImageBase}monitor.webp`;
+  if (title.includes("panela") || title.includes("cozinha") || title.includes("utensilio")) return `${marketplaceImageBase}cookware.webp`;
 
   const categoryImages = {
     MOVEIS: "sofa.webp",
     ESPORTE: "bike.webp",
-    ELETRONICOS: "monitor.svg",
-    UTENSILIOS: "cookware.svg",
-    OUTROS: "generic.svg",
+    ELETRONICOS: "monitor.webp",
+    UTENSILIOS: "cookware.webp",
+    OUTROS: "dining.webp",
   };
 
-  return `${marketplaceImageBase}${categoryImages[category] || "generic.svg"}`;
+  return `${marketplaceImageBase}${categoryImages[category] || "dining.webp"}`;
 }
 
 function ListingImage({ listing, className = "" }) {
@@ -429,9 +438,8 @@ function Marketplace() {
           <Button onClick={openCreateForm} variant="secondary" className="marketplace-hero__button">+ Criar anúncio</Button>
         </div>
         <div className="marketplace-hero__art" aria-hidden="true">
-          <span className="marketplace-hero__orb marketplace-hero__orb--one" />
-          <span className="marketplace-hero__orb marketplace-hero__orb--two" />
-          <span className="marketplace-hero__tile">H<span>+</span></span>
+          <img className="marketplace-hero__photo marketplace-hero__photo--feature" src="/images/marketplace/sofa.webp" alt="" />
+          <img className="marketplace-hero__photo marketplace-hero__photo--detail" src="/images/marketplace/bike.webp" alt="" />
         </div>
       </header>
 

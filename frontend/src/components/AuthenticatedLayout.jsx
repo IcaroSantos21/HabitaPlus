@@ -99,7 +99,7 @@ function AuthenticatedLayout({ children }) {
 
         <div id="authenticated-sidebar" className={`hp-sidebar-wrap${mobileMenuOpen ? " is-open" : ""}`}>
           <Sidebar
-            className="hp-sidebar--sticky"
+            className="hp-sidebar--fixed"
             links={links}
             onNavigate={() => setMobileMenuOpen(false)}
             footer={
