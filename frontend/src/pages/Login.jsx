@@ -19,14 +19,21 @@ function getErrorMessage(error) {
   return data?.message || "Não foi possível concluir a solicitação.";
 }
 
-function BrandSymbol() {
+function MailIcon() {
   return (
-    <span className="hp-login-brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 40 40" fill="none">
-        <path d="M5 18.2 20 6l15 12.2V34H5V18.2Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
-        <path d="M14 34V21h12v13M16 13h8M20 10v6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="m4 8 8 5.5L20 8" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="10.5" width="14" height="9.5" rx="2.5" />
+      <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
+    </svg>
   );
 }
 
@@ -91,10 +98,9 @@ function Login() {
 
       <section className="hp-login-shell">
         <aside className="hp-login-showcase">
-          <Link to="/login" className="hp-login-brand">
-            <BrandSymbol />
-            <span>Habita<span>+</span></span>
-          </Link>
+        <Link to="/login" className="hp-login-brand" aria-label="Habita+ Gestão Condominial">
+          <img src="/images/login/logo.png" alt="Habita+ Gestão Condominial" className="hp-login-logo" />
+        </Link>
 
           <div className="hp-login-showcase__copy">
             <span className="hp-login-kicker"><i /> GESTÃO CONDOMINIAL INTELIGENTE</span>
@@ -107,31 +113,25 @@ function Login() {
             </div>
           </div>
 
-          <div className="hp-login-mascot-wrap" aria-hidden="true">
-            <div className="hp-login-mascot-glow" />
-            <img src="/images/assistant/habita-bot.webp" alt="" className="hp-login-mascot" />
-            <div className="hp-login-mascot-note">
-              <span className="hp-login-mascot-note__dot" />
-              <span><strong>Assistente Habita+</strong><small>Seu parceiro no dia a dia</small></span>
-            </div>
-          </div>
 
           <div className="hp-login-showcase__bottom">
             <span>Habita+ <b>•</b> Gestão com cuidado</span>
-            <span>© {new Date().getFullYear()} Habita+</span>
+            
           </div>
         </aside>
 
         <section className="hp-login-form-side">
           <div className="hp-login-card">
             <div className="hp-login-card__topline">
-              <span className="hp-login-card__lock" aria-hidden="true">⌑</span>
+            <span className="hp-login-card__lock" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1.2 14.2-3-3 1.4-1.4 1.6 1.6 4-4 1.4 1.4-5.4 5.4Z" /></svg>
+            </span>
               <span>AMBIENTE SEGURO</span>
             </div>
-            <div className="hp-login-card__heading">
-              <p className="hp-login-card__eyebrow">{isRegistering ? "COMECE POR AQUI" : "BEM-VINDO DE VOLTA"}</p>
-              <h2>{isRegistering ? "Crie sua conta" : "Acesse sua conta"}</h2>
-              <p>{isRegistering ? "Entre para a comunidade Habita+ e tenha tudo organizado em um só lugar." : "Entre para acompanhar sua rotina condominial com praticidade."}</p>
+              <div className="hp-login-card__heading">
+              {isRegistering && <p className="hp-login-card__eyebrow">COMECE POR AQUI</p>}
+              <h2>{isRegistering ? "Crie sua conta" : "Bem-vindo!"}</h2>
+              <p>{isRegistering ? "Entre para a comunidade Habita+ e tenha tudo organizado em um só lugar." : "Acesse sua conta Habita+ para acompanhar sua rotina condominial."}</p>
             </div>
 
             <form className="hp-login-form" onSubmit={handleSubmit}>
@@ -144,12 +144,39 @@ function Login() {
 
               <div className="hp-field">
                 <label htmlFor="email">E-mail</label>
-                <input id="email" name="email" type="email" autoComplete="email" placeholder="seu@email.com" required value={email} onChange={(event) => setEmail(event.target.value)} />
+                <div className="hp-input-icon">
+                  <MailIcon />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="Digite seu e-mail"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="hp-field">
-                <div className="hp-field__label-row"><label htmlFor="senha">Senha</label>{!isRegistering && <span>Área protegida</span>}</div>
-                <input id="senha" name="senha" type="password" autoComplete={isRegistering ? "new-password" : "current-password"} minLength={isRegistering ? 8 : undefined} required value={senha} onChange={(event) => setSenha(event.target.value)} placeholder={isRegistering ? "Crie uma senha segura" : "Digite sua senha"} />
+                <div className="hp-field__label-row">
+                  <label htmlFor="senha">Senha</label>
+                </div>
+                <div className="hp-input-icon">
+                  <LockIcon />
+                  <input
+                    id="senha"
+                    name="senha"
+                    type="password"
+                    autoComplete={isRegistering ? "new-password" : "current-password"}
+                    minLength={isRegistering ? 8 : undefined}
+                    required
+                    value={senha}
+                    onChange={(event) => setSenha(event.target.value)}
+                    placeholder={isRegistering ? "Crie uma senha segura" : "Digite sua senha"}
+                  />
+                </div>
                 {isRegistering && <small>Use pelo menos 8 caracteres.</small>}
               </div>
 
