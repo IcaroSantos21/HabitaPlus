@@ -1,0 +1,298 @@
+/*
+ * Habita+ | Acabamento visual dos três perfis
+ * Base: main após PR #120 (Rafael) — 15/11/2026.
+ * Só CSS: não altera rotas, autenticação, APIs ou lógica do projeto.
+ * Esta folha entra DEPOIS de index.css, para conservar o PR #120.
+ */
+:root {
+  --hp-polish-navy: #103d57;
+  --hp-polish-deep: #082f40;
+  --hp-polish-teal: #087a79;
+  --hp-polish-green: #29bf90;
+  --hp-polish-line: #e0eaf0;
+  --hp-polish-muted: #587083;
+  --hp-polish-shadow: 0 10px 32px rgba(13, 60, 79, .075);
+}
+
+/* Superfície, fluxo e proporção da navegação; compartilhados pelos perfis. */
+.hp-app {
+  background: radial-gradient(circle at 85% -8%, rgba(55, 202, 161, .12), transparent 33rem),
+    linear-gradient(180deg, #f7fafb 0%, #f1f6f8 100%);
+}
+.hp-topbar {
+  border-bottom: 1px solid rgba(255, 255, 255, .15);
+  background: linear-gradient(110deg, #083949 0%, #075a62 56%, #087c73 100%);
+  box-shadow: 0 7px 24px rgba(5, 40, 53, .13);
+}
+.hp-topbar__inner { min-height: 78px; gap: 1.25rem; }
+.hp-topbar__brand { min-width: 0; }
+/* Logo introduzida no PR do Rafael: não a substituímos. */
+.hp-topbar__logo { display: block; width: auto; max-width: min(220px, 30vw); height: 3.65rem; object-fit: contain; }
+.hp-topbar__actions { flex-wrap: nowrap; gap: .75rem; }
+.hp-user-chip { padding: .28rem .85rem .28rem .3rem; border-color: rgba(255,255,255,.21); }
+.hp-user-chip__copy strong { max-width: 13rem; }
+.hp-logout-button { min-height: 2.5rem !important; }
+.hp-app-grid {
+  grid-template-columns: 252px minmax(0, 1fr);
+  gap: clamp(1rem, 1.65vw, 1.75rem);
+  padding-top: clamp(1rem, 1.65vw, 1.65rem);
+}
+.hp-sidebar-wrap { min-width: 0; }
+.hp-sidebar {
+  border-radius: 1.4rem;
+  border-color: rgba(255,255,255,.09);
+  padding: 1.05rem .84rem .8rem;
+  background: radial-gradient(circle at 15% 105%, rgba(35, 194, 155, .18), transparent 17rem),
+    linear-gradient(180deg, #073e51, #06384e 64%, #073346);
+  box-shadow: 0 16px 40px rgba(4, 41, 56, .15);
+}
+.hp-sidebar__nav { gap: .25rem; }
+.hp-sidebar__link {
+  min-height: 2.8rem;
+  border-radius: .8rem;
+  padding: .67rem .85rem;
+  color: #d8e9ed;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.hp-sidebar__link:hover { background: rgba(255,255,255,.1); color: #fff; }
+.hp-sidebar__link.is-active {
+  border-color: rgba(209,255,237,.7);
+  background: linear-gradient(105deg, #abf4d6, #5dd5b1);
+  color: #073d4e;
+  box-shadow: 0 7px 18px rgba(0, 27, 37, .14);
+}
+.hp-sidebar__link.is-active .hp-nav-icon { stroke-width: 2; }
+.hp-sidebar__assistant-hint { background: linear-gradient(125deg, rgba(50, 194, 159, .20), rgba(255,255,255,.055)); }
+.hp-sidebar__assistant-hint strong { font-size: .75rem; }
+.hp-sidebar__assistant-hint div > span { color: #c3e4df; font-size: .66rem; }
+.hp-sidebar__version { color: rgba(223,247,241,.55); }
+.hp-sidebar__home-link { color: #d0ece7; }
+.hp-main { min-width: 0; padding-top: .1rem; }
+.hp-page, .marketplace-page { min-width: 0; }
+.hp-page > :is(section, div), .marketplace-page > :is(section, div) { min-width: 0; }
+.hp-main__footer { margin-top: 2.5rem; color: #617d8f; }
+
+/* Títulos e mensagens: legibilidade consistente fora dos banners. */
+.hp-main > :first-child:not(.hp-login-page) { min-width: 0; }
+.hp-main .hp-page > header:not(.hp-management-hero):not(.hp-resident-hero) h1 {
+  color: var(--hp-polish-navy);
+  font-size: clamp(1.65rem, 2.3vw, 2.3rem);
+  letter-spacing: -.04em;
+}
+.hp-main :is(.hp-page, .marketplace-page) :is(h2, h3) { text-wrap: pretty; }
+.hp-main .hp-page-eyebrow { letter-spacing: .12em; font-weight: 850; }
+.hp-main .text-muted { color: var(--hp-polish-muted) !important; }
+
+/* Painéis do administrador e síndico: mantêm identidades próprias. */
+.hp-page--admin .hp-management-hero {
+  background: radial-gradient(circle at 92% 3%, rgba(127,233,206,.18), transparent 16rem),
+    linear-gradient(112deg, #0a3650 0%, #075e70 54%, #087f79 100%);
+}
+.hp-page--syndic .hp-management-hero {
+  background: radial-gradient(circle at 88% 7%, rgba(132,238,203,.18), transparent 16rem),
+    linear-gradient(110deg, #084252 0%, #08656d 54%, #15937c 100%);
+}
+.hp-page--management .hp-management-hero {
+  min-height: 192px;
+  border-color: rgba(255,255,255,.17);
+  border-radius: 1.4rem;
+  padding: clamp(1.35rem, 2.35vw, 2.1rem);
+  box-shadow: 0 18px 40px rgba(7, 71, 86, .15);
+}
+/* IMPORTANTE: .hp-main h1 do CSS anterior tem maior especificidade. */
+.hp-main .hp-management-hero h1 {
+  color: #fff !important;
+  font-size: clamp(1.85rem, 2.8vw, 2.55rem);
+  line-height: 1.12;
+  text-shadow: 0 1px 2px rgba(0,30,40,.12);
+}
+.hp-page--management .hp-management-hero .hp-page-eyebrow { color: #bcffe5 !important; }
+.hp-page--management .hp-management-hero__copy > p:not(.hp-page-eyebrow) { color: #e4f6f4 !important; max-width: 44rem; }
+.hp-page--management .hp-management-hero__meta { color: #c8f9e8 !important; }
+.hp-page--management .hp-management-hero__building { border-radius: 1.1rem 1.1rem .25rem .25rem; }
+.hp-management-metrics { align-items: stretch; }
+.hp-management-metrics .hp-card, .hp-metric-grid .hp-card {
+  min-height: 139px;
+  border: 1px solid var(--hp-polish-line) !important;
+  box-shadow: var(--hp-polish-shadow) !important;
+}
+.hp-management-metrics .hp-card > p:first-child,
+.hp-metric-grid .hp-card > p:first-child { color: #536d7f; font-weight: 750; }
+.hp-management-metrics .hp-card > p:nth-child(2),
+.hp-metric-grid .hp-card > p:nth-child(2) {
+  color: #0e405b;
+  font-size: clamp(1.48rem, 2.05vw, 2rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.hp-dashboard-panels { align-items: start; }
+.hp-dashboard-panels > * { min-width: 0; }
+.hp-dashboard-panels > .hp-card { height: auto; min-height: 100%; }
+
+/* Morador: painel mais leve, ações rápidas com leitura fácil. */
+.hp-page--resident .hp-resident-hero {
+  min-height: 192px;
+  border: 1px solid #cbe8e0;
+  border-radius: 1.4rem;
+  background: radial-gradient(circle at 78% 15%, rgba(131,231,194,.32), transparent 18rem),
+    linear-gradient(110deg, #fff 0%, #eefaf5 68%, #dcf6eb 100%);
+  box-shadow: var(--hp-polish-shadow);
+}
+.hp-main .hp-page--resident .hp-resident-hero h1 {
+  color: #10425a !important;
+  font-size: clamp(1.85rem, 2.75vw, 2.5rem);
+  line-height: 1.12;
+}
+.hp-page--resident .hp-resident-hero__copy > p:not(.hp-page-eyebrow) { color: #476c79; }
+.hp-page--resident .hp-resident-hero__meta { color: #087e71; }
+.hp-quick-actions { gap: .9rem; }
+.hp-quick-action {
+  min-height: 83px;
+  padding: 1rem;
+  border: 1px solid #deebec;
+  border-radius: 1.1rem;
+  box-shadow: 0 7px 20px rgba(10, 58, 75, .055);
+}
+.hp-quick-action:hover { border-color: #91d7be; box-shadow: 0 13px 26px rgba(10,58,75,.10); }
+.hp-quick-action strong { font-size: .82rem; white-space: normal; }
+.hp-quick-action small { font-size: .68rem; color: #668091; }
+.hp-quick-action__icon { width: 2.6rem; height: 2.6rem; }
+
+/* Marketplace: resolve o título quase invisível mostrado na captura. */
+.hp-main .marketplace-hero {
+  min-height: 205px;
+  border-radius: 1.4rem;
+  border-color: rgba(255,255,255,.18);
+  padding: clamp(1.35rem, 2.7vw, 2.35rem);
+  background: radial-gradient(circle at 85% 0%, rgba(121, 230, 188, .2), transparent 21rem),
+    linear-gradient(112deg, #0b3c56 0%, #12546a 54%, #138477 100%);
+  box-shadow: 0 16px 42px rgba(13,65,82,.13);
+}
+.hp-main .marketplace-hero .marketplace-hero__copy { max-width: 48rem; }
+.hp-main .marketplace-hero h1 {
+  color: #ffffff !important;
+  font-size: clamp(1.85rem, 3.15vw, 2.75rem) !important;
+  font-weight: 900;
+  line-height: 1.12;
+  opacity: 1;
+  text-shadow: 0 2px 10px rgba(0, 28, 42, .18);
+}
+.hp-main .marketplace-hero__eyebrow { color: #c5ffe5 !important; }
+.hp-main .marketplace-hero__copy > p { max-width: 44rem; color: #e4f5fa !important; font-size: .94rem; line-height: 1.7; }
+.hp-main .marketplace-hero__trust { color: #e4f9f2 !important; }
+.hp-main .marketplace-hero__community { color: #e2f8f4 !important; }
+.hp-main .marketplace-hero__button { color: #0c4b65 !important; }
+.marketplace-tabs { border-color: #dce9ed; padding: .43rem; gap: .4rem; border-radius: 1rem; }
+.marketplace-tab { min-height: 2.7rem; padding: .65rem 1.1rem; font-size: .84rem; }
+.marketplace-tab.is-active { background: linear-gradient(105deg, #0c5969, #168c7c); }
+.marketplace-filter-card {
+  border-color: #dce9ed !important;
+  border-radius: 1.25rem !important;
+  box-shadow: var(--hp-polish-shadow) !important;
+}
+.marketplace-filter-heading h2, .marketplace-section-heading h2 { color: #114660 !important; }
+.marketplace-filter-grid { align-items: end; gap: .85rem; }
+.marketplace-filter-grid label { color: #36576a; }
+.marketplace-product-card { border-color: #dee8ee !important; box-shadow: var(--hp-polish-shadow) !important; }
+.marketplace-product-card__title { color: #123f58 !important; }
+.marketplace-product-card__description { color: #586f80 !important; }
+.marketplace-product-card__price { color: #0b746f !important; }
+
+/* Componentes de uso comum: todas as páginas de gestão e do morador. */
+.hp-main .hp-card,
+.hp-main .rounded-xl.border.border-gray-100.bg-white,
+.hp-main .rounded-2xl.border.border-gray-100.bg-white {
+  border-color: var(--hp-polish-line) !important;
+  box-shadow: var(--hp-polish-shadow) !important;
+}
+.hp-main .hp-card h2, .hp-main .hp-card h3 { color: #10435e; }
+.hp-main .hp-card header p { color: #607c8e; font-size: .78rem; }
+.hp-main .hp-button { min-height: 2.65rem; border-radius: .8rem !important; }
+.hp-main .hp-button:disabled { transform: none; box-shadow: none; }
+.hp-main :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 2.75rem;
+  border-color: #ccdce5;
+  border-radius: .75rem;
+  color: #183e53;
+}
+.hp-main :is(input, select, textarea)::placeholder { color: #718698; opacity: 1; }
+.hp-main :is(input, select, textarea):focus-visible,
+.hp-login-page :is(input, button, a):focus-visible {
+  outline: 3px solid rgba(53, 197, 154, .28);
+  outline-offset: 2px;
+}
+.hp-table-wrap { max-width: 100%; border-color: #dce8ec !important; border-radius: 1rem; }
+.hp-table thead { background: #ecf5f6 !important; }
+.hp-table th { color: #426176 !important; font-size: .68rem !important; }
+.hp-table td { color: #244759 !important; }
+.hp-table tbody tr:hover { background: #f0faf7 !important; }
+.hp-main :is(.text-gray-500, .text-gray-600) { color: #647d8e !important; }
+.hp-main .hp-page :where(a:not(.hp-button)):hover { text-decoration-color: #17a180; }
+.hp-main .hp-page [role="alert"] { line-height: 1.55; }
+
+/* Login: apenas refinamento; mantém foto, logo e estrutura novos do Rafael. */
+.hp-login-shell { box-shadow: 0 28px 74px rgba(0, 35, 47, .27); }
+.hp-login-form-side { background: linear-gradient(145deg, #ffffff, #f6faf9); }
+.hp-login-card__heading > p:last-child { color: #5b7788; }
+.hp-login-form :is(input:not([type="checkbox"]), select) { border-color: #cfdfe6; }
+.hp-login-submit { box-shadow: 0 10px 24px rgba(6, 103, 101, .17); }
+
+/* Ajuste progressivo: tablet → celular, sem criar novo comportamento JS. */
+@media (max-width: 1100px) and (min-width: 901px) {
+  .hp-app-grid { grid-template-columns: 220px minmax(0, 1fr); gap: 1rem; }
+  .hp-quick-action { padding: .76rem; }
+  .hp-quick-action__icon { width: 2.2rem; height: 2.2rem; }
+}
+@media (max-width: 900px) {
+  .hp-app-grid { display: flex; flex-direction: column; gap: .9rem; }
+  .hp-mobile-menu-bar { width: 100%; }
+  .hp-sidebar-wrap { width: 100%; }
+  .hp-sidebar { min-height: 0; }
+  .hp-sidebar--sticky { position: static; max-height: none; }
+  .hp-mobile-menu-trigger { min-height: 2.85rem; }
+  .hp-quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .hp-topbar__inner { min-height: 68px; gap: .5rem; padding-inline: .75rem; }
+  .hp-topbar__logo { height: 2.55rem; max-width: 35vw; }
+  .hp-topbar__actions { gap: .4rem; }
+  .hp-user-chip { padding: .1rem; }
+  .hp-logout-button { min-height: 2.2rem !important; padding-inline: .55rem !important; }
+  .hp-app-grid { gap: .75rem; padding-inline: .8rem; }
+  .hp-page { width: 100%; }
+  .hp-page--management .hp-management-hero,
+  .hp-page--resident .hp-resident-hero,
+  .hp-main .marketplace-hero { min-height: 185px; border-radius: 1.05rem; padding: 1.25rem; }
+  .hp-main .hp-management-hero h1, .hp-main .hp-page--resident .hp-resident-hero h1,
+  .hp-main .marketplace-hero h1 { font-size: clamp(1.5rem, 5.6vw, 1.9rem) !important; }
+  .hp-main .marketplace-hero { align-items: flex-start; flex-direction: column; gap: 1rem; }
+  .hp-main .marketplace-hero__actions { align-items: flex-start; }
+  .hp-main .marketplace-hero__art { opacity: .35; right: -3rem; pointer-events: none; }
+  .hp-main .marketplace-hero__copy > p { font-size: .82rem; }
+  .hp-main .marketplace-hero__trust { gap: .55rem .85rem; }
+  .marketplace-tabs { gap: .25rem; }
+  .marketplace-tab { min-height: 2.5rem; padding: .55rem .7rem; font-size: .75rem; }
+  .marketplace-filter-heading { flex-wrap: wrap; }
+  .hp-management-metrics .hp-card, .hp-metric-grid .hp-card { min-height: 120px; }
+  .hp-management-metrics .hp-card > p:nth-child(2),
+  .hp-metric-grid .hp-card > p:nth-child(2) { font-size: clamp(1.25rem, 4vw, 1.65rem); }
+  .hp-quick-action { min-height: 72px; padding: .7rem; }
+  .hp-quick-action strong { font-size: .72rem; }
+  .hp-quick-action small { font-size: .62rem; }
+  .hp-main__footer { gap: .25rem; }
+  .hp-login-shell { border-radius: 1.15rem; }
+  .hp-login-form-side { padding: 1.35rem 1.1rem 1.6rem; }
+}
+@media (max-width: 390px) {
+  .hp-topbar__logo { height: 2.15rem; max-width: 34vw; }
+  .hp-quick-actions { grid-template-columns: 1fr; }
+  .marketplace-tabs { flex-direction: column; }
+  .marketplace-tab { justify-content: flex-start; }
+  .hp-main .marketplace-hero__community { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hp-app :is(.hp-sidebar__link, .hp-button, .hp-quick-action, .marketplace-product-card) {
+    transition-duration: .01ms;
+  }
+}
