@@ -940,11 +940,11 @@ button { -webkit-tap-highlight-color: transparent; }
 .hp-login-backdrop { position: absolute; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; pointer-events: none; }
 .hp-login-backdrop--one { top: -24rem; left: -14rem; width: 55rem; height: 55rem; box-shadow: 0 0 0 4rem rgba(255,255,255,.025),0 0 0 8rem rgba(255,255,255,.02); }
 .hp-login-backdrop--two { right: -12rem; bottom: -28rem; width: 56rem; height: 56rem; box-shadow: 0 0 0 3rem rgba(255,255,255,.025); }
-.hp-login-shell { position: relative; z-index: 1; display: grid; width: min(1180px,100%); min-height: min(760px,calc(100dvh - 3rem)); grid-template-columns: minmax(0,1fr) minmax(400px,.88fr); overflow: hidden; border: 1px solid rgba(255,255,255,.22); border-radius: 2rem; background: #f9fcfd; box-shadow: 0 35px 90px rgba(0,25,38,.32); }
+.hp-login-shell { position: relative; z-index: 1; display: grid; width: min(1180px,100%); min-height: max(640px,min(760px,calc(100dvh - 3rem))); grid-template-columns: minmax(0,1fr) minmax(400px,.88fr); overflow: hidden; border: 1px solid rgba(255,255,255,.22); border-radius: 2rem; background: #f9fcfd; box-shadow: 0 35px 90px rgba(0,25,38,.32); }
 .hp-login-showcase { position: relative; display: flex; min-width: 0; flex-direction: column; overflow: hidden; padding: clamp(1.6rem,4vw,3.2rem); background: linear-gradient(145deg,#073b4e 0%,#075a64 62%,#087d73 100%); color: #fff; }
 .hp-login-showcase::before { position: absolute; top: 26%; right: -12rem; width: 34rem; height: 34rem; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 2.3rem rgba(255,255,255,.035),0 0 0 4.6rem rgba(255,255,255,.025); content: ""; }
 .hp-login-brand { position: relative; z-index: 2; display: inline-flex; width: fit-content; align-items: center; gap: .6rem; color: white; font-size: 1.45rem; font-weight: 900; letter-spacing: -.05em; text-decoration: none; }
-.hp-login-brand > span:last-child > span { color: #77edc1; }
+
 .hp-login-brand-mark { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; color: #9af2cf; }
 .hp-login-brand-mark svg { width: 100%; height: 100%; }
 .hp-login-showcase__copy { position: relative; z-index: 2; max-width: 31rem; margin-top: clamp(2.4rem,6vh,4.7rem); }
@@ -952,11 +952,11 @@ button { -webkit-tap-highlight-color: transparent; }
 .hp-login-kicker i { width: .42rem; height: .42rem; border-radius: 50%; background: #62e5b4; box-shadow: 0 0 0 5px rgba(98,229,180,.13); }
 .hp-login-showcase h1 { margin-top: 1.1rem; color: #fff; font-size: clamp(2.25rem,4.7vw,3.75rem); font-weight: 900; letter-spacing: -.065em; line-height: .99; }
 .hp-login-showcase h1 em { color: #8df1c6; font-style: normal; }
-.hp-login-showcase__copy > p { max-width: 29rem; margin-top: 1rem; color: rgba(240,255,250,.78); font-size: .92rem; line-height: 1.7; }
+.hp-login-showcase__copy > p { max-width: min(29rem,56%); margin-top: 1rem; color: rgba(240,255,250,.78); font-size: .92rem; line-height: 1.7; }
 .hp-login-benefits { display: grid; gap: .7rem; margin-top: 1.55rem; color: rgba(242,255,250,.9); font-size: .76rem; font-weight: 650; }
 .hp-login-benefits span { display: flex; align-items: center; gap: .55rem; }
 .hp-login-benefits b { display: grid; width: 1.25rem; height: 1.25rem; place-items: center; border-radius: 50%; background: rgba(129,242,194,.18); color: #9cf3c9; font-size: .7rem; }
-.hp-login-mascot-wrap { position: absolute; right: 2%; bottom: 2.4rem; width: min(44%,330px); height: 48%; min-height: 240px; }
+.hp-login-mascot-wrap { position: absolute; right: 2%; bottom: 4.5rem;  width: min(44%,330px); height: 48%; min-height: 240px; }
 .hp-login-mascot-glow { position: absolute; right: 12%; bottom: 8%; width: 75%; height: 35%; border-radius: 50%; background: rgba(107,245,194,.3); filter: blur(45px); }
 .hp-login-mascot { position: absolute; right: 0; bottom: -3%; width: 100%; height: 110%; object-fit: contain; filter: drop-shadow(0 18px 28px rgba(0,20,35,.22)); }
 .hp-login-mascot-note { position: absolute; right: 0; bottom: 3%; display: flex; align-items: center; gap: .5rem; border: 1px solid rgba(255,255,255,.25); border-radius: .9rem; padding: .55rem .72rem; background: rgba(5,43,57,.75); box-shadow: 0 8px 24px rgba(0,0,0,.14); backdrop-filter: blur(12px); }
@@ -1204,3 +1204,94 @@ main:not(.hp-login-page) > div > header > p:first-child,
   max-width: 1440px;
   margin-inline: auto;
 }
+
+
+/* ===== Login (versão fiel ao mockup) ===== */
+
+/* Painel esquerdo: foto visível, escurecida só do lado do texto */
+.hp-login-showcase {
+  background:
+    linear-gradient(90deg, rgba(5,52,70,.94) 0%, rgba(6,78,92,.8) 45%, rgba(8,110,110,.28) 100%),
+    linear-gradient(0deg, rgba(5,45,62,.55) 0%, rgba(5,45,62,0) 40%),
+    url("/images/login/condominio.webp") 70% center / cover no-repeat,
+    linear-gradient(145deg, #073b4e 0%, #075a64 62%, #087d73 100%);
+}
+.hp-login-showcase::before { display: none; }
+
+/* Traço verde fino no canto inferior esquerdo */
+.hp-login-showcase::after {
+  position: absolute; bottom: 0; left: 0; width: 56%; height: 27%;
+  background: radial-gradient(ellipse 100% 100% at 100% 0%, transparent 92%, #38c995 93%, #38c995 98%, transparent 99%);
+  content: ""; pointer-events: none;
+}
+
+/* Logo */
+.hp-login-brand__text { display: grid; line-height: 1; }
+.hp-login-brand__name { color: #fff; }
+.hp-login-brand__name > span { color: #77edc1; }
+.hp-login-brand__text small { margin-top: .35rem; color: rgba(255,255,255,.85); font-size: .8rem; font-weight: 500; letter-spacing: .14em; }
+
+/* Lado do formulário */
+.hp-login-card__lock svg { width: .9rem; height: .9rem; color: #15836d; }
+.hp-login-card__heading h2 { font-size: clamp(2.3rem, 3.6vw, 3.1rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.05; }
+.hp-login-card__heading > p:last-child { max-width: 22rem; margin-top: .8rem; color: #4d6579; font-size: 1.02rem; line-height: 1.55; }
+.hp-field label { color: #0e3f5c; font-size: .9rem; font-weight: 800; }
+.hp-field input { min-height: 3.4rem; border-color: #dbe6ec; border-radius: 1.1rem; font-size: .95rem; }
+.hp-input-icon { position: relative; }
+.hp-input-icon svg { position: absolute; top: 50%; left: 1rem; width: 1.15rem; height: 1.15rem; transform: translateY(-50%); color: #254c60; pointer-events: none; }
+.hp-input-icon input { padding-left: 3rem; }
+
+/* Botão: texto centralizado e seta à direita */
+.hp-login-submit { position: relative; justify-content: center; min-height: 3.4rem; border-radius: 1.1rem; font-size: 1rem; }
+.hp-login-submit span { position: absolute; right: 1.1rem; width: auto; height: auto; background: transparent; font-size: 1.4rem; }
+
+/* "Lembrar de mim" e "Esqueceu sua senha?" */
+.hp-login-options { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem; }
+.hp-login-remember { display: inline-flex; align-items: center; gap: .55rem; color: #254c60; font-size: .88rem; cursor: pointer; }
+.hp-login-remember input { width: 1.05rem; height: 1.05rem; accent-color: #087e76; }
+.hp-login-forgot { color: #087e76; font-size: .88rem; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.hp-login-hint { border: 1px solid #d5ece4; border-radius: .85rem; padding: .7rem .85rem; background: #f2fff8; color: #2a6b5b; font-size: .8rem; line-height: 1.5; }
+
+/* Só em telas maiores, para não mexer nos ajustes de celular */
+@media (min-width: 641px) {
+  .hp-login-brand { gap: .8rem; font-size: 2.8rem; }
+  .hp-login-brand-mark { width: 4.2rem; height: 4.2rem; }
+  .hp-login-showcase__copy > p { max-width: 22rem; font-size: 1rem; }
+  .hp-login-card__heading { margin-top: 2rem; }
+  .hp-login-form { gap: 1.15rem; margin-top: 2rem; }
+}
+
+/* Logo do login */
+.hp-login-logo { display: block; width: clamp(11rem, 22vw, 17rem); height: auto; }
+
+/* Login: remove o arco verde e sobe o texto */
+.hp-login-showcase::after { display: none; }
+
+@media (min-width: 901px) {
+  .hp-login-showcase__copy { margin-top: 2rem; }
+}
+
+/* Menu lateral fixo ao rolar a página */
+@media (min-width: 901px) {
+  .hp-sidebar-wrap { align-self: stretch; }
+}
+
+/* Logo do topo */
+.hp-topbar__logo { display: block; width: auto; max-width: 100%; height: 4rem; }
+@media (max-width: 640px) { .hp-topbar__logo { height: 2.4rem; } }
+
+/* Menu sem o bloco da marca: aproxima o título do topo */
+.hp-sidebar__section-label { margin-top: .4rem; }
+
+/* Cabeçalho do síndico e do administrador: fundo escuro, texto claro */
+.hp-page--admin .hp-management-hero .hp-page-eyebrow,
+.hp-page--syndic .hp-management-hero .hp-page-eyebrow { color: #9bf2cf; }
+
+.hp-page--admin .hp-management-hero h1,
+.hp-page--syndic .hp-management-hero h1 { color: #fff; }  
+
+.hp-page--admin .hp-management-hero__copy > p:not(.hp-page-eyebrow),
+.hp-page--syndic .hp-management-hero__copy > p:not(.hp-page-eyebrow) { color: rgba(236, 252, 248, .92); }
+
+.hp-page--admin .hp-management-hero__meta,
+.hp-page--syndic .hp-management-hero__meta { color: #a8f3d6; }
