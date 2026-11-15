@@ -40,30 +40,13 @@ function NavIcon({ name }) {
   );
 }
 
-function BrandMark() {
-  return (
-    <span className="hp-brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 40 40" fill="none">
-        <path d="M5 18.2 20 6l15 12.2V34H5V18.2Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
-        <path d="M14 34V21h12v13M16 13h8M20 10v6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M29 7.5h5v5" stroke="#75F0C5" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
-  );
-}
 
-function Sidebar({ brand = "Habita+", links = [], footer, className = "", onNavigate }) {
+
+function Sidebar({ links = [], footer, className = "", onNavigate }) {
   return (
     <aside className={`hp-sidebar ${className}`}>
-      <div className="hp-sidebar__brand">
-        <BrandMark />
-        <div className="min-w-0">
-          <p className="hp-sidebar__brand-name">{brand}</p>
-          <p className="hp-sidebar__brand-caption">Gestão condominial inteligente</p>
-        </div>
-      </div>
 
-      <div className="hp-sidebar__section-label">MENU PRINCIPAL</div>
+      
       <nav aria-label="Navegação lateral" className="hp-sidebar__nav">
         {links.map((link) => (
           <NavLink
